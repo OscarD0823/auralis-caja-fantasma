@@ -16,8 +16,8 @@ for (const icon of manifest.icons) {
   assert.equal(bytes.readUInt32BE(16), size);
   assert.equal(bytes.readUInt32BE(20), size);
 }
-const scope = "https://example.test/Caja-Fantasma/";
-const shell = '<script src="/Caja-Fantasma/assets/app.js"></script><link href="/Caja-Fantasma/assets/app.css">';
+const scope = "https://example.test/auralis-caja-fantasma/";
+const shell = '<script src="/auralis-caja-fantasma/assets/app.js"></script><link href="/auralis-caja-fantasma/assets/app.css">';
 const network = new Map([[scope, shell], [scope + "assets/app.js", "app code"], [scope + "assets/app.css", "app styles"], ...["manifest.webmanifest", "icons/app-192.png", "icons/app-512.png"].map((path) => [scope + path, "resource"])]);
 const records = new Map();
 const events = new Map();

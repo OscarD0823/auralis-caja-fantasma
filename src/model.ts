@@ -205,18 +205,18 @@ export type CountdownTransitionSnapshot = {
   progress: number;
 };
 
-export const APP_VERSION = "1.23.0";
+export const APP_VERSION = "1.23.1";
 export const AUTHOR = "OscarD0823";
 export const AUTHOR_PROFILE_URL = `https://github.com/${AUTHOR}`;
 export const DEFAULT_CHARACTER_ID = "character-main";
 export const GAME_DAY_TIME_ZONE = "America/Bogota";
 export const GAME_DAY_RESET_HOUR = 8;
-export const REPOSITORY_URL = "https://github.com/OscarD0823/Caja-Fantasma";
+export const REPOSITORY_URL = "https://github.com/OscarD0823/auralis-caja-fantasma";
 export const RELEASES_DOWNLOAD_URL = `${REPOSITORY_URL}/releases/latest`;
 export const WINDOWS_DOWNLOAD_URL = RELEASES_DOWNLOAD_URL;
 export const ANDROID_APK_URL = RELEASES_DOWNLOAD_URL;
-export const WEB_APP_URL = "https://oscard0823.github.io/Caja-Fantasma/";
-export const REMOTE_CATALOG_URL = "https://raw.githubusercontent.com/OscarD0823/Caja-Fantasma/main/catalog/visions.json";
+export const WEB_APP_URL = "https://oscard0823.github.io/auralis-caja-fantasma/";
+export const REMOTE_CATALOG_URL = "https://raw.githubusercontent.com/OscarD0823/auralis-caja-fantasma/main/catalog/visions.json";
 // Gravedad terminó y comenzó su espera a las 16:52:30 de Colombia del 10/09/2026.
 export const VISION_CYCLE_WAIT_STARTED_AT = "2026-09-10T21:52:30.000Z";
 // Las instalaciones nuevas aprenden únicamente de los datos añadidos por la persona.

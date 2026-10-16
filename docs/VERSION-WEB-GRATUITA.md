@@ -2,7 +2,7 @@
 
 ## Opción preparada: GitHub Pages
 
-La interfaz se publica como un sitio estático en `https://oscard0823.github.io/Caja-Fantasma/`. El flujo `.github/workflows/web-pages.yml` ejecuta las mismas validaciones del programa, compila con la ruta correcta del repositorio y publica el resultado después de cada cambio en `main` o cuando se ejecuta manualmente.
+La interfaz se publica como un sitio estático en `https://oscard0823.github.io/auralis-caja-fantasma/`. El flujo `.github/workflows/web-pages.yml` ejecuta las mismas validaciones del programa, compila con la ruta correcta del repositorio y publica el resultado después de cada cambio en `main` o cuando se ejecuta manualmente.
 
 GitHub Pages está disponible sin costo para este repositorio público. No se configura dominio de pago, base de datos, Worker, Firebase ni otro servicio facturable.
 

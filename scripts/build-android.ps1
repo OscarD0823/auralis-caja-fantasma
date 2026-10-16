@@ -57,7 +57,7 @@ $AndroidStrings = Join-Path $ProjectRoot "src-tauri\gen\android\app\src\main\res
 $AndroidProductName = ((Get-Content -Raw (Join-Path $ProjectRoot "src-tauri\tauri.conf.json") | ConvertFrom-Json).productName)
 $AndroidProductName = [Security.SecurityElement]::Escape($AndroidProductName)
 [IO.File]::WriteAllText($AndroidStrings, "<resources><string name=`"app_name`">$AndroidProductName</string><string name=`"main_activity_title`">$AndroidProductName</string></resources>`n", (New-Object Text.UTF8Encoding($false)))
-& $Node $TauriCli icon (Join-Path $ProjectRoot "src-tauri\icons\auralis.svg")
+& $Node $TauriCli icon (Join-Path $ProjectRoot "src-tauri\icons\source.svg")
 if ($LASTEXITCODE -ne 0) { throw "No se pudieron generar los iconos de la aplicación." }
 # Tauri writes directly to the initialized Android project's resources.
 $AndroidIcon = Join-Path $ProjectRoot "src-tauri\gen\android\app\src\main\res\mipmap-xxxhdpi\ic_launcher.png"

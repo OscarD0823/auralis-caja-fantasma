@@ -118,7 +118,7 @@ fn finish_desktop_close(app: tauri::AppHandle, exit_app: bool) -> Result<(), Str
 }
 
 #[cfg(desktop)]
-const REPOSITORY: &str = "OscarD0823/Caja-Fantasma";
+const REPOSITORY: &str = "OscarD0823/auralis-caja-fantasma";
 #[cfg(desktop)]
 const CATALOG_PATH: &str = "catalog/visions.json";
 #[cfg(desktop)]

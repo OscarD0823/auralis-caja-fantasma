@@ -2,7 +2,7 @@
 
 ## Versión 1.22.2
 
-[Descargar instalador](Caja-Fantasma-1.22.2-Instalador.exe) · [Último lanzamiento](https://github.com/OscarD0823/Caja-Fantasma/releases/latest) · [SHA-256](SHA256SUMS.txt)
+[Descargar instalador](Caja-Fantasma-1.22.2-Instalador.exe) · [Último lanzamiento](https://github.com/OscarD0823/auralis-caja-fantasma/releases/latest) · [SHA-256](SHA256SUMS.txt)
 
 Windows 10/11 x64. Ejecuta el instalador sobre la versión anterior sin desinstalarla para conservar el progreso. Solo incluye Caja Fantasma y su desinstalador; si falta WebView2, descarga el componente oficial de Microsoft necesario para mostrar la interfaz.
 

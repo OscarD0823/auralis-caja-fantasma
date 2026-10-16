@@ -3,11 +3,10 @@ import { copyFileSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-// Package the original Auralis vector identity for every platform.
+// Package the recognizable Caja Fantasma identity for every platform.
 const root = resolve(import.meta.dirname, "..");
-const source = join(root, "src-tauri/icons/auralis.svg");
-// Auralis SVG is the reproducible identity source; chest rendering is a
-// separate animation asset and no longer overwrites the application's logo.
+const source = join(root, "src-tauri/icons/source.svg");
+// Preserve the original chest artwork across web, PC and Android.
 const cli = join(root, "node_modules/@tauri-apps/cli/tauri.js");
 const temporary = mkdtempSync(join(tmpdir(), "caja-fantasma-icons-"));
 const run = (args) => execFileSync(process.execPath, [cli, "icon", ...args], { cwd: root, stdio: "inherit" });

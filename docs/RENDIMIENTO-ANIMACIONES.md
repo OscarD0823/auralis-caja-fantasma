@@ -13,7 +13,7 @@
 
 Reproducción real en el laboratorio aislado: iniciar `pnpm dev --host 127.0.0.1 --port 1427` y ejecutar `node scripts/check-opening-playback.mjs`. Comprueba vídeo, pausa en segundo plano, salida al menú, fallback, movimiento reducido y pausa del cofre pequeño fuera de pantalla; usa solamente datos simulados.
 
-Web de producción: compilar con `VITE_WEB_BASE=/Caja-Fantasma/`, servir con `vite preview` usando la misma base en el puerto 1428 y ejecutar `node scripts/check-web-release.mjs`. Comprueba la apertura y el cofre del contador a 1320 × 850, la caché activa, una respuesta parcial MP4 de 1.024 bytes (206) y la conservación de un punto ficticio al recargar. Usa un perfil temporal sin datos personales. También admite la URL pública de GitHub Pages.
+Web de producción: compilar con `VITE_WEB_BASE=/auralis-caja-fantasma/`, servir con `vite preview` usando la misma base en el puerto 1428 y ejecutar `node scripts/check-web-release.mjs`. Comprueba la apertura y el cofre del contador a 1320 × 850, la caché activa, una respuesta parcial MP4 de 1.024 bytes (206) y la conservación de un punto ficticio al recargar. Usa un perfil temporal sin datos personales. También admite la URL pública de GitHub Pages.
 
 El benchmark usa un perfil aislado de Edge a 390 × 844 y CPU limitada ×4. No abre datos personales; sus tiempos no son FPS de un teléfono real. Algunos motores headless no informan de capas GPU.
 

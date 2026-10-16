@@ -8,9 +8,9 @@ Tu seguimiento de recompensas, cajas y módulos Brillantes de Once Human, en **P
 
 | Plataforma | Acceso | Qué elegir |
 | --- | --- | --- |
-| Windows | [Descargar para PC](https://github.com/OscarD0823/Caja-Fantasma/releases/latest) | En **Assets**, el archivo `Caja-Fantasma-…-Instalador.exe`. |
-| Web | [Abrir Caja Fantasma](https://oscard0823.github.io/Caja-Fantasma/) | Sin instalación. También puedes instalarla como app desde el aviso del navegador. |
-| Android | [Descargar APK](https://github.com/OscarD0823/Caja-Fantasma/releases/latest) | En **Assets**, `Caja-Fantasma-Android-….apk`. Android 8 o superior, ARM64. |
+| Windows | [Descargar para PC](https://github.com/OscarD0823/auralis-caja-fantasma/releases/latest) | En **Assets**, el archivo `Caja-Fantasma-…-Instalador.exe`. |
+| Web | [Abrir Caja Fantasma](https://oscard0823.github.io/auralis-caja-fantasma/) | Sin instalación. También puedes instalarla como app desde el aviso del navegador. |
+| Android | [Descargar APK](https://github.com/OscarD0823/auralis-caja-fantasma/releases/latest) | En **Assets**, `Caja-Fantasma-Android-….apk`. Android 8 o superior, ARM64. |
 
 Las descargas llevan a la **última versión publicada**, no a versiones en preparación. Los archivos también están organizados en [Programa](Programa/).
 

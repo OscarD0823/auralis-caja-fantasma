@@ -2,7 +2,7 @@
 
 ## Versión 1.22.2
 
-[Descargar APK](Caja-Fantasma-Android-1.22.2.apk) · [Último lanzamiento](https://github.com/OscarD0823/Caja-Fantasma/releases/latest) · [SHA-256](SHA256SUMS.txt)
+[Descargar APK](Caja-Fantasma-Android-1.22.2.apk) · [Último lanzamiento](https://github.com/OscarD0823/auralis-caja-fantasma/releases/latest) · [SHA-256](SHA256SUMS.txt)
 
 Android 8+ / API 26, ARM64. Versión 1.22.2, `versionCode` 1022002. Firma RSA 4096 del proyecto, con esquemas v2/v3 y el certificado habitual de actualización. También actualiza las APK de prueba anteriores.
 

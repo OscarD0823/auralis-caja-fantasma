@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Check, Download, RefreshCw, ShieldCheck, TriangleAlert } from "lucide-react";
-import GameLogoMark from "./AuralisLogo";
+import GameLogoMark from "./GameLogoMark";
 import { translate, type UiLanguage } from "./i18n";
 import useDialogFocus from "./useDialogFocus";
 

@@ -5,9 +5,9 @@ import { join } from "node:path";
 import { withChestBrowser } from "./isolated-chest-browser.mjs";
 
 // Production smoke test in a fresh private profile, never the user's tabs/data.
-const url = new URL(process.argv[2] ?? "http://127.0.0.1:1428/Caja-Fantasma/");
+const url = new URL(process.argv[2] ?? "http://127.0.0.1:1428/auralis-caja-fantasma/");
 assert(["127.0.0.1", "localhost", "oscard0823.github.io"].includes(url.hostname));
-if (url.hostname === "oscard0823.github.io") assert.equal(url.pathname, "/Caja-Fantasma/");
+if (url.hostname === "oscard0823.github.io") assert.equal(url.pathname, "/auralis-caja-fantasma/");
 const output = mkdtempSync(join(tmpdir(), "caja-fantasma-web-release-"));
 await withChestBrowser(join(output, "isolated-profile"), 1320, 850, async (call, on) => {
   const exceptions = [];

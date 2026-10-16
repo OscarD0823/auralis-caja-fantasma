@@ -57,7 +57,7 @@ import OverlayPreviewLab from "./OverlayPreviewLab";
 import AppUpdater from "./Updater";
 import WebInstallNotice from "./WebInstallNotice";
 import DevicePresence from "./DevicePresenceStrip";
-import GameLogoMark from './AuralisLogo';
+import GameLogoMark from './GameLogoMark';
 import { ShinyModuleMark } from "./GameLogoMark";
 import ConsoleGlyph from "./ConsoleGlyph";
 import { recentConnectedDevices, type DeviceKind } from "./devicePresence";
@@ -161,7 +161,7 @@ type BackgroundSyncStatus = {
   connectedDevices?: string[];
 };
 
-const REMOTE_CATALOG_API_URL = "https://api.github.com/repos/OscarD0823/Caja-Fantasma/contents/catalog/visions.json?ref=main";
+const REMOTE_CATALOG_API_URL = "https://api.github.com/repos/OscarD0823/auralis-caja-fantasma/contents/catalog/visions.json?ref=main";
 const PLATFORM = runtimePlatform(isTauri(), navigator.userAgent);
 const IS_ANDROID = PLATFORM === "android";
 const IS_WEB = PLATFORM === "web";

@@ -12,4 +12,4 @@ No cambia el cálculo de puntos, el historial de cajas, los personajes, los mód
 
 **Para actualizar:** instala sobre la versión anterior, sin desinstalar. Windows dispone del actualizador firmado; Android pide aceptar la instalación. En la web, vuelve a abrir la página para recibir la interfaz nueva. Exportar un respaldo local sigue siendo recomendable.
 
-[Descargas](https://github.com/OscarD0823/Caja-Fantasma/releases/latest) · [Web](https://oscard0823.github.io/Caja-Fantasma/) · [Verificación de rendimiento](../RENDIMIENTO-ANIMACIONES.md)
+[Descargas](https://github.com/OscarD0823/auralis-caja-fantasma/releases/latest) · [Web](https://oscard0823.github.io/auralis-caja-fantasma/) · [Verificación de rendimiento](../RENDIMIENTO-ANIMACIONES.md)

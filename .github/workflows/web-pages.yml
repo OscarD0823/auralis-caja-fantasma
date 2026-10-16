@@ -35,7 +35,7 @@ jobs:
       - name: Compilar para GitHub Pages
         run: pnpm run build
         env:
-          VITE_WEB_BASE: /Caja-Fantasma/
+          VITE_WEB_BASE: /auralis-caja-fantasma/
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

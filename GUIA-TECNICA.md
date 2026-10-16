@@ -2,7 +2,7 @@
 
 Aplicación para Windows, Android y navegador creada por [OscarD0823](https://github.com/OscarD0823). Registra las recompensas reclamadas hasta obtener la Caja Fantasma, muestra la Rueda Visional pública y aprende del historial personal de cajas.
 
-Repositorio del proyecto comunitario: <https://github.com/OscarD0823/Caja-Fantasma>
+Repositorio del proyecto comunitario: <https://github.com/OscarD0823/auralis-caja-fantasma>
 
 La versión web gratuita está preparada para GitHub Pages y su alcance de guardado está documentado en [`docs/VERSION-WEB-GRATUITA.md`](docs/VERSION-WEB-GRATUITA.md). La auditoría del catálogo moderno se encuentra en [`docs/CATALOGO-MODS-ACTUALES.md`](docs/CATALOGO-MODS-ACTUALES.md).
 
@@ -64,7 +64,7 @@ El modo desarrollador incluye un laboratorio visual que reutiliza la misma inter
 
 ## Actualizaciones
 
-El actualizador sigue el patrón de [Fortuna Real](https://github.com/OscarD0823/Fortuna-Real): Windows y Android consultan el mismo `latest.json` en GitHub Releases al abrir, cada 15 minutos, al volver Internet y al recuperar el foco. Windows descarga el instalador, verifica su firma, lo instala y vuelve a abrir la aplicación. Android descarga la APK desde la app, verifica su SHA-256 y entrega el paquete firmado al instalador del sistema; Android exige que la persona confirme esa pantalla y puede solicitar una sola vez el permiso «Instalar apps desconocidas». No es necesario buscar ni descargar manualmente las versiones siguientes. Sin Internet, el programa inicia normalmente con los datos locales.
+El actualizador sigue el patrón de [Fortuna Real](https://github.com/OscarD0823/auralis-fortuna-real): Windows y Android consultan el mismo `latest.json` en GitHub Releases al abrir, cada 15 minutos, al volver Internet y al recuperar el foco. Windows descarga el instalador, verifica su firma, lo instala y vuelve a abrir la aplicación. Android descarga la APK desde la app, verifica su SHA-256 y entrega el paquete firmado al instalador del sistema; Android exige que la persona confirme esa pantalla y puede solicitar una sola vez el permiso «Instalar apps desconocidas». No es necesario buscar ni descargar manualmente las versiones siguientes. Sin Internet, el programa inicia normalmente con los datos locales.
 
 La clave privada y su contraseña DPAPI permanecen fuera del repositorio, en el perfil local de Windows. El repositorio contiene únicamente la clave pública necesaria para verificar instalaciones.
 

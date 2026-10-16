@@ -12,7 +12,7 @@ La aplicación incluye imágenes de referencia proporcionadas para identificar e
 
 El emblema espectral de Caja Fantasma y la geometría de su apertura son gráficos propios del proyecto, no un logotipo oficial del juego.
 
-La licencia MIT cubre el código propio; no otorga derechos sobre marcas, capturas ni imágenes de terceros. Quien redistribuya el programa debe revisar por separado esos derechos. Las solicitudes de atribución o retirada de imágenes pueden presentarse en los [issues del proyecto](https://github.com/OscarD0823/Caja-Fantasma/issues).
+La licencia MIT cubre el código propio; no otorga derechos sobre marcas, capturas ni imágenes de terceros. Quien redistribuya el programa debe revisar por separado esos derechos. Las solicitudes de atribución o retirada de imágenes pueden presentarse en los [issues del proyecto](https://github.com/OscarD0823/auralis-caja-fantasma/issues).
 
 ## Estimaciones y datos
 
