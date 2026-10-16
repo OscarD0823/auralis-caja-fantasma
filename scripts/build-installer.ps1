@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([switch]$Publish)
+param([switch]$Publish,[string]$OutputDirectory='')
 
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Security
@@ -10,7 +10,7 @@ $Version = (Get-Content -Raw (Join-Path $ProjectRoot "src-tauri\tauri.conf.json"
 $SigningKeyPath = Join-Path $env:USERPROFILE ".tauri\fortuna-real.key"
 $SigningPasswordPath = "$SigningKeyPath.password.dpapi"
 $ReleaseRepository = "OscarD0823/Caja-Fantasma"
-$OutputDirectory = Join-Path $ProjectRoot "Entrega"
+$OutputDirectory = if($OutputDirectory){[IO.Path]::GetFullPath($OutputDirectory)}else{Join-Path $ProjectRoot "Entrega"}
 $Node = (Get-Command node.exe -ErrorAction Stop).Source
 $TauriCli = Join-Path $ProjectRoot "node_modules\@tauri-apps\cli\tauri.js"
 

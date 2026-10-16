@@ -146,7 +146,10 @@ assert(openingStyles.includes("counter-hinge-cycle") && openingStyles.includes("
 const chestMaterials = await read("src/ChestMaterials.tsx");
 const chestRelief = await read("src/ChestRelief.tsx");
 const emblemRenderer = await read("scripts/render-chest-emblem.mjs");
-assert(crate.includes("ChestMaterialDefs") && emblemRenderer.includes('"src/CrateOpeningArt.tsx"') && (await read("src/GameLogoMark.tsx")).includes('"./assets/chest-emblem.png"'), "The app logo must be rendered from the actual assembled chest, not a separate flattened drawing.");
+assert(crate.includes("ChestMaterialDefs") && emblemRenderer.includes('"src/CrateOpeningArt.tsx"'), "The original chest animation retains its assembled model.");
+assert((await read("src/AuralisLogo.tsx")).includes("'./assets/auralis-brand.png'"), "The current logo uses the Auralis identity.");
+const brand=readFileSync(resolve(root,'src/assets/auralis-brand.png'));
+assert.equal(brand.readUInt32BE(16),512);assert.equal(brand.readUInt32BE(20),512);
 assert(chestRelief.includes("vault-corner-armor") && chestRelief.includes("vault-raised-post") && chestRelief.includes("vault-lock-bevel") && chestRelief.includes("vault-lock-groove"), "Keep the reference chest's raised bronze corners, inset steel panels and central crystal bezel.");
 assert(chestMaterials.includes("patternTransform") && chestMaterials.includes("chest-countersunk-bolt"), "Surface wear and countersunk bolts must remain static, scalable vector details.");
 for (const detail of ["machining-corner", "machining-post", "machining-panel", "machining-rail", "machining-lock", "machining-latch", "chest-hex-socket", "chest-exposed-edge", "vault-roof-machining", "vault-interior-machining"]) {
@@ -209,7 +212,7 @@ assert(tour.includes('role="dialog"') && tour.includes("Registra tus recompensas
 const Update = await loadComponent("src/UpdateExperience.tsx");
 for (const progress of [null, 72]) {
   const experience = renderToStaticMarkup(createElement(Update, { status: "downloading", progress, route: { current: "1.21.8", next: "1.22.0" }, language: "en", android: true, notes: "", error: "", dismiss() {}, install() {} }));
-  assert(experience.includes("Updating Caja Fantasma") && experience.includes('role="progressbar"'));
+  assert(experience.includes("Updating Auralis Caja Fantasma") && experience.includes('role="progressbar"'));
   assert.equal(experience.includes("aria-valuenow"), progress !== null, "Unknown download progress must not invent a percentage.");
 }
 const Counter = await loadComponent("src/CounterChestArt.tsx");

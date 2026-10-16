@@ -124,7 +124,7 @@ export default function AppUpdater({ beforeInstall, language = "es" }: { beforeI
       setVisible(true);
       void install();
     } catch (reason) {
-      console.info("[Caja Fantasma] Comprobación automática aplazada.", reason);
+      console.info("[Auralis Caja Fantasma] Comprobación automática aplazada.", reason);
     } finally {
       checking.current = false;
     }

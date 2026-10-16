@@ -28,7 +28,7 @@ function WebInstallNotice({ pwa, language, variant = "notice" }: { pwa: PwaInsta
     <img className="web-install-logo" src={`${import.meta.env.BASE_URL}icons/app-192.png`} width={42} height={42} alt="" aria-hidden="true" />
     <div className="web-install-copy">
       <span className="eyebrow">{tx("VERSIÓN WEB INSTALABLE", "INSTALLABLE WEB APP")}</span>
-      <h2>{pwa.installed ? tx("Página instalada", "Web app installed") : tx("Instala Caja Fantasma", "Install Caja Fantasma")}</h2>
+      <h2>{pwa.installed ? tx("Página instalada", "Web app installed") : tx("Instala Auralis Caja Fantasma", "Install Auralis Caja Fantasma")}</h2>
       <p>{pwa.installed ? tx("Ábrela desde su icono y usa tus datos guardados sin conexión.", "Open it from its icon and use saved data offline.") : tx("Ten su icono en tu PC o celular y ábrela como una app. Es gratis.", "Put its icon on your PC or phone and open it as an app. It's free.")}</p>
     </div>
     <div className="web-install-actions">

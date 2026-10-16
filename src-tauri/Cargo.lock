@@ -396,7 +396,7 @@ dependencies = [
 
 [[package]]
 name = "caja-fantasma-once-human"
-version = "1.22.2"
+version = "1.23.0"
 dependencies = [
  "base64 0.22.1",
  "minisign-verify",

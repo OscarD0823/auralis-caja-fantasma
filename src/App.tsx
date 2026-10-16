@@ -57,7 +57,8 @@ import OverlayPreviewLab from "./OverlayPreviewLab";
 import AppUpdater from "./Updater";
 import WebInstallNotice from "./WebInstallNotice";
 import DevicePresence from "./DevicePresenceStrip";
-import GameLogoMark, { ShinyModuleMark } from "./GameLogoMark";
+import GameLogoMark from './AuralisLogo';
+import { ShinyModuleMark } from "./GameLogoMark";
 import ConsoleGlyph from "./ConsoleGlyph";
 import { recentConnectedDevices, type DeviceKind } from "./devicePresence";
 import { GRAVITY_EVENT_IMAGE_A, GRAVITY_EVENT_IMAGE_B, LUNAR_EVENT_IMAGE, SYMBIOSIS_EVENT_IMAGE, visionVisualImage, visionVisualTheme } from "./assets";
@@ -373,7 +374,7 @@ const CHANGELOG = [
     items: [
       "Mods Brillantes conserva exclusivamente los 1.618 registros del sistema actual: 809 normales de nivel 1 a 17 y sus 809 versiones Brillantes.",
       "La apertura incorpora una secuencia cinematográfica de verificación, ruta de energía, impacto de la cerradura y apertura holográfica sin partir la imagen de la caja.",
-      "El emblema de Caja Fantasma y los iconos de Windows se rediseñaron alrededor de la caja, la cerradura espectral y el nivel 17.",
+      "El emblema de Auralis Caja Fantasma y los iconos de Windows se rediseñaron alrededor de la caja, la cerradura espectral y el nivel 17.",
       "La configuración de la ventana flotante aparece junto al seguimiento; la actividad diaria y el ranking quedaron debajo de todas las recompensas.",
       "El selector Español / English está disponible directamente en la barra del contador.",
       "El proyecto queda preparado para una publicación web gratuita en GitHub Pages, con guardado local por navegador y una ruta documentada para nube opcional sin Firebase.",
@@ -527,7 +528,7 @@ const CHANGELOG = [
     date: "12 de septiembre de 2026",
     title: "Historial de rondas de puntos",
     items: [
-      "El cuadro principal muestra los puntos de la ronda actual sin alterar el progreso total de la Caja Fantasma.",
+      "El cuadro principal muestra los puntos de la ronda actual sin alterar el progreso total de la Auralis Caja Fantasma.",
       "Al comenzar una rueda, la ronda anterior se guarda con fecha, recompensas y desglose, y el conteo parcial vuelve a cero.",
       "El botón Guardar ronda permite cerrar el conteo actual manualmente y consultar debajo cuántas rondas y puntos se llevan.",
       "En Gravedad, la ronda se guarda automáticamente un minuto después de que termina y desaparece la Ballena.",
@@ -603,7 +604,7 @@ const CHANGELOG = [
       "La ventana flotante muestra la imagen del evento seleccionado y adopta una silueta propia para Lunar, Gravedad y Simbiosis.",
       "La Ballena ahora vive únicamente en la ventana flotante: llega desde la izquierda en el minuto 15 de Gravedad y se coloca debajo del contador.",
       "Su rayo funciona como barra y reloj independiente durante los 15 minutos restantes más 5 minutos adicionales; luego se apaga y la Ballena sale por la derecha.",
-      "El instalador fue auditado para incluir solo Caja Fantasma, su desinstalador y la dependencia oficial WebView2 cuando haga falta.",
+      "El instalador fue auditado para incluir solo Auralis Caja Fantasma, su desinstalador y la dependencia oficial WebView2 cuando haga falta.",
     ],
   },
   {
@@ -1081,6 +1082,13 @@ export default function App() {
   }, [saveAndClose]);
 
   useEffect(() => {
+    const flush=()=>{if(!personalRestoreReady)return;try{saveState(currentStateRef.current);}catch{setToast(tx('No se pudo guardar: exporta una copia antes de cerrar.','Could not save: export a backup before closing.'));}};
+    const hidden=()=>{if(document.visibilityState==='hidden')flush();};
+    window.addEventListener('pagehide',flush);document.addEventListener('visibilitychange',hidden);
+    return()=>{window.removeEventListener('pagehide',flush);document.removeEventListener('visibilitychange',hidden);};
+  },[personalRestoreReady,tx]);
+
+  useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
 
@@ -1202,14 +1210,14 @@ export default function App() {
               return result;
             } catch (error) {
               if (error instanceof Error && error.name === "AbortError") {
-                throw new Error(tx("El navegador no pudo entrar al puente del PC. Mantén Caja Fantasma abierta y permite el acceso a la red local cuando lo solicite.", "The browser could not reach the PC bridge. Keep Caja Fantasma open and allow local network access when prompted."));
+                throw new Error(tx("El navegador no pudo entrar al puente del PC. Mantén Auralis Caja Fantasma abierta y permite el acceso a la red local cuando lo solicite.", "The browser could not reach the PC bridge. Keep Auralis Caja Fantasma open and allow local network access when prompted."));
               }
               if (error instanceof TypeError) {
                 const permissionState = await localNetworkPermissionState(address);
                 if (permissionState === "denied") {
                   throw new Error(tx("Edge bloqueó el permiso de red local para esta página. Habilítalo desde el icono junto a la dirección y pulsa Volver a conectar.", "Edge blocked local network permission for this page. Enable it from the icon next to the address and select Reconnect."));
                 }
-                throw new Error(tx("No se encontró el puente del PC. Abre Caja Fantasma en Windows, ve a Dispositivos, pulsa Compartir con el celular y luego Volver a conectar aquí.", "The PC bridge was not found. Open Caja Fantasma on Windows, go to Devices, select Share with phone, then select Reconnect here."));
+                throw new Error(tx("No se encontró el puente del PC. Abre Auralis Caja Fantasma en Windows, ve a Dispositivos, pulsa Compartir con el celular y luego Volver a conectar aquí.", "The PC bridge was not found. Open Auralis Caja Fantasma on Windows, go to Devices, select Share with phone, then select Reconnect here."));
               }
               throw error;
             } finally {
@@ -2146,7 +2154,7 @@ export default function App() {
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-mark"><GameLogoMark /></div>
-          <div><strong>Caja Fantasma</strong><span>Once Human · v{APP_VERSION}</span></div>
+          <div><strong>Auralis Caja Fantasma</strong><span>Once Human · v{APP_VERSION}</span></div>
         </div>
 
         <nav aria-label={tx("Navegación principal", "Main navigation")}>
@@ -2202,7 +2210,7 @@ export default function App() {
         </header>
 
         {IS_WEB && <WebInstallNotice pwa={pwa} language={language} />}
-        {tutorialNotice && !introVisible && <div className="tutorial-welcome"><CircleHelp size={20} /><span>{tx("¿Primera vez? Conoce Caja Fantasma en seis pasos.", "First time? Learn Caja Fantasma in six steps.")}</span><button type="button" className="primary compact" onClick={() => setTutorialOpen(true)}>{tx("Ver tutorial", "View tutorial")}</button><button type="button" className="experience-close" aria-label={tx("Ocultar aviso", "Hide notice")} onClick={finishTutorial}><X size={16} /></button></div>}
+        {tutorialNotice && !introVisible && <div className="tutorial-welcome"><CircleHelp size={20} /><span>{tx("¿Primera vez? Conoce Auralis Caja Fantasma en seis pasos.", "First time? Learn Auralis Caja Fantasma in six steps.")}</span><button type="button" className="primary compact" onClick={() => setTutorialOpen(true)}>{tx("Ver tutorial", "View tutorial")}</button><button type="button" className="experience-close" aria-label={tx("Ocultar aviso", "Hide notice")} onClick={finishTutorial}><X size={16} /></button></div>}
 
         {tab === "progress" && (
           <section className="page progress-page">
@@ -2476,7 +2484,7 @@ export default function App() {
             <article className="platform-access-panel panel"><span className="eyebrow">{tx("PC, WEB Y CELULAR", "PC, WEB AND PHONE")}</span><h2>{tx("Tu caja, en cualquier pantalla", "Your crate, on every screen")}</h2><div className="platform-download-actions"><button type="button" className="secondary" onClick={openWindowsDownload}><MonitorUp size={21} /><span><strong>Windows</strong><small>{tx("Descargar para PC", "Download for PC")}</small></span></button><button type="button" className="secondary" onClick={openWebApp}><ExternalLink size={21} /><span><strong>Web</strong><small>{tx("Abrir página web", "Open web app")}</small></span></button><button type="button" className="secondary" onClick={openAndroidDownload}><Smartphone size={21} /><span><strong>Android</strong><small>{tx("Descargar APK", "Download APK")}</small></span></button></div><div className="connection-shortcuts"><a href="#pc-connection">{tx("Conectar con PC", "Connect with PC")}</a><a href="#phone-connection">{tx("Web ↔ Celular sin PC", "Web ↔ Phone without PC")}</a></div></article>
             <article className="device-version-panel panel">
               <div className="device-version-icon"><ShieldCheck size={27} /></div>
-              <div><span className="eyebrow">{tx("VERSIÓN INSTALADA", "INSTALLED VERSION")}</span><h2>Caja Fantasma v{APP_VERSION}</h2><p>{IS_WEB ? tx("Versión web gratuita con guardado local y funcionamiento sin conexión.", "Free web version with local storage and offline support.") : IS_ANDROID ? tx("Aplicación Android ARM64 con actualizaciones verificadas dentro de la app.", "ARM64 Android app with verified in-app updates.") : tx("Aplicación de Windows con actualizaciones firmadas desde GitHub Releases.", "Windows app with signed updates from GitHub Releases.")}</p><small className="version-developer"><Github size={12} aria-hidden="true" /> {tx("Creado por", "Created by")} <strong>{AUTHOR}</strong></small></div>
+              <div><span className="eyebrow">{tx("VERSIÓN INSTALADA", "INSTALLED VERSION")}</span><h2>Auralis Caja Fantasma v{APP_VERSION}</h2><p>{IS_WEB ? tx("Versión web gratuita con guardado local y funcionamiento sin conexión.", "Free web version with local storage and offline support.") : IS_ANDROID ? tx("Aplicación Android ARM64 con actualizaciones verificadas dentro de la app.", "ARM64 Android app with verified in-app updates.") : tx("Aplicación de Windows con actualizaciones firmadas desde GitHub Releases.", "Windows app with signed updates from GitHub Releases.")}</p><small className="version-developer"><Github size={12} aria-hidden="true" /> {tx("Creado por", "Created by")} <strong>{AUTHOR}</strong></small></div>
               <span className="version-current-badge">{tx("ACTUAL", "CURRENT")}</span>
             </article>
 
@@ -2515,7 +2523,7 @@ export default function App() {
               </div>
               {state.settings.localSyncLiveEnabled && <p className="local-live-sync-note"><RadioTower size={15} /> {tx(IS_ANDROID ? "Android mostrará una notificación silenciosa mientras trabaja en segundo plano. Si un dispositivo aparece vacío, se conserva la copia que tenga historial." : "Debe estar activada en ambos dispositivos. Si uno aparece vacío, se conserva automáticamente la copia que tenga historial.", IS_ANDROID ? "Android shows a silent notification while working in the background. If a device appears empty, the copy containing history is preserved." : "Enable it on both devices. If one appears empty, the copy containing history is preserved automatically.")}</p>}
               <p className="local-sync-message" role="status">{localSyncStatus}</p>
-              {IS_WEB && <p className="local-live-sync-note"><RadioTower size={15} /> {tx("Usa aquí la misma IP, puerto y código que muestra Windows para Android. Caja Fantasma debe permanecer abierta y el navegador debe tener permiso de red local.", "Use the same IP, port, and code shown by Windows for Android. Caja Fantasma must stay open and the browser must have local network permission.")}</p>}
+              {IS_WEB && <p className="local-live-sync-note"><RadioTower size={15} /> {tx("Usa aquí la misma IP, puerto y código que muestra Windows para Android. Auralis Caja Fantasma debe permanecer abierta y el navegador debe tener permiso de red local.", "Use the same IP, port, and code shown by Windows for Android. Auralis Caja Fantasma must stay open and the browser must have local network permission.")}</p>}
               <small>{tx("Usa una red Wi‑Fi de confianza o el anclaje USB del teléfono. Los cambios públicos del administrador también viajan del PC al celular mientras estén conectados.", "Use a trusted Wi-Fi network or USB tethering. Public administrator changes also travel from the PC to the phone while connected.")}</small>
             </article>
 
