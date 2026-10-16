@@ -53,6 +53,10 @@ if (-not (Test-Path -LiteralPath $ZipAlign) -or -not (Test-Path -LiteralPath $Ap
 }
 
 $BuildStarted = Get-Date
+$AndroidStrings = Join-Path $ProjectRoot "src-tauri\gen\android\app\src\main\res\values\strings.xml"
+$AndroidProductName = ((Get-Content -Raw (Join-Path $ProjectRoot "src-tauri\tauri.conf.json") | ConvertFrom-Json).productName)
+$AndroidProductName = [Security.SecurityElement]::Escape($AndroidProductName)
+[IO.File]::WriteAllText($AndroidStrings, "<resources><string name=`"app_name`">$AndroidProductName</string><string name=`"main_activity_title`">$AndroidProductName</string></resources>`n", (New-Object Text.UTF8Encoding($false)))
 & $Node $TauriCli icon (Join-Path $ProjectRoot "src-tauri\icons\auralis.svg")
 if ($LASTEXITCODE -ne 0) { throw "No se pudieron generar los iconos de la aplicación." }
 # Tauri writes directly to the initialized Android project's resources.
