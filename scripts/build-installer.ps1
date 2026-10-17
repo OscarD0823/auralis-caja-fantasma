@@ -77,16 +77,20 @@ try {
     }
     $AndroidApkName = "Caja-Fantasma-Android-$Version.apk"
     $AndroidApk = Join-Path $ProjectRoot "Programa\Android\$AndroidApkName"
+    $AndroidManifestTool = Join-Path $PSScriptRoot "android-update-manifest.mjs"
     if (Test-Path -LiteralPath $AndroidApk) {
-        $Manifest.android = [ordered]@{
-            url = "https://github.com/$ReleaseRepository/releases/download/v$Version/$AndroidApkName"
-            sha256 = Get-Sha256Hex $AndroidApk
-            architecture = "arm64-v8a"
-            minimum_android = 8
-        }
+        # Old installed APKs require the original repository alias. GitHub
+        # redirects it to Auralis; changing this URL strands those clients.
+        $AndroidMetadata = & $Node $AndroidManifestTool create $AndroidApk $Version
+        if ($LASTEXITCODE -ne 0) { throw "No se pudo preparar el enlace Android compatible." }
+        $Manifest.android = $AndroidMetadata | ConvertFrom-Json
     }
     $ManifestPath = Join-Path $OutputDirectory "latest.json"
     Write-Utf8NoBom $ManifestPath ($Manifest | ConvertTo-Json -Depth 5)
+    if (Test-Path -LiteralPath $AndroidApk) {
+        & $Node $AndroidManifestTool check $ManifestPath $AndroidApk
+        if ($LASTEXITCODE -ne 0) { throw "La publicación dejaría de ser compatible con las APK instaladas." }
+    }
     Copy-Item -LiteralPath $NotesPath -Destination $OutputDirectory -Force
 
     if ($Publish) {

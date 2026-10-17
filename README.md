@@ -14,6 +14,8 @@ Tu seguimiento de recompensas, cajas y módulos Brillantes de Once Human, en **P
 
 Las descargas llevan a la **última versión publicada**, no a versiones en preparación. Los archivos también están organizados en [Programa](Programa/).
 
+**Actualización de instalaciones anteriores a Auralis:** el manifiesto Android conserva el enlace `OscarD0823/Caja-Fantasma`, que GitHub redirige al repositorio actual. Las APK antiguas validan ese nombre antes de descargar. No se debe ocupar de nuevo el nombre anterior ni sustituir este enlace en `latest.json`; el generador comprueba la compatibilidad y la suma SHA-256. El identificador y el certificado Android se mantienen, por lo que esta actualización se instala sobre la aplicación existente.
+
 **1.22.2 · Cofre fluido y animaciones ligeras:** apertura en vídeo local a 60 FPS y salida continua del fantasma. El cofre del contador conserva el mismo diseño con cerca de un 95 % menos de elementos y se pausa cuando no se ve. No cambia el progreso ni la sincronización. [Qué cambió](docs/versiones/NOTAS-VERSION-1.22.2.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
