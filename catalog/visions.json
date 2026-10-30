@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 56,
-  "updatedAt": "2026-10-05T02:23:26.240Z",
+  "catalogVersion": 57,
+  "updatedAt": "2026-10-30T04:18:30.000Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -50,6 +50,20 @@
       "points": 2,
       "enabled": true,
       "note": "Recompensa del encuentro de Manibus."
+    },
+    {
+      "id": "calamity-tower",
+      "name": "Torre de calamidad",
+      "points": 1,
+      "enabled": true,
+      "note": "Cuenta al reclamar la recompensa."
+    },
+    {
+      "id": "calamity-zone",
+      "name": "Zona de calamidad",
+      "points": 1,
+      "enabled": true,
+      "note": "Cuenta al reclamar la recompensa."
     },
     {
       "id": "dream-zone-invasion",

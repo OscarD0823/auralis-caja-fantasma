@@ -41,6 +41,38 @@ assert.equal(sharedVisionId(invalidDisabledSelection), "lunar", "Si una copia an
 for (const id of ["pro-monolith-boss", "pro-silo", "dream-manibus-challenge", "pro-war", "manibus-manibus", "dream-zone-invasion", "dreamer-light", "dreamer-deep", "dreamer-eternal"]) {
   assert.ok(catalog.proActivities.some((item) => item.id === id), `Falta la recompensa editable ${id}.`);
 }
+const calamityBosses = [
+  { id: "calamity-tower", name: "Torre de calamidad" },
+  { id: "calamity-zone", name: "Zona de calamidad" },
+];
+const calamityActions: PointAction[] = calamityBosses.flatMap((boss) => {
+  const matches = catalog.proActivities.filter((item) => item.id === boss.id);
+  assert.equal(matches.length, 1, `${boss.name} debe aparecer una sola vez en las actividades del mapa.`);
+  const activity = matches[0];
+  assert.equal(activity.name, boss.name);
+  assert.equal(activity.points, 1, `${boss.name} debe sumar un punto por recompensa.`);
+  assert.equal(activity.enabled, true, `${boss.name} debe estar disponible para registrar.`);
+  return Array.from({ length: 3 }, (_, index) => ({
+    id: `${boss.id}-${index}`,
+    activityId: activity.id,
+    activityName: activity.name,
+    points: activity.points,
+    occurredAt: "2026-10-29T15:00:00.000Z",
+  }));
+});
+assert.deepEqual(buildBreakdown(calamityActions).map(({ name, count, points }) => ({ name, count, points })), [
+  { name: "Torre de calamidad", count: 3, points: 3 },
+  { name: "Zona de calamidad", count: 3, points: 3 },
+], "Los dos jefes deben conservar contadores independientes y sumar un punto por registro.");
+const previousBossCatalog = structuredClone(catalog) as Catalog;
+previousBossCatalog.catalogVersion -= 1;
+previousBossCatalog.proActivities = previousBossCatalog.proActivities.filter((activity) => !calamityBosses.some((boss) => boss.id === activity.id));
+const existingBossState = { ...initialState(), catalog: previousBossCatalog, actions: calamityActions };
+const updatedBossState = applyRemoteCatalog(existingBossState, catalog as Catalog);
+assert.ok(calamityBosses.every((boss) => updatedBossState.catalog.proActivities.some((activity) => activity.id === boss.id)));
+assert.strictEqual(updatedBossState.actions, existingBossState.actions, "Actualizar los jefes no debe reemplazar los puntos existentes.");
+assert.strictEqual(updatedBossState.activityHistory, existingBossState.activityHistory);
+assert.strictEqual(updatedBossState.boxes, existingBossState.boxes);
 for (const visionId of ["lunar", "gravity", "symbiosis"]) {
   assert.ok(catalog.visions.some((vision) => vision.id === visionId), `Falta la rueda editable ${visionId}.`);
 }
