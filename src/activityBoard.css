@@ -1,0 +1,112 @@
+/* Keep the recording controls together; histories and overlay editing follow them. */
+.progress-page { width: min(1380px, 100%); padding: 16px 24px 36px; }
+.progress-main .topbar { padding: 14px 24px; }
+.progress-page > .hero-grid { grid-template-columns: minmax(0, 1fr) 220px; gap: 12px; margin-bottom: 16px; }
+.progress-page .progress-hero { min-height: 174px; padding: 16px 20px; }
+.progress-page .hero-copy { width: calc(100% - 112px); }
+.progress-page .hero-copy h2 { margin: 8px 0 5px; font-size: 44px; }
+.progress-page .hero-copy h2 small { font-size: 15px; }
+.progress-page .hero-copy > p { font-size: 11px; line-height: 1.35; }
+.progress-page .hero-copy > .progress-track { height: 12px; margin: 10px 0; }
+.progress-page .hero-actions { gap: 6px; }
+.progress-page .hero-actions > button { min-height: 34px; padding: 6px 9px; font-size: 10px; gap: 5px; }
+.progress-page .hero-actions > button > svg { width: 15px; height: 15px; }
+.progress-page .progress-hero .counter-chest { width: 108px; height: 122px; right: 12px; top: 24px; }
+.progress-page .counter-chest-scene { transform: scale(.28); }
+.progress-page .chance-card { min-height: 0; padding: 14px; }
+.progress-page .chance-card .eyebrow { font-size: 8px; }
+.progress-page .chance-value { margin-top: 9px; font-size: 32px; }
+.progress-page .chance-card > p { margin: 8px 0; font-size: 10px; line-height: 1.4; }
+.progress-page .mini-stats { gap: 6px; }
+.progress-page .mini-stats > span { padding: 6px 8px; }
+.progress-page .mini-stats small { font-size: 8px; }
+.progress-page .mini-stats strong { font-size: 15px; }
+
+.activity-board { display: grid; gap: 14px; margin-bottom: 18px; }
+.common-activity-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.quick-activity-group { min-width: 0; }
+.quick-activity-group > header { min-height: 36px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+.quick-activity-group h2 { margin: 0; font-size: 14px; line-height: 1.3; }
+.quick-activity-group header small { color: #98b5bb; font-size: 10px; }
+.quick-activity-group > header > small { text-align: right; }
+.vision-activity-group header > div > small { font-size: 7px; letter-spacing: .12em; }
+.quick-activity-group .link-button { display: inline-flex; align-items: center; gap: 2px; font-size: 10px; white-space: nowrap; }
+.activity-board .quick-activity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.activity-board .activity-card { display: grid; grid-template-columns: 29px minmax(0, 1fr); align-content: start; gap: 8px; padding: 10px 12px; min-height: 102px; }
+.activity-board .activity-points { width: 29px; height: 31px; border-radius: 4px; }
+.activity-board .activity-points strong { font-size: 15px; }
+.activity-board .activity-points small { font-size: 7px; }
+.activity-board .activity-copy { align-self: center; }
+.activity-board .activity-copy strong { font-size: 12px; line-height: 1.35; }
+.activity-board .activity-copy > span { display: none; }
+.activity-board .activity-counts { grid-column: 1 / -1; width: 100%; display: flex; flex-direction: row-reverse; align-items: center; justify-content: space-between; gap: 5px; }
+.activity-board .activity-counter { gap: 4px; }
+.activity-board .activity-counter > button { width: 38px; height: 38px; border-radius: 6px; }
+.activity-board .activity-counter > button:last-child { width: 46px; color: #092c30; background: linear-gradient(125deg, #95e6d3, #48c9be); }
+.activity-board .activity-counter > button:disabled { opacity: .25; cursor: default; }
+.activity-board .activity-counter > span { min-width: 22px; font-size: 16px; }
+.activity-board .activity-counts > small { max-width: 100px; font-size: 9px; line-height: 1.4; white-space: normal; }
+.scenario-activity-panel { --map-accent: #d6b57c; padding: 12px; border: 1px solid #58787555; border-top: 2px solid var(--map-accent); border-radius: 8px; background: #0b202a; }
+.scenario-activity-panel.map-dream { --map-accent: #bbacff; }
+.scenario-activity-panel.map-abyss { --map-accent: #69cbe9; }
+.scenario-activity-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+.scenario-activity-heading .eyebrow { font-size: 8px; color: var(--map-accent); }
+.scenario-activity-heading p { margin: 4px 0 0; color: #9bb5bc; font-size: 10px; }
+.activity-map-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
+.activity-map-tabs > button { min-height: 40px; padding: 7px 10px; display: flex; align-items: center; gap: 7px; border: 1px solid #58777b66; border-radius: 5px; color: #a8bfc5; background: #0b1a25; cursor: pointer; font-size: 12px; }
+.activity-map-tabs > button.selected { border-color: var(--map-accent); color: #effffb; background: #223c44; box-shadow: inset 0 -2px var(--map-accent); }
+.activity-map-tabs > button > small { min-width: 17px; padding: 2px 4px; border-radius: 3px; background: #ffffff0d; font-size: 9px; }
+.activity-board .map-activity-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.map-abyss .map-activity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.activity-map-empty { grid-column: 1 / -1; margin: 0; padding: 16px; color: #9bb5bc; font-size: 12px; }
+.progress-page > .home-overlay-controls { margin: 0 0 14px; }
+.activity-editor.has-map { grid-template-columns: minmax(130px, 1fr) 70px 150px minmax(130px, 1.2fr) 30px 30px; }
+
+@media (min-width: 1250px) {
+  .map-manibus .map-activity-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1101px) {
+  .progress-main .topbar { flex-wrap: nowrap; }
+  .progress-main .topbar-copy { min-width: 0; }
+  .progress-main .topbar-meta { gap: 4px; }
+  .progress-main .topbar-meta .creator-credit { display: none; }
+  .progress-main .topbar .device-node { min-width: 0; min-height: 24px; padding: 3px 6px; }
+  .progress-main .topbar .device-telemetry { display: none; }
+  .progress-main .topbar h1 { font-size: 23px; }
+  .progress-main .topbar-actions { gap: 7px; }
+}
+@media (max-width: 1100px) {
+  .progress-page { padding: 14px 18px 30px; }
+  .progress-main .topbar { padding-inline: 18px; }
+  .progress-page > .hero-grid { grid-template-columns: minmax(0, 1fr) 180px; }
+  .progress-page .hero-copy { width: 100%; }
+  .progress-page .progress-hero .counter-chest { display: none; }
+  .activity-board .map-activity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scenario-activity-heading { align-items: flex-start; flex-direction: column; }
+  .activity-editor.has-map { grid-template-columns: 1fr 80px; }
+}
+@media (max-width: 760px) {
+  .progress-page { padding: 12px; }
+  .progress-page > .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .progress-page .progress-hero { min-height: 0; padding: 14px; }
+  .progress-page .hero-copy > .eyebrow { max-width: 100%; }
+  .progress-page .hero-copy h2 { padding: 0; }
+  .progress-page .hero-copy h2 small { display: inline; font-size: 14px; }
+  .progress-page .chance-card { display: grid; grid-template-columns: 1fr auto 1.5fr; gap: 8px; align-items: center; padding: 9px 12px; }
+  .progress-page .chance-value { margin: 0; font-size: 24px; }
+  .progress-page .chance-card > p { display: none; }
+  .common-activity-groups { grid-template-columns: minmax(0, 1fr); }
+  .activity-board .activity-counter > button { height: 44px; }
+  .activity-board .activity-card { padding: 10px; }
+  .activity-map-tabs { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .activity-map-tabs > button { justify-content: center; padding: 9px 5px; font-size: 11px; min-height: 44px; }
+  .activity-map-tabs > button > small { display: none; }
+  .scenario-activity-panel { padding: 10px; }
+  .activity-editor.has-map { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 390px) {
+  .activity-board .activity-counts { flex-direction: column; }
+  .activity-board .activity-counts > small { max-width: none; text-align: center; }
+  .activity-map-tabs > button { flex-direction: column; gap: 3px; }
+}

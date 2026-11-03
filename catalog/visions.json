@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 57,
-  "updatedAt": "2026-10-30T04:18:30.000Z",
+  "catalogVersion": 58,
+  "updatedAt": "2026-11-03T00:05:09.238Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -21,77 +21,112 @@
       "name": "Jefe de monolito",
       "points": 1,
       "enabled": true,
-      "note": "Solo cuenta en dificultad Pro."
+      "note": "Solo cuenta en dificultad Pro.",
+      "mapId": "general"
     },
     {
       "id": "pro-silo",
       "name": "Silo",
       "points": 1,
       "enabled": true,
-      "note": "Solo cuenta en dificultad Pro."
-    },
-    {
-      "id": "dream-manibus-challenge",
-      "name": "Desafío de Manibus · Endless Dream",
-      "points": 1,
-      "enabled": true,
-      "note": "Recompensa completa del desafío."
+      "note": "Solo cuenta en dificultad Pro.",
+      "mapId": "general"
     },
     {
       "id": "pro-war",
       "name": "Guerra Pro",
       "points": 2,
       "enabled": true,
-      "note": "Recompensa reclamada de la guerra."
+      "note": "Recompensa reclamada de la guerra.",
+      "mapId": "manibus"
+    },
+    {
+      "id": "manibus-event",
+      "name": "Manibus Evento",
+      "points": 1,
+      "enabled": true,
+      "note": "Recompensa del evento de Manibus.",
+      "mapId": "manibus"
+    },
+    {
+      "id": "manibus-war",
+      "name": "Guerra Manibus",
+      "points": 1,
+      "enabled": true,
+      "note": "Recompensa de Guerra Manibus.",
+      "mapId": "manibus"
     },
     {
       "id": "manibus-manibus",
       "name": "Manibus de Manibus",
       "points": 2,
       "enabled": true,
-      "note": "Recompensa del encuentro de Manibus."
-    },
-    {
-      "id": "calamity-tower",
-      "name": "Torre de calamidad",
-      "points": 1,
-      "enabled": true,
-      "note": "Cuenta al reclamar la recompensa."
-    },
-    {
-      "id": "calamity-zone",
-      "name": "Zona de calamidad",
-      "points": 1,
-      "enabled": true,
-      "note": "Cuenta al reclamar la recompensa."
-    },
-    {
-      "id": "dream-zone-invasion",
-      "name": "Invasión de Zona Onírica",
-      "points": 1,
-      "enabled": true,
-      "note": "Invasión de Endless Dream."
+      "note": "Recompensa del encuentro de Manibus.",
+      "mapId": "manibus"
     },
     {
       "id": "dreamer-light",
       "name": "Soñador de Luz",
       "points": 1,
       "enabled": true,
-      "note": "Light Dreamer de Endless Dream."
+      "note": "Light Dreamer de Endless Dream.",
+      "mapId": "dream"
     },
     {
       "id": "dreamer-deep",
       "name": "Soñador Profundo",
       "points": 1,
       "enabled": true,
-      "note": "Deep Dreamer de Endless Dream."
+      "note": "Deep Dreamer de Endless Dream.",
+      "mapId": "dream"
     },
     {
       "id": "dreamer-eternal",
       "name": "Soñador Eterno",
       "points": 1,
       "enabled": true,
-      "note": "Eternal Dreamer de Endless Dream."
+      "note": "Eternal Dreamer de Endless Dream.",
+      "mapId": "dream"
+    },
+    {
+      "id": "dream-zone-invasion",
+      "name": "Invasión de Zona Onírica",
+      "points": 1,
+      "enabled": true,
+      "note": "Invasión de Endless Dream.",
+      "mapId": "dream"
+    },
+    {
+      "id": "dream-manibus-nightmare",
+      "name": "Manibus Pesadilla",
+      "points": 1,
+      "enabled": true,
+      "note": "Recompensa de Manibus Pesadilla en Dream.",
+      "mapId": "dream"
+    },
+    {
+      "id": "dream-manibus-challenge",
+      "name": "Desafío de Manibus · Endless Dream",
+      "points": 1,
+      "enabled": true,
+      "note": "Recompensa completa del desafío.",
+      "mapId": "dream"
+    },
+    {
+      "id": "calamity-tower",
+      "name": "Torre de calamidad",
+      "points": 1,
+      "enabled": true,
+      "note": "Cuenta al reclamar la recompensa.",
+      "mapId": "abyss"
+    },
+    {
+      "id": "calamity-zone",
+      "name": "Zona de calamidad",
+      "points": 1,
+      "enabled": true,
+      "note": "Cuenta al reclamar la recompensa.",
+      "mapId": "abyss"
     }
   ],
   "visions": [

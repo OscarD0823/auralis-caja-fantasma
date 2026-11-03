@@ -3,6 +3,7 @@ import { Check, Github, Plus, RadioTower, Save, Trash2 } from "lucide-react";
 import { visionVisualImage } from "./assets";
 import type { Activity, Catalog, Vision, VisionVisualTheme } from "./model";
 import { AUTHOR, clampNumber, createId, resolveTransitionDelayMilliseconds } from "./model";
+import { ACTIVITY_MAPS, activityMapId } from "./activityMaps";
 
 type Props = {
   catalog: Catalog;
@@ -41,7 +42,7 @@ export default function CatalogEditor({ catalog, onSave, onPublish }: Props) {
   });
 
   const addActivity = (group: "pro" | string) => change((current) => {
-    const activity: Activity = { id: createId("reward"), name: "Nueva recompensa", points: 1, enabled: true, note: "" };
+    const activity: Activity = { id: createId("reward"), name: "Nueva recompensa", points: 1, enabled: true, note: "", ...(group === "pro" ? { mapId: "general" as const } : {}) };
     if (group === "pro") current.proActivities.push(activity);
     else current.visions = current.visions.map((vision) => vision.id === group ? { ...vision, activities: [...vision.activities, activity] } : vision);
     return current;
@@ -151,8 +152,8 @@ export default function CatalogEditor({ catalog, onSave, onPublish }: Props) {
         <small className="admin-batch-note">La transición empieza al desactivarse el evento. La rueda, los tiempos, el objetivo y todas las recompensas permanecen como borrador hasta pulsar “Guardar todo”.</small>
       </section>
 
-      <EditorGroup title="Recompensas Pro" subtitle={`${draft.proActivities.length} opciones`} onAdd={() => addActivity("pro")}>
-        {draft.proActivities.map((activity) => <ActivityEditor key={activity.id} activity={activity} onChange={(patch) => updateActivity("pro", activity.id, patch)} onRemove={() => removeActivity("pro", activity.id)} />)}
+      <EditorGroup title="Actividades por mapa" subtitle={`${draft.proActivities.length} opciones`} onAdd={() => addActivity("pro")}>
+        {draft.proActivities.map((activity) => <ActivityEditor key={activity.id} activity={activity} showMap onChange={(patch) => updateActivity("pro", activity.id, patch)} onRemove={() => removeActivity("pro", activity.id)} />)}
       </EditorGroup>
 
       {draft.visions.map((vision) => (
@@ -177,6 +178,6 @@ function EditorGroup({ title, subtitle, onAdd, onRemove, children }: { title: st
   return <section className="editor-group"><header><div><strong>{title}</strong><span>{subtitle}</span></div><div>{onRemove && <button type="button" className="icon-danger" onClick={onRemove} aria-label={`Eliminar ${title}`}><Trash2 size={15} /></button>}<button type="button" onClick={onAdd}><Plus size={15} /> Añadir opción</button></div></header>{children}</section>;
 }
 
-function ActivityEditor({ activity, onChange, onRemove }: { activity: Activity; onChange: (patch: Partial<Activity>) => void; onRemove: () => void }) {
-  return <div className="activity-editor"><label>Nombre<input value={activity.name} onChange={(event) => onChange({ name: event.target.value })} /></label><label>Puntos<input type="number" min={0} max={1000} value={activity.points} onChange={(event) => onChange({ points: clampNumber(Number(event.target.value), 0, 1000) })} /></label><label>Nota<input value={activity.note ?? ""} onChange={(event) => onChange({ note: event.target.value })} /></label><label className="tiny-check" title="Habilitada"><input type="checkbox" checked={activity.enabled} onChange={(event) => onChange({ enabled: event.target.checked })} /><span /></label><button type="button" className="icon-danger" onClick={onRemove} aria-label={`Eliminar ${activity.name}`}><Trash2 size={15} /></button></div>;
+function ActivityEditor({ activity, showMap = false, onChange, onRemove }: { activity: Activity; showMap?: boolean; onChange: (patch: Partial<Activity>) => void; onRemove: () => void }) {
+  return <div className={`activity-editor${showMap ? " has-map" : ""}`}><label>Nombre<input value={activity.name} onChange={(event) => onChange({ name: event.target.value })} /></label><label>Puntos<input type="number" min={0} max={1000} value={activity.points} onChange={(event) => onChange({ points: clampNumber(Number(event.target.value), 0, 1000) })} /></label>{showMap && <label>Mapa<select value={activityMapId(activity)} onChange={(event) => onChange({ mapId: event.target.value as Activity["mapId"] })}>{ACTIVITY_MAPS.map((map) => <option key={map.id} value={map.id}>{map.name}</option>)}</select></label>}<label>Nota<input value={activity.note ?? ""} onChange={(event) => onChange({ note: event.target.value })} /></label><label className="tiny-check" title="Habilitada"><input type="checkbox" checked={activity.enabled} onChange={(event) => onChange({ enabled: event.target.checked })} /><span /></label><button type="button" className="icon-danger" onClick={onRemove} aria-label={`Eliminar ${activity.name}`}><Trash2 size={15} /></button></div>;
 }

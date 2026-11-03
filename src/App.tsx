@@ -116,6 +116,7 @@ import type { PhoneBridgeSnapshot } from "./phoneBridgeProtocol";
 import RewardProgressBar from "./RewardProgressBar";
 import ObservedProbability from "./ObservedProbability";
 import CrateHistoryCard from "./CrateHistoryCard";
+import ActivityMapBoard from "./ActivityMapBoard";
 
 type ShinyCatalogModule = typeof import("./shinyModsCatalog");
 const EMPTY_SHINY_CATALOG: ShinyModCatalogItem[] = [];
@@ -1666,10 +1667,12 @@ export default function App() {
     try {
       const catalog = await fetchPublicCatalog();
       if (!validateCatalog(catalog)) throw new Error(tx("formato no válido", "invalid format"));
+      const savedCatalog = currentStateRef.current.catalog;
+      const effectiveCatalog = catalog.catalogVersion >= savedCatalog.catalogVersion ? catalog : savedCatalog;
       setState((current) => applyRemoteCatalog(current, catalog));
       setSyncStatus(tx(
-        `Catálogo v${catalog.catalogVersion} comprobado · ${catalog.eventTiming?.waitMinutes ?? "—"}/${catalog.eventTiming?.activeMinutes ?? "—"} min · ${resolveTransitionDelayMilliseconds(catalog.eventTiming)} ms`,
-        `Catalog v${catalog.catalogVersion} checked · ${catalog.eventTiming?.waitMinutes ?? "—"}/${catalog.eventTiming?.activeMinutes ?? "—"} min · ${resolveTransitionDelayMilliseconds(catalog.eventTiming)} ms`,
+        `Catálogo v${effectiveCatalog.catalogVersion} comprobado · ${effectiveCatalog.eventTiming?.waitMinutes ?? "—"}/${effectiveCatalog.eventTiming?.activeMinutes ?? "—"} min · ${resolveTransitionDelayMilliseconds(effectiveCatalog.eventTiming)} ms`,
+        `Catalog v${effectiveCatalog.catalogVersion} checked · ${effectiveCatalog.eventTiming?.waitMinutes ?? "—"}/${effectiveCatalog.eventTiming?.activeMinutes ?? "—"} min · ${resolveTransitionDelayMilliseconds(effectiveCatalog.eventTiming)} ms`,
       ));
     } catch (error) {
       setSyncStatus(tx("Sin conexión · usando catálogo local", "Offline · using local catalog"));
@@ -2181,7 +2184,7 @@ export default function App() {
         </button>
       </aside>
 
-      <main>
+      <main className={tab === "progress" ? "progress-main" : undefined}>
         <header className={`topbar vision-${selectedVision?.id ?? "none"} ${cycle.phase}`}>
           <VisionAtmosphere visionId={selectedVision?.id} active={cycle.phase === "active"} />
           <div className="topbar-copy">
@@ -2209,7 +2212,7 @@ export default function App() {
           </div>
         </header>
 
-        {IS_WEB && <WebInstallNotice pwa={pwa} language={language} />}
+        {IS_WEB && tab !== "progress" && <WebInstallNotice pwa={pwa} language={language} />}
         {tutorialNotice && !introVisible && <div className="tutorial-welcome"><CircleHelp size={20} /><span>{tx("¿Primera vez? Conoce Auralis Caja Fantasma en seis pasos.", "First time? Learn Auralis Caja Fantasma in six steps.")}</span><button type="button" className="primary compact" onClick={() => setTutorialOpen(true)}>{tx("Ver tutorial", "View tutorial")}</button><button type="button" className="experience-close" aria-label={tx("Ocultar aviso", "Hide notice")} onClick={finishTutorial}><X size={16} /></button></div>}
 
         {tab === "progress" && (
@@ -2234,29 +2237,6 @@ export default function App() {
               </div>
               {isTeamMode && <div className={`team-guidance ${teamReady ? "ready" : "warning"}`}><Users size={17} /><span><strong>{state.teamMemberIds.length} {tx("personajes en este equipo.", "characters on this team.")}</strong>{teamReady ? tx(" Cada recompensa se suma una vez a todos los seleccionados.", " Each reward is added once to every selected character.") : tx(" Selecciona al menos dos para comenzar.", " Select at least two to begin.")}</span><button type="button" className="secondary compact" onClick={startNewTeamCount}><RotateCcw size={15} /> {tx("Nuevo conteo en 0", "New count at 0")}</button></div>}
             </article>}
-
-            <article className={`home-overlay-controls panel ${homeOverlayConfigOpen ? "expanded" : ""}`}>
-              <div><span className="eyebrow"><MonitorUp size={13} /> {tx(IS_WEB || IS_ANDROID ? "CONTADORES" : "VENTANA FLOTANTE", IS_WEB || IS_ANDROID ? "COUNTDOWNS" : "FLOATING OVERLAY")}</span><h2>{tx(IS_WEB || IS_ANDROID ? "Configurar contadores" : "Configurar ventana", IS_WEB || IS_ANDROID ? "Configure countdowns" : "Configure overlay")}</h2></div>
-              <div className="home-overlay-actions">
-                <button type="button" className="secondary" aria-expanded={homeOverlayConfigOpen} aria-controls="home-overlay-size-panel" onClick={() => setHomeOverlayEditing(!homeOverlayConfigOpen)}><Settings2 size={17} /> {homeOverlayConfigOpen ? tx("Terminar ajuste", "Finish editing") : tx("Abrir configuración", "Open settings")}</button>
-                {!IS_WEB && !IS_ANDROID && <button type="button" className={`secondary overlay-home-button ${state.settings.overlayEnabled ? "enabled" : ""}`} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayEnabled: !current.settings.overlayEnabled } }))}><Eye size={16} /> {state.settings.overlayEnabled ? tx("Quitar ventana", "Remove overlay") : tx("Agregar ventana", "Add overlay")}</button>}
-              </div>
-              {homeOverlayConfigOpen && <div id="home-overlay-size-panel" className={`home-overlay-size-panel ${IS_WEB || IS_ANDROID ? "in-app" : ""}`}>
-                <div className={`mock-overlay ${cycle.phase} vision-${selectedVision?.id ?? "none"} shape-${state.settings.overlayShape} counter-${state.settings.overlayCounterStyle}`}><span>{transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</span><strong>{overlayDisplayTimer}</strong></div>
-                <div className="overlay-style-config">
-                  <label>{tx("Forma", "Shape")}<select value={state.settings.overlayShape} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayShape: event.target.value as OverlayShape } }))}><option value="event">{tx("Automática por evento", "Automatic by event")}</option><option value="rectangle">{tx("Rectangular", "Rectangle")}</option><option value="square">{tx("Cuadrada", "Square")}</option><option value="vertical">{tx("Vertical", "Vertical")}</option><option value="round">{tx("Redonda", "Round")}</option></select></label>
-                  <label>{tx("Estilo del contador", "Countdown style")}<select value={state.settings.overlayCounterStyle} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayCounterStyle: event.target.value as OverlayCounterStyle } }))}><option value="digital">Digital</option><option value="compact">{tx("Compacto", "Compact")}</option><option value="ring">{tx("Anillo de progreso", "Progress ring")}</option></select></label>
-                  <label>{tx("Nombre del evento", "Event name")}<select value={state.settings.overlayNameMode} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayNameMode: event.target.value as OverlayNameMode } }))}><option value="spanish">Español</option><option value="english">English</option><option value="custom">{tx("Personalizado", "Custom")}</option></select></label>
-                  {state.settings.overlayNameMode === "custom" && <label>{tx("Tu nombre", "Custom name")}<input maxLength={40} value={state.settings.overlayCustomName} placeholder={tx("Ej. Gravedad azul", "E.g. Blue Gravity")} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayCustomName: event.target.value.slice(0, 40) } }))} /></label>}
-                </div>
-                <label className="overlay-size-control"><span>{tx("Ventana", "Overlay")} <strong>{Math.round(state.settings.overlayScale * 100)}%</strong></span><input type="range" min={20} max={150} step={5} value={Math.round(state.settings.overlayScale * 100)} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayScale: clampNumber(Number(event.target.value) / 100, .2, 1.5) } }))} /></label>
-                <label className="overlay-size-control"><span>{tx("Área de Ballena", "Whale area")} <strong>{Math.round(state.settings.overlayAddonScale * 100)}%</strong></span><input type="range" min={20} max={100} step={5} value={Math.round(state.settings.overlayAddonScale * 100)} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayAddonScale: clampNumber(Number(event.target.value) / 100, .2, 1) } }))} /></label>
-                {state.settings.overlayWhaleShowTime && <>{state.settings.overlayWhaleCounterStyle !== "beam" && <label className="overlay-size-control"><span>{tx("Tiempo sobre el rayo", "Time over the beam")} <strong>{Math.round(state.settings.overlayWhaleCounterScale * 100)}%</strong></span><input type="range" min={20} max={150} step={5} value={Math.round(state.settings.overlayWhaleCounterScale * 100)} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleCounterScale: clampNumber(Number(event.target.value) / 100, .2, 1.5) } }))} /></label>}
-                <label className="overlay-size-control"><span>{tx("Estilo del tiempo", "Time style")}</span><select value={state.settings.overlayWhaleCounterStyle} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleCounterStyle: event.target.value as WhaleCounterStyle } }))}><option value="digital">Digital</option><option value="compact">{tx("Compacto", "Compact")}</option><option value="ring">{tx("Anillo", "Ring")}</option><option value="beam">{tx("Solo rayo", "Beam only")}</option></select></label></>}
-                <div className="overlay-addon-option"><span><strong>{tx("Mostrar tiempo de Ballena", "Show Whale time")}</strong><small>{tx(IS_WEB || IS_ANDROID ? "Durante la ballena activa puedes ver solo el rayo de progreso." : "Si lo desactivas, permanece solamente el Riftwalker con su rayo de progreso.", IS_WEB || IS_ANDROID ? "While the whale is active, you can show only its progress beam." : "When disabled, only the Riftwalker and its progress beam remain.")}</small></span><button type="button" className={`switch ${state.settings.overlayWhaleShowTime ? "on" : ""}`} aria-label={tx("Mostrar tiempo sobre el rayo de Ballena", "Show time over the Whale beam")} aria-pressed={state.settings.overlayWhaleShowTime} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleShowTime: !current.settings.overlayWhaleShowTime } }))}><span /></button></div>
-                <div className="overlay-addon-option"><span><strong>{tx("Ballena y rayo", "Whale and beam")}</strong><small>{tx("Puede ocultarse por completo sin desactivar el contador principal.", "It can be hidden completely without disabling the main countdown.")}</small></span><button type="button" className={`switch ${state.settings.overlayWhaleEnabled ? "on" : ""}`} aria-label={tx("Mostrar Ballena y rayo", "Show Whale and beam")} aria-pressed={state.settings.overlayWhaleEnabled} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleEnabled: !current.settings.overlayWhaleEnabled } }))}><span /></button></div>
-              </div>}
-            </article>
 
             <div className="hero-grid">
               <article className="progress-hero panel">
@@ -2284,35 +2264,42 @@ export default function App() {
               </article>
             </div>
 
-            <div className="section-heading"><div><span className="eyebrow">{tx("ACTIVIDADES DEL MAPA", "MAP ACTIVITIES")}</span><h2>{tx("Registra tus recorridos", "Track your runs")}</h2></div><span>{tx("Jefes, silos y desafíos · cuenta al reclamar", "Bosses, silos and challenges · count on claim")}</span></div>
-            <div className="activity-grid">
-              {state.catalog.proActivities.map((activity) => <ActivityCard
-                key={activity.id}
+            <ActivityMapBoard activities={state.catalog.proActivities} vision={selectedVision} language={language} onViewVision={() => setTab("vision")} renderActivity={(activity, vision) => <ActivityCard
+                key={`${vision?.id ?? "map"}:${activity.id}`}
                 language={language}
                 activity={activity}
-                disabled={!teamReady}
-                currentCount={currentPointRoundActions.filter((action) => !action.visionId && action.activityId === activity.id).length}
-                dailyCount={activityCount(activity).todayCount}
-                totalCount={activityCount(activity).count}
-                onAdd={() => addActivity(activity)}
-                onRemove={() => removeLastActivity(activity.id)}
-              />)}
-            </div>
+                disabled={!teamReady || (vision !== undefined && !vision.enabled)}
+                currentCount={currentPointRoundActions.filter((action) => action.visionId === vision?.id && action.activityId === activity.id).length}
+                dailyCount={activityCount(activity, vision).todayCount}
+                totalCount={activityCount(activity, vision).count}
+                onAdd={() => addActivity(activity, vision)}
+                onRemove={() => removeLastActivity(activity.id, vision?.id)}
+              />} />
 
-            <div className="section-heading"><div><span className="eyebrow">{tx("VISIÓN SELECCIONADA POR EL ADMINISTRADOR", "ADMINISTRATOR-SELECTED WHEEL")}</span><h2>{selectedVision ? (english ? selectedVision.englishName || selectedVision.name : selectedVision.name) : tx("Sin visión", "No wheel")}</h2></div><button type="button" className="link-button" onClick={() => setTab("vision")}>{tx("Ver contador", "View countdown")} <ChevronRight size={15} /></button></div>
-            <div className="activity-grid">
-              {selectedVision?.activities.length ? selectedVision.activities.map((activity) => <ActivityCard
-                key={activity.id}
-                language={language}
-                activity={activity}
-                disabled={!selectedVision.enabled || !teamReady}
-                currentCount={currentPointRoundActions.filter((action) => action.visionId === selectedVision.id && action.activityId === activity.id).length}
-                dailyCount={activityCount(activity, selectedVision).todayCount}
-                totalCount={activityCount(activity, selectedVision).count}
-                onAdd={() => addActivity(activity, selectedVision)}
-                onRemove={() => removeLastActivity(activity.id, selectedVision.id)}
-              />) : <div className="empty-card"><Sparkles size={28} /><strong>Aún no hay recompensas para {selectedVision?.name}</strong><span>Puedes añadirlas en Configuración y publicarlas para todos.</span></div>}
-            </div>
+            {IS_WEB && <WebInstallNotice pwa={pwa} language={language} />}
+
+            <article className={`home-overlay-controls panel ${homeOverlayConfigOpen ? "expanded" : ""}`}>
+              <div><span className="eyebrow"><MonitorUp size={13} /> {tx(IS_WEB || IS_ANDROID ? "CONTADORES" : "VENTANA FLOTANTE", IS_WEB || IS_ANDROID ? "COUNTDOWNS" : "FLOATING OVERLAY")}</span><h2>{tx(IS_WEB || IS_ANDROID ? "Configurar contadores" : "Configurar ventana", IS_WEB || IS_ANDROID ? "Configure countdowns" : "Configure overlay")}</h2></div>
+              <div className="home-overlay-actions">
+                <button type="button" className="secondary" aria-expanded={homeOverlayConfigOpen} aria-controls="home-overlay-size-panel" onClick={() => setHomeOverlayEditing(!homeOverlayConfigOpen)}><Settings2 size={17} /> {homeOverlayConfigOpen ? tx("Terminar ajuste", "Finish editing") : tx("Abrir configuración", "Open settings")}</button>
+                {!IS_WEB && !IS_ANDROID && <button type="button" className={`secondary overlay-home-button ${state.settings.overlayEnabled ? "enabled" : ""}`} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayEnabled: !current.settings.overlayEnabled } }))}><Eye size={16} /> {state.settings.overlayEnabled ? tx("Quitar ventana", "Remove overlay") : tx("Agregar ventana", "Add overlay")}</button>}
+              </div>
+              {homeOverlayConfigOpen && <div id="home-overlay-size-panel" className={`home-overlay-size-panel ${IS_WEB || IS_ANDROID ? "in-app" : ""}`}>
+                <div className={`mock-overlay ${cycle.phase} vision-${selectedVision?.id ?? "none"} shape-${state.settings.overlayShape} counter-${state.settings.overlayCounterStyle}`}><span>{transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</span><strong>{overlayDisplayTimer}</strong></div>
+                <div className="overlay-style-config">
+                  <label>{tx("Forma", "Shape")}<select value={state.settings.overlayShape} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayShape: event.target.value as OverlayShape } }))}><option value="event">{tx("Automática por evento", "Automatic by event")}</option><option value="rectangle">{tx("Rectangular", "Rectangle")}</option><option value="square">{tx("Cuadrada", "Square")}</option><option value="vertical">{tx("Vertical", "Vertical")}</option><option value="round">{tx("Redonda", "Round")}</option></select></label>
+                  <label>{tx("Estilo del contador", "Countdown style")}<select value={state.settings.overlayCounterStyle} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayCounterStyle: event.target.value as OverlayCounterStyle } }))}><option value="digital">Digital</option><option value="compact">{tx("Compacto", "Compact")}</option><option value="ring">{tx("Anillo de progreso", "Progress ring")}</option></select></label>
+                  <label>{tx("Nombre del evento", "Event name")}<select value={state.settings.overlayNameMode} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayNameMode: event.target.value as OverlayNameMode } }))}><option value="spanish">Español</option><option value="english">English</option><option value="custom">{tx("Personalizado", "Custom")}</option></select></label>
+                  {state.settings.overlayNameMode === "custom" && <label>{tx("Tu nombre", "Custom name")}<input maxLength={40} value={state.settings.overlayCustomName} placeholder={tx("Ej. Gravedad azul", "E.g. Blue Gravity")} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayCustomName: event.target.value.slice(0, 40) } }))} /></label>}
+                </div>
+                <label className="overlay-size-control"><span>{tx("Ventana", "Overlay")} <strong>{Math.round(state.settings.overlayScale * 100)}%</strong></span><input type="range" min={20} max={150} step={5} value={Math.round(state.settings.overlayScale * 100)} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayScale: clampNumber(Number(event.target.value) / 100, .2, 1.5) } }))} /></label>
+                <label className="overlay-size-control"><span>{tx("Área de Ballena", "Whale area")} <strong>{Math.round(state.settings.overlayAddonScale * 100)}%</strong></span><input type="range" min={20} max={100} step={5} value={Math.round(state.settings.overlayAddonScale * 100)} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayAddonScale: clampNumber(Number(event.target.value) / 100, .2, 1) } }))} /></label>
+                {state.settings.overlayWhaleShowTime && <>{state.settings.overlayWhaleCounterStyle !== "beam" && <label className="overlay-size-control"><span>{tx("Tiempo sobre el rayo", "Time over the beam")} <strong>{Math.round(state.settings.overlayWhaleCounterScale * 100)}%</strong></span><input type="range" min={20} max={150} step={5} value={Math.round(state.settings.overlayWhaleCounterScale * 100)} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleCounterScale: clampNumber(Number(event.target.value) / 100, .2, 1.5) } }))} /></label>}
+                <label className="overlay-size-control"><span>{tx("Estilo del tiempo", "Time style")}</span><select value={state.settings.overlayWhaleCounterStyle} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleCounterStyle: event.target.value as WhaleCounterStyle } }))}><option value="digital">Digital</option><option value="compact">{tx("Compacto", "Compact")}</option><option value="ring">{tx("Anillo", "Ring")}</option><option value="beam">{tx("Solo rayo", "Beam only")}</option></select></label></>}
+                <div className="overlay-addon-option"><span><strong>{tx("Mostrar tiempo de Ballena", "Show Whale time")}</strong><small>{tx(IS_WEB || IS_ANDROID ? "Durante la ballena activa puedes ver solo el rayo de progreso." : "Si lo desactivas, permanece solamente el Riftwalker con su rayo de progreso.", IS_WEB || IS_ANDROID ? "While the whale is active, you can show only its progress beam." : "When disabled, only the Riftwalker and its progress beam remain.")}</small></span><button type="button" className={`switch ${state.settings.overlayWhaleShowTime ? "on" : ""}`} aria-label={tx("Mostrar tiempo sobre el rayo de Ballena", "Show time over the Whale beam")} aria-pressed={state.settings.overlayWhaleShowTime} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleShowTime: !current.settings.overlayWhaleShowTime } }))}><span /></button></div>
+                <div className="overlay-addon-option"><span><strong>{tx("Ballena y rayo", "Whale and beam")}</strong><small>{tx("Puede ocultarse por completo sin desactivar el contador principal.", "It can be hidden completely without disabling the main countdown.")}</small></span><button type="button" className={`switch ${state.settings.overlayWhaleEnabled ? "on" : ""}`} aria-label={tx("Mostrar Ballena y rayo", "Show Whale and beam")} aria-pressed={state.settings.overlayWhaleEnabled} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleEnabled: !current.settings.overlayWhaleEnabled } }))}><span /></button></div>
+              </div>}
+            </article>
 
             <section className="point-round-history panel" aria-label={tx("Historial de rondas de puntos", "Point round history")}>
               <header><div><span>{tx("RONDA ACTUAL", "CURRENT ROUND")}</span><strong>{pointsLabel(currentPointRoundPoints, language)}</strong><small>{currentPointRoundActions.length} {tx("recompensas desde el último guardado", "rewards since the last save")}</small></div><div className="point-round-totals"><span><strong>{visiblePointRounds.length}</strong> {tx("rondas guardadas", "saved rounds")}</span><span><strong>{savedPointRoundTotal}</strong> {tx("puntos registrados", "recorded points")}</span></div></header>
@@ -2639,12 +2626,12 @@ function ActivityCard({ activity, currentCount, dailyCount, totalCount, language
   const english = language !== "es";
   const inactive = disabled || !activity.enabled || activity.points <= 0;
   return (
-    <article className={`activity-card ${inactive ? "disabled" : ""}`}>
+    <article className={`activity-card ${inactive ? "disabled" : ""}`} title={activity.note}>
       <div className="activity-points"><strong>{activity.points}</strong><small>PTS</small></div>
       <div className="activity-copy"><strong>{activity.name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
       <div className="activity-counts">
         <div className="activity-counter">
-          {currentCount > 0 && <button type="button" aria-label={`${english ? "Remove one" : "Quitar una de"} ${activity.name}`} onClick={onRemove}><Minus size={15} /></button>}
+          <button type="button" aria-label={`${english ? "Remove one" : "Quitar una de"} ${activity.name}`} disabled={currentCount === 0} onClick={onRemove}><Minus size={15} /></button>
           <span aria-label={`${currentCount} ${english ? "in the current round" : "en la ronda actual"}`}>{currentCount}</span>
           <button type="button" aria-label={`${english ? "Add" : "Sumar"} ${activity.name}`} disabled={inactive} onClick={onAdd}><Plus size={19} /></button>
         </div>

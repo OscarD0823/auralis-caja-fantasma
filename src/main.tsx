@@ -14,6 +14,7 @@ import "./interface.css";
 import "./refinement.css";
 import "./chestChoreography.css";
 import "./chestPerformance.css";
+import "./activityBoard.css";
 import { currentChestDetail } from "./chestMotion";
 
 const nativeHost = isTauri();
