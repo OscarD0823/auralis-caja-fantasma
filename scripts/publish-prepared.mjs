@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir, open, readdir } from 'node:fs/promises';
 import { resolve, sep, basename, join } from 'node:path';
 import { createHash } from 'node:crypto';
+import { inflateSync } from 'node:zlib';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 
@@ -20,20 +21,60 @@ const run = (command, args) => {
   if (result.error || result.status !== 0) throw new Error(`${basename(command)} failed: ${result.stderr || result.error?.message || result.stdout}`);
   return result.stdout;
 };
+const safePath = (relative, prefix) => {
+  assert.equal(typeof relative, 'string');
+  const path = resolve(root, relative);
+  assert(relative.startsWith(prefix) && path.startsWith(root + sep), 'Invalid payload location.');
+  return path;
+};
+async function* chunksFor(file) {
+  if (file.delta) {
+    assert.equal(file.name, expected[2]);
+    const delta = file.delta;
+    const base = await readFile(safePath(delta.source, 'unsigned/'));
+    assert.equal(base.length, delta.sourceSize);
+    assert.equal(createHash('sha256').update(base).digest('hex'), delta.sourceSha256);
+    assert(Array.isArray(delta.patchParts) && delta.patchParts.length > 0);
+    const patchParts = await Promise.all(delta.patchParts.map(part => readFile(safePath(part, 'payload/'))));
+    const encoded = Buffer.concat(patchParts);
+    assert(encoded.length <= 4 * 1024 * 1024);
+    assert.equal(createHash('sha256').update(encoded).digest('hex'), delta.patchSha256);
+    assert.equal(encoded.subarray(0, 8).toString('ascii'), 'CFAPDEL1');
+    const patch = JSON.parse(inflateSync(encoded.subarray(8), { maxOutputLength: 16 * 1024 * 1024 }).toString('utf8'));
+    assert.equal(patch.version, 1);
+    assert.equal(patch.sourceSha256, delta.sourceSha256);
+    assert.equal(patch.sourceSize, base.length);
+    assert.equal(patch.targetSha256, file.sha256);
+    assert.equal(patch.targetSize, file.size);
+    assert(Array.isArray(patch.operations) && patch.operations.length < 100000);
+    for (const op of patch.operations) {
+      if (op[0] === 'c') {
+        assert(Number.isSafeInteger(op[1]) && Number.isSafeInteger(op[2]) && op[1] >= 0 && op[2] >= 0 && op[1] + op[2] <= base.length);
+        yield base.subarray(op[1], op[1] + op[2]);
+      } else {
+        assert.equal(op[0], 'd');
+        assert.equal(typeof op[1], 'string');
+        yield Buffer.from(op[1], 'base64');
+      }
+    }
+    return;
+  }
+  assert(file.parts?.length > 0);
+  for (const part of file.parts) {
+    const bytes = await readFile(safePath(part, 'payload/'));
+    assert(bytes.length <= 1_048_576);
+    yield bytes;
+  }
+}
 if (mode === 'assemble') {
   await mkdir(output, { recursive: true });
   for (const file of plan.artifacts) {
     assert.equal(file.name, basename(file.name));
     assert.match(file.sha256, /^[a-f0-9]{64}$/);
-    assert(file.parts.length > 0);
     const hash = createHash('sha256'); let size = 0;
     const target = await open(join(output, file.name), 'wx');
     try {
-      for (const part of file.parts) {
-        const path = resolve(root, part);
-        assert(path.startsWith(root + sep) && part.startsWith('payload/'), 'Invalid part location.');
-        const bytes = await readFile(path);
-        assert(bytes.length <= 1_048_576);
+      for await (const bytes of chunksFor(file)) {
         hash.update(bytes); size += bytes.length;
         await target.writeFile(bytes);
       }
@@ -54,13 +95,16 @@ if (mode === 'assemble') {
   assert.equal(current.android.certificate_sha256, identity.androidCertificateSha256);
   const apk = plan.artifacts.find(file => file.name === expected[2]);
   assert.equal(current.android.sha256.toLowerCase(), apk.sha256);
-  const toolsRoot = join(process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT, 'build-tools');
-  const versions = (await readdir(toolsRoot)).filter(name => /^\d/.test(name)).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
-  const tools = join(toolsRoot, versions[0]);
-  const verification = run(join(tools, 'apksigner'), ['verify', '--print-certs', join(output, apk.name)]);
+  let tools = process.env.ANDROID_BUILD_TOOLS;
+  if (!tools) {
+    const toolsRoot = join(process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT, 'build-tools');
+    const versions = (await readdir(toolsRoot)).filter(name => /^\d/.test(name)).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+    tools = join(toolsRoot, versions[0]);
+  }
+  const verification = run('java', ['-jar', join(tools, 'lib/apksigner.jar'), 'verify', '--print-certs', join(output, apk.name)]);
   const certificates = [...verification.matchAll(/certificate SHA-256 digest: ([a-f0-9]+)/gi)].map(match => match[1].toLowerCase());
   assert.deepEqual(certificates, [identity.androidCertificateSha256]);
-  const badging = run(join(tools, 'aapt2'), ['dump', 'badging', join(output, apk.name)]);
+  const badging = run(join(tools, process.platform === 'win32' ? 'aapt2.exe' : 'aapt2'), ['dump', 'badging', join(output, apk.name)]);
   const info = badging.match(/^package: name='([^']+)'[^\r\n]*? versionName='([^']+)'/m);
   assert.equal(info?.[1], identity.androidApplicationId);
   assert.equal(info?.[2], plan.version);

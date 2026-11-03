@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   publicar:
@@ -19,6 +20,12 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - uses: actions/download-artifact@v5
+        with:
+          name: Caja-Fantasma-Android-1.25.0-sin-firma
+          run-id: 41588497172
+          github-token: ${{ github.token }}
+          path: unsigned
       - id: plan
         name: Leer el commit de origen
         run: node -e 'const p=require("./release-plan.json"); if(!/^[a-f0-9]{40}$/.test(p.sourceCommit))process.exit(1); require("fs").appendFileSync(process.env.GITHUB_OUTPUT,`source=${p.sourceCommit}\n`)'
