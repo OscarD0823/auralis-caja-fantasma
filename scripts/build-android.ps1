@@ -30,13 +30,14 @@ if (-not $UnsignedApk) {
     if ($LASTEXITCODE -ne 0) { throw 'No se pudo preparar el proyecto Android.' }
     & $Node $TauriCli android build --ci --target aarch64 --apk
     if ($LASTEXITCODE -ne 0) { throw 'No se pudo compilar la APK sin firmar. Tambien puedes usar el artefacto del workflow Android con -UnsignedApk.' }
-    $UnsignedApk = Join-Path $ProjectRoot 'src-tauri\gen\android\app\build\outputs\apk\arm64\release\app-arm64-release-unsigned.apk'
+    $UnsignedApk = Join-Path $ProjectRoot 'src-tauri\gen\android\app\build\outputs\apk\universal\release\app-universal-release-unsigned.apk'
 }
 $UnsignedApk = [IO.Path]::GetFullPath($UnsignedApk)
 if (-not (Test-Path -LiteralPath $UnsignedApk)) { throw 'No se encontro la APK sin firma.' }
 $badging = (& $Aapt dump badging $UnsignedApk 2>&1) -join "`n"
 if ($LASTEXITCODE -ne 0 -or $badging -notmatch "package: name='([^']+)'[^\r\n]*versionName='([^']+)'") { throw 'No se pudo leer la identidad de la APK.' }
 if ($Matches[1] -ne $Identity.androidApplicationId -or $Matches[2] -ne $Version) { throw 'La APK no corresponde a la identidad nueva y version esperadas.' }
+if ($badging -notmatch "native-code:.*'arm64-v8a'") { throw 'La APK no incluye la arquitectura ARM64 requerida.' }
 $encoded = (Get-Content -Raw -LiteralPath $PasswordPath).Trim()
 if ($encoded.Length % 2 -ne 0 -or $encoded -notmatch '^[0-9A-Fa-f]+$') { throw 'Contrasena protegida no valida.' }
 $encrypted = New-Object byte[] ($encoded.Length / 2)

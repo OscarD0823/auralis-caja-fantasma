@@ -2130,6 +2130,7 @@ export default function App() {
   const onImport = async (file?: File) => {
     if (!file) return;
     try {
+      if (!restoreReadyRef.current) throw new Error(tx("El respaldo inicial todavía se está recuperando. Intenta importar de nuevo en unos segundos.", "The initial backup is still being recovered. Try importing again in a few seconds."));
       const imported = importState(await file.text());
       commitState((current) => applyRemoteCatalog(imported, current.catalog));
       setToast("Respaldo importado correctamente");
@@ -2145,11 +2146,11 @@ export default function App() {
     <div className="app-shell" data-event={cycle.phase === "active" ? visionVisualTheme(selectedVision) : "neutral"}>
       <input ref={importRef} hidden type="file" accept="application/json,.json" onChange={(event) => void onImport(event.target.files?.[0])} />
       <AppUpdater language={language} beforeInstall={async () => {
+        if (isTauri() && !restoreReadyRef.current) throw new Error("El respaldo inicial todavía se está recuperando. Intenta actualizar de nuevo.");
         if (IS_ANDROID) {
           saveState(currentStateRef.current);
           await invoke("save_native_personal_backup", { dataJson: JSON.stringify(personalSyncPayload(currentStateRef.current)) });
         } else if (isTauri()) {
-          if (!restoreReadyRef.current) throw new Error("El respaldo inicial todavía se está recuperando. Intenta actualizar de nuevo.");
           const saved = await persistDesktopProgress(currentStateRef.current, invoke, false);
           currentStateRef.current = saved;
           setState(saved);
@@ -2218,7 +2219,7 @@ export default function App() {
           </div>
         </header>
 
-        {IS_ANDROID && tab === "progress" && personalHistoryCount(state) === 0 && <MigrationGuide language={language} android onImport={() => importRef.current?.click()} onDevices={() => setTab("devices")} />}
+        {IS_ANDROID && personalRestoreReady && tab === "progress" && personalHistoryCount(state) === 0 && <MigrationGuide language={language} android onImport={() => importRef.current?.click()} onDevices={() => setTab("devices")} />}
         {IS_WEB && tab !== "progress" && <WebInstallNotice pwa={pwa} language={language} />}
         {tutorialNotice && !introVisible && <div className="tutorial-welcome"><CircleHelp size={20} /><span>{tx("¿Primera vez? Conoce Auralis Caja Fantasma en seis pasos.", "First time? Learn Auralis Caja Fantasma in six steps.")}</span><button type="button" className="primary compact" onClick={() => setTutorialOpen(true)}>{tx("Ver tutorial", "View tutorial")}</button><button type="button" className="experience-close" aria-label={tx("Ocultar aviso", "Hide notice")} onClick={finishTutorial}><X size={16} /></button></div>}
 

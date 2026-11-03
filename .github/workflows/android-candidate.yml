@@ -37,6 +37,7 @@ jobs:
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: src-tauri -> target
+          cache-on-failure: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm run lint && pnpm test
       - name: Inicializar proyecto Android
@@ -49,6 +50,6 @@ jobs:
       - uses: actions/upload-artifact@v5
         with:
           name: Caja-Fantasma-Android-1.25.0-sin-firma
-          path: src-tauri/gen/android/app/build/outputs/apk/arm64/release/*unsigned.apk
+          path: src-tauri/gen/android/app/build/outputs/apk/universal/release/*unsigned.apk
           if-no-files-found: error
           retention-days: 7
