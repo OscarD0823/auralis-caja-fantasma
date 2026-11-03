@@ -61,7 +61,7 @@ if (mode === 'assemble') {
   const certificates = [...verification.matchAll(/certificate SHA-256 digest: ([a-f0-9]+)/gi)].map(match => match[1].toLowerCase());
   assert.deepEqual(certificates, [identity.androidCertificateSha256]);
   const badging = run(join(tools, 'aapt2'), ['dump', 'badging', join(output, apk.name)]);
-  const info = badging.match(/package: name='([^']+)'[^\r\n]*versionName='([^']+)'/);
+  const info = badging.match(/^package: name='([^']+)'[^\r\n]*? versionName='([^']+)'/m);
   assert.equal(info?.[1], identity.androidApplicationId);
   assert.equal(info?.[2], plan.version);
   assert.match(badging, /native-code:.*'arm64-v8a'/);

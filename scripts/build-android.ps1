@@ -35,8 +35,9 @@ if (-not $UnsignedApk) {
 $UnsignedApk = [IO.Path]::GetFullPath($UnsignedApk)
 if (-not (Test-Path -LiteralPath $UnsignedApk)) { throw 'No se encontro la APK sin firma.' }
 $badging = (& $Aapt dump badging $UnsignedApk 2>&1) -join "`n"
-if ($LASTEXITCODE -ne 0 -or $badging -notmatch "package: name='([^']+)'[^\r\n]*versionName='([^']+)'") { throw 'No se pudo leer la identidad de la APK.' }
-if ($Matches[1] -ne $Identity.androidApplicationId -or $Matches[2] -ne $Version) { throw 'La APK no corresponde a la identidad nueva y version esperadas.' }
+$packageInfo = [regex]::Match($badging, "(?m)^package: name='([^']+)'[^\r\n]*? versionName='([^']+)'")
+if ($LASTEXITCODE -ne 0 -or -not $packageInfo.Success) { throw 'No se pudo leer la identidad de la APK.' }
+if ($packageInfo.Groups[1].Value -ne $Identity.androidApplicationId -or $packageInfo.Groups[2].Value -ne $Version) { throw 'La APK no corresponde a la identidad nueva y version esperadas.' }
 if ($badging -notmatch "native-code:.*'arm64-v8a'") { throw 'La APK no incluye la arquitectura ARM64 requerida.' }
 $encoded = (Get-Content -Raw -LiteralPath $PasswordPath).Trim()
 if ($encoded.Length % 2 -ne 0 -or $encoded -notmatch '^[0-9A-Fa-f]+$') { throw 'Contrasena protegida no valida.' }
