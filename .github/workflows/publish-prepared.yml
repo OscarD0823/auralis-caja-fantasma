@@ -1,0 +1,48 @@
+name: Publicar paquetes firmados 1.25.0
+
+on:
+  push:
+    branches: [release/prepared-1.25.0]
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - id: plan
+        name: Leer el commit de origen
+        run: node -e 'const p=require("./release-plan.json"); if(!/^[a-f0-9]{40}$/.test(p.sourceCommit))process.exit(1); require("fs").appendFileSync(process.env.GITHUB_OUTPUT,`source=${p.sourceCommit}\n`)'
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.plan.outputs.source }}
+          path: source
+      - name: Reconstruir y comprobar APK y canales
+        run: node source/scripts/publish-prepared.mjs assemble . source
+      - name: Comprobar la firma de Windows
+        run: |
+          mkdir -p "$RUNNER_TEMP/caja-verify/src"
+          cp source/src-tauri/examples/verify_release.rs "$RUNNER_TEMP/caja-verify/src/main.rs"
+          cat > "$RUNNER_TEMP/caja-verify/Cargo.toml" <<'TOML'
+          [package]
+          name = "caja-release-verify"
+          version = "1.0.0"
+          edition = "2021"
+          [dependencies]
+          base64 = "=0.22.1"
+          minisign-verify = "=0.2.5"
+          TOML
+          cargo run --release --manifest-path "$RUNNER_TEMP/caja-verify/Cargo.toml" -- assembled/windows.pub assembled/Caja-Fantasma-1.25.0-Instalador.exe assembled/Caja-Fantasma-1.25.0-Instalador.exe.sig
+      - name: Publicar los paquetes comprobados
+        run: node source/scripts/publish-prepared.mjs publish . source
+        env:
+          GH_TOKEN: ${{ github.token }}
