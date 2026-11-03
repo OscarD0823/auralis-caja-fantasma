@@ -1,0 +1,100 @@
+{
+  "version": "1.25.0",
+  "sourceCommit": "0afa80e1aa7c52c1a672cdc76c67392f3a649155",
+  "artifacts": [
+    {
+      "name": "Caja-Fantasma-1.25.0-Instalador.exe",
+      "size": 13596979,
+      "sha256": "ff197e260cdb10fbc182909e8372b976d9766f199f4ef7d40a64badb8b54c790",
+      "parts": [
+        "payload/windows/part-00000.bin",
+        "payload/windows/part-00001.bin",
+        "payload/windows/part-00002.bin",
+        "payload/windows/part-00003.bin",
+        "payload/windows/part-00004.bin",
+        "payload/windows/part-00005.bin",
+        "payload/windows/part-00006.bin",
+        "payload/windows/part-00007.bin",
+        "payload/windows/part-00008.bin",
+        "payload/windows/part-00009.bin",
+        "payload/windows/part-00010.bin",
+        "payload/windows/part-00011.bin",
+        "payload/windows/part-00012.bin",
+        "payload/windows/part-00013.bin",
+        "payload/windows/part-00014.bin",
+        "payload/windows/part-00015.bin",
+        "payload/windows/part-00016.bin",
+        "payload/windows/part-00017.bin",
+        "payload/windows/part-00018.bin",
+        "payload/windows/part-00019.bin",
+        "payload/windows/part-00020.bin",
+        "payload/windows/part-00021.bin",
+        "payload/windows/part-00022.bin",
+        "payload/windows/part-00023.bin",
+        "payload/windows/part-00024.bin",
+        "payload/windows/part-00025.bin"
+      ]
+    },
+    {
+      "name": "Caja-Fantasma-Android-1.25.0.apk",
+      "size": 23236282,
+      "sha256": "309c1464db0896068abb93f186f05c56b0f28ff38044f7a368924d6ed14a0565",
+      "delta": {
+        "source": "unsigned/app-universal-release-unsigned.apk",
+        "sourceSize": 23154839,
+        "sourceSha256": "921b801d56a5280a827e909157321ff8ce30ee98aa25cb87fe8d3cb35387d8b2",
+        "patchSha256": "1c142d6d53aa8d8ff923a42ea528cf3a13cecfe7242a74f7e74a3f1a6b8bccec",
+        "patchParts": [
+          "payload/android-delta/part-00000.bin",
+          "payload/android-delta/part-00001.bin",
+          "payload/android-delta/part-00002.bin",
+          "payload/android-delta/part-00003.bin",
+          "payload/android-delta/part-00004.bin",
+          "payload/android-delta/part-00005.bin",
+          "payload/android-delta/part-00006.bin",
+          "payload/android-delta/part-00007.bin"
+        ]
+      }
+    },
+    {
+      "name": "Caja-Fantasma-1.25.0-Instalador.exe.sig",
+      "size": 436,
+      "sha256": "7a1efab4492c5e067a36fe05816ce7da67f10deb51dfe50c9c26164b48dc6238",
+      "parts": [
+        "payload/metadata/Caja-Fantasma-1.25.0-Instalador.exe.sig"
+      ]
+    },
+    {
+      "name": "latest-v2.json",
+      "size": 2739,
+      "sha256": "23c3831d58bf4e11f96d809405d986bece98b802bc7586b5cbf6fc30502dd220",
+      "parts": [
+        "payload/metadata/latest-v2.json"
+      ]
+    },
+    {
+      "name": "latest.json",
+      "size": 1481,
+      "sha256": "024219376a7f0346de496672272c7ae8b239812396ae28e9f3e16d55642c40c4",
+      "parts": [
+        "payload/metadata/latest.json"
+      ]
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 466,
+      "sha256": "8d151699214070b89120b29962b7c1da76838f89166ef726183ee0939759f88c",
+      "parts": [
+        "payload/metadata/SHA256SUMS.txt"
+      ]
+    },
+    {
+      "name": "NOTAS-VERSION-1.25.0.md",
+      "size": 1534,
+      "sha256": "4fcc81f320875f003f7df3ec9515b85a0ae35e16c691128b6386d65b1f6019b4",
+      "parts": [
+        "payload/metadata/NOTAS-VERSION-1.25.0.md"
+      ]
+    }
+  ]
+}

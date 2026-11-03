@@ -1,8 +1,0 @@
-.migration-guide { padding: 18px 20px; line-height: 1.6; }
-.migration-guide summary { cursor: pointer; font-weight: 700; color: #dcecf2; }
-.migration-guide p { margin: 12px 0; color: #aabec9; }
-.migration-guide ol { padding-left: 22px; margin: 14px 0; }
-.migration-guide li { margin: 8px 0; }
-.migration-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
-.migration-guide small { display: flex; gap: 8px; align-items: center; color: #9db5c3; }
-@media (max-width: 600px) { .migration-guide { padding: 15px; } .migration-actions button { flex: 1 1 160px; } }

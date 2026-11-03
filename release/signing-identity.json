@@ -1,8 +1,0 @@
-{
-  "generation": 2,
-  "windowsPublicKey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDkyMjlEQzYwNDkyRTQyQUUKUldTdVFpNUpZTndwa3JnK013b3BQcnBYd3JsQXRMSHlrazVDMldSd3FPQStWVUFZN2F1TDMzV1EK",
-  "androidApplicationId": "com.oscard0823.auralis.cajafantasma",
-  "androidCertificateSha256": "f3953d60b12d7e8b8506335d98eea6aab920aaef106420f22ad050d5e72b5e8c",
-  "updaterManifest": "latest-v2.json",
-  "legacyVersion": "1.23.1"
-}

@@ -1,0 +1,20 @@
+{
+  "version": "1.25.0",
+  "notes": "# Caja Fantasma 1.25.0\n\nIncluye el registro compacto por mapas de 1.24.0 y renueva las firmas de las aplicaciones tras perderse las claves anteriores al formatear el PC.\n\n## Si ya usas Windows\n\nExporta un respaldo en **Configuración → Respaldo local → Exportar**. Descarga el instalador 1.25.0 y ejecútalo sobre la aplicación actual. Se conserva el identificador y la carpeta de datos de Windows. Después de esta instalación manual, las próximas actualizaciones llegarán desde el programa.\n\n## Si ya usas Android\n\nLa nueva aplicación se instala junto a la anterior. Mantén la anterior instalada hasta comprobar la transferencia.\n\n1. En la anterior, abre **Configuración → Respaldo local → Exportar**.\n2. Instala la nueva APK e importa ese archivo mediante **Importar respaldo**.\n3. Comprueba personajes, puntos, cajas, rondas y módulos. Conserva el archivo de respaldo.\n\nTambién puedes pasar el progreso con **Dispositivos**, usando el PC o la web como copia intermedia. La aplicación anterior conserva sus datos mientras permanezca instalada.\n\nLa importación conserva los registros y aplica el catálogo más reciente disponible. Las versiones antiguas siguen consultando su canal anterior y no reciben automáticamente un paquete incompatible.\n\n[Guía de transferencia](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html).\n\nReferencias: [firmas y actualizaciones Android](https://developer.android.com/studio/publish/app-signing), [actualizador de Tauri](https://v2.tauri.app/plugin/updater/).\n",
+  "pub_date": "2026-11-03T06:34:32.838Z",
+  "signing_generation": 2,
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTdVFpNUpZTndwa2xOa0U1eFN5YVJsejRJQ0ViRlF2NmpEMEdMaG90a255UmVxUlJpZXBXWmRXdm1pZzMwWi9qeXdVV2JNUXgrY1dKak11UVhMMGllZzgzUUw1a0lQRVFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzNjg2MjM4CWZpbGU6QXVyYWxpcyBDYWphIEZhbnRhc21hXzEuMjUuMF94NjQtc2V0dXAuZXhlCnFITCtCTWVhUG1RamhWeEZ3RlZFU212RjBBdzBnK0x1RmlMQzNFUXRsUTIwM3g4UDBCYjVodCtoT1F6cVRqL0h1c3h6WWVTNTlWWWtGUmtSUnFyVERBPT0K",
+      "url": "https://github.com/OscarD0823/auralis-caja-fantasma/releases/download/v1.25.0/Caja-Fantasma-1.25.0-Instalador.exe"
+    }
+  },
+  "android": {
+    "url": "https://github.com/OscarD0823/Caja-Fantasma/releases/download/v1.25.0/Caja-Fantasma-Android-1.25.0.apk",
+    "sha256": "309C1464DB0896068ABB93F186F05C56B0F28FF38044F7A368924D6ED14A0565",
+    "architecture": "arm64-v8a",
+    "minimum_android": 8,
+    "application_id": "com.oscard0823.auralis.cajafantasma",
+    "certificate_sha256": "f3953d60b12d7e8b8506335d98eea6aab920aaef106420f22ad050d5e72b5e8c"
+  }
+}
