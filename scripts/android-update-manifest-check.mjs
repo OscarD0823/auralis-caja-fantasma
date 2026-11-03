@@ -32,8 +32,9 @@ try {
   await writeFile(apk, "");
   await assert.rejects(androidUpdateMetadata(apk, "1.23.1"));
   const builder = await readFile(new URL("./build-installer.ps1", import.meta.url), "utf8");
-  assert(builder.includes('android-update-manifest.mjs"'));
-  assert(builder.includes('& $Node $AndroidManifestTool check $ManifestPath $AndroidApk'));
+  assert(builder.includes('create-release-manifests.mjs'));
+  const releaseBuilder = await readFile(new URL('./create-release-manifests.mjs', import.meta.url), 'utf8');
+  assert(releaseBuilder.includes('validateAndroidUpdate({ version, android }, android)'));
   console.log("Android update regression OK: legacy clients, repository migration, version and APK integrity.");
 } finally {
   await rm(directory, { recursive: true, force: true });

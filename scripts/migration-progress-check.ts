@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import { initialState, importState } from '../src/storage.ts';
+import { applyRemoteCatalog } from '../src/model.ts';
+
+const previous = structuredClone(initialState());
+previous.catalog.catalogVersion--;
+const now = '2026-11-03T00:00:00.000Z';
+const character = previous.characters[0];
+previous.actions = [{ id: 'ongoing', activityId: 'pro-silo', activityName: 'Silo', points: 2, occurredAt: now, characterId: character.id }];
+previous.activityHistory = previous.actions.map(action => ({ id: action.id, activityId: action.activityId, activityName: action.activityName, occurredAt: action.occurredAt, points: action.points, count: 1 }));
+previous.boxes = [{ id: 'old-box', occurredAt: now, points: 987, claims: 500, characterId: character.id, characterName: character.name, actionIds: ['claimed-old'], breakdown: [{ name: 'Silo', points: 987, count: 500 }] }];
+previous.pointRounds = [{ id: 'old-round', startedAt: now, endedAt: now, trigger: 'manual', points: 2, claims: 1, actionIds: ['ongoing'], trackingMode: 'solo', characterId: character.id, characterName: character.name, breakdown: [{ name: 'Silo', count: 1, points: 2 }] }];
+previous.deletedActionIds = ['intentional-correction'];
+previous.manualBaselinePoints = [1001];
+previous.shinyMods = [{ id: 'old-mod', modName: 'Modulo', groupName: 'Grupo', variant: 'Pro', attempts: 31, isShiny: true, createdAt: now, obtainedAt: now }];
+const imported = importState(JSON.stringify(previous));
+const migrated = applyRemoteCatalog(imported, initialState().catalog);
+for (const key of ['actions', 'activityHistory', 'boxes', 'pointRounds', 'deletedActionIds', 'manualBaselinePoints', 'shinyMods', 'characters', 'activeCharacterId'] as const) assert.deepEqual(JSON.parse(JSON.stringify(migrated[key])), JSON.parse(JSON.stringify(previous[key])), `Migration must preserve ${key}.`);
+assert(migrated.catalog.catalogVersion > previous.catalog.catalogVersion);
+assert.equal(migrated.actions[0].points, 2);
+console.log('Migration progress OK: backup imports preserve points, crates, rounds, mods, characters and corrections while updating the catalog.');

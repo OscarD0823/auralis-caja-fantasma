@@ -20,3 +20,8 @@ plugins/*/android/.tauri/
 plugins/*/android/build/
 .env
 !.env.example
+*.jks
+*.keystore
+*.key
+*.dpapi
+recuperacion-privada.json

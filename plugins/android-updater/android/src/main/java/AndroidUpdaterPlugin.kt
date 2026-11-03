@@ -27,7 +27,7 @@ import java.security.MessageDigest
 import java.util.Locale
 
 private const val RELEASE_MANIFEST =
-    "https://github.com/OscarD0823/Caja-Fantasma/releases/latest/download/latest.json"
+    "https://github.com/OscarD0823/Caja-Fantasma/releases/latest/download/latest-v2.json"
 private const val APK_MIME = "application/vnd.android.package-archive"
 private const val MAX_MANIFEST_BYTES = 1_048_576
 private const val MAX_APK_BYTES = 150L * 1_048_576L

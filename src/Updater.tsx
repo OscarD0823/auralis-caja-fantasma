@@ -54,6 +54,7 @@ export default function AppUpdater({ beforeInstall, language = "es" }: { beforeI
       setError("");
       setProgress(null);
       try {
+        await beforeInstallRef.current?.();
         const result = await invoke<AndroidInstallResult>("plugin:android-updater|install", {
           version: release.version,
           url: release.url,

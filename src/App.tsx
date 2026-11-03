@@ -117,6 +117,7 @@ import RewardProgressBar from "./RewardProgressBar";
 import ObservedProbability from "./ObservedProbability";
 import CrateHistoryCard from "./CrateHistoryCard";
 import ActivityMapBoard from "./ActivityMapBoard";
+import MigrationGuide from "./MigrationGuide";
 
 type ShinyCatalogModule = typeof import("./shinyModsCatalog");
 const EMPTY_SHINY_CATALOG: ShinyModCatalogItem[] = [];
@@ -2129,7 +2130,8 @@ export default function App() {
   const onImport = async (file?: File) => {
     if (!file) return;
     try {
-      commitState(importState(await file.text()));
+      const imported = importState(await file.text());
+      commitState((current) => applyRemoteCatalog(imported, current.catalog));
       setToast("Respaldo importado correctamente");
     } catch (error) {
       setToast(error instanceof Error ? error.message : "No se pudo importar el respaldo.");
@@ -2141,8 +2143,12 @@ export default function App() {
 
   return (
     <div className="app-shell" data-event={cycle.phase === "active" ? visionVisualTheme(selectedVision) : "neutral"}>
+      <input ref={importRef} hidden type="file" accept="application/json,.json" onChange={(event) => void onImport(event.target.files?.[0])} />
       <AppUpdater language={language} beforeInstall={async () => {
-        if (!IS_ANDROID && isTauri()) {
+        if (IS_ANDROID) {
+          saveState(currentStateRef.current);
+          await invoke("save_native_personal_backup", { dataJson: JSON.stringify(personalSyncPayload(currentStateRef.current)) });
+        } else if (isTauri()) {
           if (!restoreReadyRef.current) throw new Error("El respaldo inicial todavía se está recuperando. Intenta actualizar de nuevo.");
           const saved = await persistDesktopProgress(currentStateRef.current, invoke, false);
           currentStateRef.current = saved;
@@ -2212,6 +2218,7 @@ export default function App() {
           </div>
         </header>
 
+        {IS_ANDROID && tab === "progress" && personalHistoryCount(state) === 0 && <MigrationGuide language={language} android onImport={() => importRef.current?.click()} onDevices={() => setTab("devices")} />}
         {IS_WEB && tab !== "progress" && <WebInstallNotice pwa={pwa} language={language} />}
         {tutorialNotice && !introVisible && <div className="tutorial-welcome"><CircleHelp size={20} /><span>{tx("¿Primera vez? Conoce Auralis Caja Fantasma en seis pasos.", "First time? Learn Auralis Caja Fantasma in six steps.")}</span><button type="button" className="primary compact" onClick={() => setTutorialOpen(true)}>{tx("Ver tutorial", "View tutorial")}</button><button type="button" className="experience-close" aria-label={tx("Ocultar aviso", "Hide notice")} onClick={finishTutorial}><X size={16} /></button></div>}
 
@@ -2527,6 +2534,7 @@ export default function App() {
 
         {tab === "settings" && (
           <section className="page settings-page">
+            <MigrationGuide language={language} android={IS_ANDROID} onImport={() => importRef.current?.click()} onDevices={() => setTab("devices")} />
             <div className="settings-grid">
               <article className="settings-card language-settings panel">
                 <div className="settings-icon"><Languages /></div><div><h3>{tx("Idioma de la aplicación", "App language")}</h3><p>{tx("Detecta el idioma del dispositivo o elige uno de los 12 disponibles. Tu elección manual se conserva. Los textos aún no traducidos aparecen en inglés.", "Detect the device language or choose one of the 12 supported languages. Your manual choice is preserved. Text not yet translated appears in English.")}</p><div className="language-choice" role="group" aria-label={tx("Idioma", "Language")}><button type="button" className={state.settings.uiLanguageMode === "auto" ? "selected" : ""} onClick={() => commitState(current => ({ ...current, settings: { ...current.settings, uiLanguageMode: "auto", uiLanguage: detectUiLanguage() } }))}>Auto · {language.toUpperCase()}</button>{UI_LANGUAGES.map((item) => <button key={item.code} type="button" className={state.settings.uiLanguageMode !== "auto" && language === item.code ? "selected" : ""} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, uiLanguageMode: "manual", uiLanguage: item.code } }))}>{item.name}</button>)}</div></div>
@@ -2540,7 +2548,7 @@ export default function App() {
               {!IS_ANDROID && <><SettingToggle icon={MonitorUp} title={tx("Iniciar con Windows", "Start with Windows")} description={tx("Arranca en segundo plano; la ventana principal no interrumpe al encender el PC.", "Starts in the background without interrupting you when the PC boots.")} enabled={state.settings.autoStartEnabled} onToggle={(enabled) => { commitState((current) => ({ ...current, settings: { ...current.settings, autoStartEnabled: enabled } })); void toggleAutostart(enabled); }} /><SettingToggle icon={Eye} title={tx("Ventana flotante", "Floating overlay")} description={tx("Contador pequeño, movible y siempre encima del juego.", "A small movable countdown that stays above the game.")} enabled={state.settings.overlayEnabled} onToggle={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayEnabled: !current.settings.overlayEnabled } }))} /><SettingToggle icon={Zap} title={tx("Contador de Ballena", "Whale countdown")} description={tx("Muestra la Ballena y su rayo durante Gravedad; puede ocultarse sin quitar la ventana flotante.", "Shows the Whale and its beam during Gravity; it can be hidden without disabling the main overlay.")} enabled={state.settings.overlayWhaleEnabled} onToggle={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleEnabled: !current.settings.overlayWhaleEnabled } }))} /></>}
             </div>
 
-            <article className="backup-panel panel"><div><span className="eyebrow">{tx("DATOS PERSONALES", "PERSONAL DATA")}</span><h2>{tx("Respaldo local", "Local backup")}</h2><p>{tx("El historial permanece en este equipo y no se sube al repositorio público.", "Your history stays on this device and is not uploaded to the public repository.")}</p></div><div><button type="button" className="secondary" onClick={() => exportState(state)}><Download size={17} /> {tx("Exportar", "Export")}</button><button type="button" className="secondary" onClick={() => importRef.current?.click()}><Upload size={17} /> {tx("Importar", "Import")}</button><input ref={importRef} hidden type="file" accept="application/json,.json" onChange={(event) => void onImport(event.target.files?.[0])} /></div></article>
+            <article className="backup-panel panel"><div><span className="eyebrow">{tx("DATOS PERSONALES", "PERSONAL DATA")}</span><h2>{tx("Respaldo local", "Local backup")}</h2><p>{tx("El historial permanece en este equipo y no se sube al repositorio público.", "Your history stays on this device and is not uploaded to the public repository.")}</p></div><div><button type="button" className="secondary" onClick={() => exportState(state)}><Download size={17} /> {tx("Exportar", "Export")}</button><button type="button" className="secondary" onClick={() => importRef.current?.click()}><Upload size={17} /> {tx("Importar", "Import")}</button></div></article>
 
             {(creatorAccess === "granted" || ownerEntryRequested) && <article className="owner-panel panel">
               <div className="panel-title"><div><span className="eyebrow">{creatorAccess === "granted" ? "MODO DESARROLLADOR" : "CUENTA PROPIETARIA"}</span><h2>{creatorAccess === "granted" ? "Editor de OscarD0823" : "Acceso privado"}</h2></div><span className={`creator-access-badge ${creatorAccess}`}>{creatorAccess === "granted" ? <UserCheck size={15} /> : <LockKeyhole size={15} />}{creatorAccess === "granted" ? "Propietario verificado" : creatorAccess === "checking" ? "Comprobando" : "Bloqueado"}</span></div>
