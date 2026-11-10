@@ -12,10 +12,14 @@ export function activityName(activity: Activity, language: UiLanguage) {
 }
 
 export function activityPhaseNames(activity: Activity, activities: readonly Activity[], language: UiLanguage) {
-  return activity.phaseActivities?.map((id) => {
-    const phase = activities.find((candidate) => candidate.id === id);
-    return phase ? activityName(phase, language) : "";
-  });
+  if (activity.phaseActivities) {
+    return activity.phaseActivities.map((id) => {
+      const phase = activities.find((candidate) => candidate.id === id);
+      return phase ? activityName(phase, language) : "";
+    });
+  }
+  const phases = names.phases as Partial<Record<string, Partial<Record<UiLanguage, string[]>>>>;
+  return phases[activity.id]?.[language] ?? phases[activity.id]?.en;
 }
 
 export function localizedActivityRecord(record: Pick<PointAction, "activityId" | "activityName" | "visionId" | "visionName">, catalog: Catalog, language: UiLanguage) {

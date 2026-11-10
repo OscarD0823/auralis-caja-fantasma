@@ -21,6 +21,9 @@ for (const { code } of UI_LANGUAGES) {
   assert.equal(activityPhaseNames(lord, catalog.proActivities as Activity[], code)?.length, 3);
 }
 assert.deepEqual(activityPhaseNames(lord, catalog.proActivities as Activity[], "es"), ["Búho de Calamidad", "Torre de calamidad", "Señor Hundido"]);
+const lea = catalog.proActivities.find((activity) => activity.id === "manibus-lea")! as Activity;
+assert.deepEqual(activityPhaseNames(lea, catalog.proActivities as Activity[], "es"), ["2 gigantes", "Dr. Mannheim", "Madre de la vida"]);
+assert.deepEqual(activityPhaseNames(lea, catalog.proActivities as Activity[], "en"), ["2 Giants", "Dr. Mannheim", "Mother of Life"]);
 assert.equal(activityName(lord, "en"), "The Sunken Lord");
 assert.equal(activityName(lord, "de"), "Versunkener Lord");
 const oldLabel = { activityId: lord.id, activityName: "The Sunken Lord", visionId: undefined, visionName: undefined };

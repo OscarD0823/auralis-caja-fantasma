@@ -16,7 +16,7 @@ Las descargas llevan a la **última versión publicada**, no a versiones en prep
 
 **¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**1.27.0 · Mapas y jefes por idioma, avisos por voz.** Señor Hundido muestra los nombres de sus tres fases. El aviso de Gravedad utiliza el idioma elegido y Android cuenta con voz nativa y avisos programados en segundo plano. [Qué cambió](docs/versiones/NOTAS-VERSION-1.27.0.md) · [Historial de versiones](docs/versiones/).
+**1.27.1 · Mapas y jefes por idioma, avisos por voz.** LEA y Señor Hundido muestran los nombres de sus tres fases. El aviso de Gravedad utiliza el idioma elegido y Android cuenta con voz nativa y avisos programados en segundo plano. [Qué cambió](docs/versiones/NOTAS-VERSION-1.27.1.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 

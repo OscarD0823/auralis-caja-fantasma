@@ -67,5 +67,54 @@
     "https://wikily.gg/de/once-human/items/30380004/",
     "https://wikily.gg/pt/once-human/items/30380004/",
     "https://wikily.gg/ru/once-human/items/30380004/"
-  ]
+  ],
+  "phases": {
+    "manibus-lea": {
+      "es": [
+        "2 gigantes",
+        "Dr. Mannheim",
+        "Madre de la vida"
+      ],
+      "en": [
+        "2 Giants",
+        "Dr. Mannheim",
+        "Mother of Life"
+      ],
+      "pt": [
+        "2 gigantes",
+        "Dr. Mannheim",
+        "Mãe da Vida"
+      ],
+      "fr": [
+        "2 géants",
+        "Dr. Mannheim",
+        "Mère génitrice"
+      ],
+      "de": [
+        "2 Giganten",
+        "Dr. Mannheim",
+        "Mutter des Lebens"
+      ],
+      "ru": [
+        "2 гиганта",
+        "Dr. Mannheim",
+        "Матерь жизни"
+      ],
+      "ja": [
+        "巨人2体",
+        "Dr. Mannheim",
+        "生命の母"
+      ],
+      "ko": [
+        "거인 2마리",
+        "Dr. Mannheim",
+        "마더 오브 라이프"
+      ],
+      "zh": [
+        "2个巨人",
+        "Dr. Mannheim",
+        "唤生之母"
+      ]
+    }
+  }
 }
