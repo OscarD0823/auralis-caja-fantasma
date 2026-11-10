@@ -14,11 +14,9 @@ Tu seguimiento de recompensas, cajas y módulos Brillantes de Once Human, en **P
 
 Las descargas llevan a la **última versión publicada**, no a versiones en preparación. Los archivos también están organizados en [Programa](Programa/).
 
-**Catálogo 57:** añade **Torre de calamidad** y **Zona de calamidad**, con **1 punto por recompensa** y contadores independientes. PC, Android y web reciben el catálogo al conectarse a Internet, sin reinstalar la app ni borrar el progreso. No modifica los horarios de la visión.
+**¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**Actualización de instalaciones anteriores a Auralis:** el manifiesto Android conserva el enlace `OscarD0823/Caja-Fantasma`, que GitHub redirige al repositorio actual. Las APK antiguas validan ese nombre antes de descargar. No se debe ocupar de nuevo el nombre anterior ni sustituir este enlace en `latest.json`; el generador comprueba la compatibilidad y la suma SHA-256. El identificador y el certificado Android se mantienen, por lo que esta actualización se instala sobre la aplicación existente.
-
-**1.22.2 · Cofre fluido y animaciones ligeras:** apertura en vídeo local a 60 FPS y salida continua del fantasma. El cofre del contador conserva el mismo diseño con cerca de un 95 % menos de elementos y se pausa cuando no se ve. No cambia el progreso ni la sincronización. [Qué cambió](docs/versiones/NOTAS-VERSION-1.22.2.md) · [Historial de versiones](docs/versiones/).
+**1.26.0 · Jefes por fases y puntero flotante.** Registra hasta tres puntos por intento en LEA y The Sunken Lord. En Windows, coloca un punto de color sobre el juego junto al contador de la rueda. [Qué cambió](docs/versiones/NOTAS-VERSION-1.26.0.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 

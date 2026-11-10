@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { importState, initialState, loadState, personalSyncPayload } from "../src/storage.ts";
+import { importState, initialState, loadOverlayPosition, loadState, personalSyncPayload, saveOverlayPosition } from "../src/storage.ts";
 import type { Settings } from "../src/model.ts";
 
 function checkRemovedSettings(settings: Settings) {
@@ -22,6 +22,11 @@ Object.defineProperty(globalThis, "localStorage", {
 });
 
 try {
+  saveOverlayPosition({ x: 10, y: 20 });
+  saveOverlayPosition({ x: -120, y: 310 }, "pointer");
+  assert.deepEqual(loadOverlayPosition(), { x: 10, y: 20 });
+  assert.deepEqual(loadOverlayPosition("pointer"), { x: -120, y: 310 });
+
   for (const voiceEnabled of [true, false]) {
     const existing = initialState();
     const occurredAt = "2026-10-07T18:00:00.000Z";
@@ -35,6 +40,7 @@ try {
     existing.settings.lastVoiceAlertPhaseStartedAt = occurredAt;
     existing.settings.overlayEnabled = true;
     existing.settings.overlayScale = .5;
+    existing.settings.pointer = { enabled: true, color: "#f0a002" };
     existing.settings.phoneSyncAddress = "192.168.1.20:47183";
     existing.settings.phoneSyncCode = "123456";
     const legacy = {
@@ -53,6 +59,7 @@ try {
       assert.equal(migrated.settings.lastVoiceAlertPhaseStartedAt, occurredAt);
       assert.equal(migrated.settings.overlayEnabled, true);
       assert.equal(migrated.settings.overlayScale, .5);
+      assert.deepEqual(migrated.settings.pointer, existing.settings.pointer);
       assert.equal(migrated.settings.phoneSyncAddress, "192.168.1.20:47183");
       assert.equal(migrated.settings.phoneSyncCode, "123456");
       assert.equal(Object.hasOwn(personalSyncPayload(migrated), "settings"), false, "Connection details must remain device-local.");
@@ -65,6 +72,13 @@ try {
     assert.deepEqual(personalSyncPayload(recovered), personalSyncPayload(existing));
     assert.equal(recovered.settings.voiceNotificationsEnabled, voiceEnabled);
   }
+  const old = initialState();
+  delete old.settings.pointer;
+  assert.deepEqual(importState(JSON.stringify(old)).settings.pointer, { enabled: false, color: "#54f1b9" });
+  old.settings.pointer = { enabled: true, color: "invalid" };
+  memory.set(storageKey, JSON.stringify(old));
+  memory.delete(backupKey);
+  assert.deepEqual(loadState().settings.pointer, { enabled: true, color: "#54f1b9" });
 } finally {
   if (originalStorage) Object.defineProperty(globalThis, "localStorage", originalStorage);
   else Reflect.deleteProperty(globalThis, "localStorage");

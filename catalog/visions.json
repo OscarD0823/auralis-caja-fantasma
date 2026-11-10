@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 58,
-  "updatedAt": "2026-11-03T00:05:09.238Z",
+  "catalogVersion": 59,
+  "updatedAt": "2026-11-10T05:51:23.000Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -65,6 +65,15 @@
       "mapId": "manibus"
     },
     {
+      "id": "manibus-lea",
+      "name": "Laboratorio LEA",
+      "points": 1,
+      "enabled": true,
+      "note": "Registra una vez la fase más alta del intento.",
+      "mapId": "manibus",
+      "phaseCount": 3
+    },
+    {
       "id": "dreamer-light",
       "name": "Soñador de Luz",
       "points": 1,
@@ -114,10 +123,18 @@
     },
     {
       "id": "calamity-tower",
-      "name": "Torre de calamidad",
-      "points": 1,
+      "name": "Faro · Torre de calamidad",
+      "points": 3,
       "enabled": true,
       "note": "Cuenta al reclamar la recompensa.",
+      "mapId": "abyss"
+    },
+    {
+      "id": "calamity-owl",
+      "name": "Búho de calamidad",
+      "points": 1,
+      "enabled": true,
+      "note": "Recompensa del Búho en el Nido de calamidad.",
       "mapId": "abyss"
     },
     {
@@ -127,6 +144,23 @@
       "enabled": true,
       "note": "Cuenta al reclamar la recompensa.",
       "mapId": "abyss"
+    },
+    {
+      "id": "sunken-lord",
+      "name": "The Sunken Lord",
+      "points": 1,
+      "enabled": true,
+      "note": "Registra una vez la fase más alta del intento.",
+      "mapId": "abyss",
+      "phaseCount": 3
+    },
+    {
+      "id": "winter-chaosweaver",
+      "name": "Tejedores del caos",
+      "points": 1,
+      "enabled": true,
+      "note": "Recompensa de un tejedor (Chaosweaver).",
+      "mapId": "winter"
     }
   ],
   "visions": [

@@ -2,7 +2,7 @@ name: Compilar candidato Android
 
 on:
   push:
-    branches: [codex/signing-migration-1.25.0]
+    branches: ['codex/release-*']
   workflow_dispatch:
 
 permissions:
@@ -40,6 +40,8 @@ jobs:
           cache-on-failure: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm run lint && pnpm test
+      - id: version
+        run: node -e 'require("fs").appendFileSync(process.env.GITHUB_OUTPUT, "app=" + require("./package.json").version + "\n")'
       - name: Inicializar proyecto Android
         run: pnpm tauri android init --ci --skip-targets-install
       - name: Compilar APK ARM64 sin firma privada
@@ -49,7 +51,7 @@ jobs:
           CARGO_BUILD_JOBS: 4
       - uses: actions/upload-artifact@v5
         with:
-          name: Caja-Fantasma-Android-1.25.0-sin-firma
+          name: Caja-Fantasma-Android-${{ steps.version.outputs.app }}-sin-firma
           path: src-tauri/gen/android/app/build/outputs/apk/universal/release/*unsigned.apk
           if-no-files-found: error
           retention-days: 7

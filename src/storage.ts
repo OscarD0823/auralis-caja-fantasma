@@ -5,7 +5,10 @@ import { detectUiLanguage, restoredLanguage } from "./i18n.ts";
 
 export const STORAGE_KEY = "caja-fantasma.once-human.state.v1";
 const SAFETY_BACKUP_KEY = "caja-fantasma.once-human.safety-backup.v1";
-const OVERLAY_POSITION_KEY = "caja-fantasma.once-human.overlay-position.v1";
+const OVERLAY_POSITION_KEYS = {
+  overlay: "caja-fantasma.once-human.overlay-position.v1",
+  pointer: "caja-fantasma.once-human.pointer-position.v1",
+};
 const PERSONAL_SYNC_UPDATED_AT_KEY = "caja-fantasma.once-human.personal-sync-updated-at.v1";
 export const PERSONAL_SYNC_INITIAL_DATE = "1970-01-01T00:00:00.000Z";
 const CURRENT_DATA_RESET_VERSION = 2;
@@ -48,6 +51,14 @@ export function hasIntentionalActionDeletions(value: unknown) {
 }
 
 export type OverlayPosition = { x: number; y: number };
+export type PositionedOverlay = keyof typeof OVERLAY_POSITION_KEYS;
+
+export function pointerSettings(value?: Settings["pointer"]): NonNullable<Settings["pointer"]> {
+  return {
+    enabled: value?.enabled === true,
+    color: typeof value?.color === "string" && /^#[a-f\d]{6}$/i.test(value.color) ? value.color : "#54f1b9",
+  };
+}
 
 function parseStoredState(text: string): Partial<PersistedState> | null {
   try {
@@ -258,6 +269,7 @@ export function initialState(): PersistedState {
       overlayCounterStyle: "digital",
       overlayNameMode: "spanish",
       overlayCustomName: "",
+      pointer: pointerSettings(),
       transitionDelayMilliseconds: 3_000,
       voiceNotificationsEnabled: true,
       voiceLeadMinutes: 5,
@@ -323,6 +335,7 @@ export function loadState(): PersistedState {
     settings.overlayCounterStyle = OVERLAY_COUNTER_STYLES.has(settings.overlayCounterStyle) ? settings.overlayCounterStyle : "digital";
     settings.overlayNameMode = OVERLAY_NAME_MODES.has(settings.overlayNameMode) ? settings.overlayNameMode : "spanish";
     settings.overlayCustomName = typeof settings.overlayCustomName === "string" ? settings.overlayCustomName.trim().slice(0, 40) : "";
+    settings.pointer = pointerSettings(parsed.settings?.pointer);
     settings.localSyncEnabled = settings.localSyncEnabled === true;
     settings.localSyncLiveEnabled = settings.localSyncLiveEnabled === true;
     settings.localSyncAddress = typeof settings.localSyncAddress === "string" ? settings.localSyncAddress.trim().slice(0, 80) : "";
@@ -382,9 +395,9 @@ export function saveState(state: PersistedState) {
   window.dispatchEvent(new CustomEvent("caja-fantasma-state", { detail: state }));
 }
 
-export function loadOverlayPosition(): OverlayPosition | undefined {
+export function loadOverlayPosition(overlay: PositionedOverlay = "overlay"): OverlayPosition | undefined {
   try {
-    const value = JSON.parse(localStorage.getItem(OVERLAY_POSITION_KEY) ?? "null") as Partial<OverlayPosition> | null;
+    const value = JSON.parse(localStorage.getItem(OVERLAY_POSITION_KEYS[overlay]) ?? "null") as Partial<OverlayPosition> | null;
     if (!value || !Number.isFinite(value.x) || !Number.isFinite(value.y)) return undefined;
     if (Math.abs(value.x!) > 100_000 || Math.abs(value.y!) > 100_000) return undefined;
     return { x: Math.round(value.x!), y: Math.round(value.y!) };
@@ -393,9 +406,9 @@ export function loadOverlayPosition(): OverlayPosition | undefined {
   }
 }
 
-export function saveOverlayPosition(position: OverlayPosition) {
+export function saveOverlayPosition(position: OverlayPosition, overlay: PositionedOverlay = "overlay") {
   if (!Number.isFinite(position.x) || !Number.isFinite(position.y)) return;
-  localStorage.setItem(OVERLAY_POSITION_KEY, JSON.stringify({ x: Math.round(position.x), y: Math.round(position.y) }));
+  localStorage.setItem(OVERLAY_POSITION_KEYS[overlay], JSON.stringify({ x: Math.round(position.x), y: Math.round(position.y) }));
 }
 
 export function exportState(state: PersistedState) {
@@ -447,6 +460,7 @@ export function importState(text: string): PersistedState {
       overlayCounterStyle: OVERLAY_COUNTER_STYLES.has(parsed.settings?.overlayCounterStyle as OverlayCounterStyle) ? parsed.settings!.overlayCounterStyle! : "digital",
       overlayNameMode: OVERLAY_NAME_MODES.has(parsed.settings?.overlayNameMode as OverlayNameMode) ? parsed.settings!.overlayNameMode! : "spanish",
       overlayCustomName: typeof parsed.settings?.overlayCustomName === "string" ? parsed.settings.overlayCustomName.trim().slice(0, 40) : "",
+      pointer: pointerSettings(parsed.settings?.pointer),
       localSyncEnabled: parsed.settings?.localSyncEnabled === true,
       localSyncLiveEnabled: parsed.settings?.localSyncLiveEnabled === true,
       localSyncAddress: typeof parsed.settings?.localSyncAddress === "string" ? parsed.settings.localSyncAddress.trim().slice(0, 80) : "",

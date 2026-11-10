@@ -1,11 +1,11 @@
 import { useRef, useState, type ReactNode } from "react";
-import { ChevronRight, Moon, Swords, Waves } from "lucide-react";
+import { ChevronRight, Moon, Snowflake, Swords, Waves } from "lucide-react";
 import type { Activity, ActivityMapId, Vision } from "./model";
 import { activitiesByMap } from "./activityMaps";
 import type { UiLanguage } from "./i18n";
 
 const MAP_PREFERENCE = "caja-fantasma.activity-map.v1";
-const MAP_ICONS = { manibus: Swords, dream: Moon, abyss: Waves };
+const MAP_ICONS = { manibus: Swords, dream: Moon, abyss: Waves, winter: Snowflake };
 type ScenarioMapId = Exclude<ActivityMapId, "general">;
 
 export default function ActivityMapBoard({ activities, vision, language, renderActivity, onViewVision }: {
@@ -22,7 +22,7 @@ export default function ActivityMapBoard({ activities, vision, language, renderA
   const [selected, setSelected] = useState<ScenarioMapId>(() => {
     try {
       const saved = localStorage.getItem(MAP_PREFERENCE);
-      if (saved === "manibus" || saved === "dream" || saved === "abyss") return saved;
+      if (scenarios.some((map) => map.id === saved)) return saved as ScenarioMapId;
     } catch { /* A blocked preference must not block counters. */ }
     return "manibus";
   });

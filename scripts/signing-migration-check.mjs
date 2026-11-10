@@ -26,6 +26,9 @@ assert.deepEqual(previous.platforms, legacy.platforms, 'Old clients must keep th
 assert.deepEqual(previous.android, legacy.android, 'Old clients must never be offered the new Android identity.');
 assert(previous.android.url.startsWith(LEGACY_APK_PREFIX));
 assert(previous.android.url.includes('/v1.23.1/'));
+assert.equal(previous.migration.version, version);
+assert(previous.notes.includes(previous.migration.guide));
+assert(previous.notes.startsWith(legacy.notes));
 assert.equal(legacy.migration, undefined, 'Manifest generation must not mutate the frozen legacy snapshot.');
 assert.throws(() => releaseManifests({ ...input, identity: { ...identity, androidApplicationId: config.identifier } }));
 assert.throws(() => releaseManifests({ ...input, identity: { ...identity, androidCertificateSha256: '' } }));

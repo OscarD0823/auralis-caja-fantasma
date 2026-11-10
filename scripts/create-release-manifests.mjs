@@ -17,6 +17,7 @@ export function releaseManifests({ version, signature, android, notes, identity,
   };
   const previous = structuredClone(legacy);
   previous.migration = { version, guide: 'https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html', automatic: false };
+  previous.notes += `\nPara pasar a la versión ${version} en Windows, abre Configuración → Windows → Descargar para PC y ejecuta el instalador sobre tu copia actual. Este paso conserva el progreso y se hace una sola vez. Guía: ${previous.migration.guide}\n`;
   return { current, previous };
 }
 

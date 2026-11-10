@@ -62,19 +62,21 @@ import { ShinyModuleMark } from "./GameLogoMark";
 import ConsoleGlyph from "./ConsoleGlyph";
 import { recentConnectedDevices, type DeviceKind } from "./devicePresence";
 import { GRAVITY_EVENT_IMAGE_A, GRAVITY_EVENT_IMAGE_B, LUNAR_EVENT_IMAGE, SYMBIOSIS_EVENT_IMAGE, visionVisualImage, visionVisualTheme } from "./assets";
-import type { Activity, ActivityHistoryRecord, Catalog, CharacterProfile, OverlayCounterStyle, OverlayNameMode, OverlayShape, PersistedState, PointAction, PointRoundRecord, PointRoundTrigger, Settings, ShinyModRecord, Vision, WhaleCounterStyle } from "./model";
+import type { Activity, ActivityHistoryRecord, Catalog, CharacterProfile, OverlayCounterStyle, OverlayNameMode, OverlayShape, PersistedState, PointAction, PointRoundRecord, PointRoundTrigger, RewardPhase, Settings, ShinyModRecord, Vision, WhaleCounterStyle } from "./model";
 import {
   APP_VERSION,
   ANDROID_APK_URL,
   AUTHOR,
   AUTHOR_PROFILE_URL,
   DEFAULT_CHARACTER_ID,
+  REWARD_PHASES,
   REMOTE_CATALOG_URL,
   REPOSITORY_URL,
   WEB_APP_URL,
   WINDOWS_DOWNLOAD_URL,
   actionCharacterIds,
   activityHistorySummary,
+  activityRewardPoints,
   applyRemoteCatalog,
   actionsForCharacter,
   actionsForTeamSession,
@@ -99,7 +101,7 @@ import {
   splitPlatformCarryover,
   validateCatalog,
 } from "./model";
-import { STORAGE_KEY, applyPersonalSyncPayload, exportState, hasIntentionalActionDeletions, importState, loadPersonalSyncUpdatedAt, loadState, mergePersonalSyncPayload, personalDurableHistoryCount, personalHistoryCount, personalSyncPayload, recoverPersonalBackup, savePersonalSyncUpdatedAt, saveState } from "./storage";
+import { STORAGE_KEY, applyPersonalSyncPayload, exportState, hasIntentionalActionDeletions, importState, loadPersonalSyncUpdatedAt, loadState, mergePersonalSyncPayload, personalDurableHistoryCount, personalHistoryCount, personalSyncPayload, pointerSettings, recoverPersonalBackup, savePersonalSyncUpdatedAt, saveState, type PositionedOverlay } from "./storage";
 import { isValidLocalSyncAddress, localSyncTargetAddressSpace, splitLocalSyncAddress } from "./localSyncAddress";
 import { UI_LANGUAGES, detectUiLanguage, localeForLanguage, translate, type UiLanguage } from "./i18n";
 import AppTutorial from "./AppTutorial";
@@ -215,6 +217,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.26.0", date: "10 de noviembre de 2026", title: "Jefes por fases y puntero flotante", items: ["Laboratorio LEA en Manibus y The Sunken Lord en Islas del Abismo. Registra un intento con 1, 2 o 3 puntos según la fase.", "Faro de calamidad de 3 puntos, búho de 1 y nueva pestaña Winter con tejedores de 1 punto.", "Puntero de color ajustable junto a los controles de la Rueda Visional. En Windows se puede colocar sobre el juego."] },
   { version: "1.22.2", date: "10 de octubre de 2026", title: "Cofre fluido y animaciones ligeras", items: ["Apertura del cofre en vídeo local a 60 FPS, sin cargar el modelo 3D pesado durante el inicio.", "El fantasma emerge y se aleja de forma continua, sin las pausas de la trayectoria anterior.", "El cofre junto a los puntos conserva su tapa y fantasma con cerca de un 95 % menos de elementos; se pausa fuera de pantalla y en segundo plano.", "Reproducción adaptada a Windows, Android y web, con alternativa estática si falla el vídeo o se prefiere reducir movimiento.", "Conserva los puntos, las cajas, los personajes, los módulos y la sincronización existente."] },
   { version: "1.22.1", date: "9 de octubre de 2026", title: "Cofre con profundidad e iconos fieles", items: ["Cofre con herrajes en relieve, tapa curva, cerradura profunda y paredes interiores; conserva la apertura del módulo y el fantasma.", "Acabado de metal envejecido con tornillos, ranuras y desgaste sutil, sin el aspecto plástico anterior.", "El logo y los iconos de Windows, Android y web se generan desde el mismo cofre tridimensional, con proporciones y márgenes seguros.", "Piezas estáticas reutilizadas y animaciones que respetan movimiento reducido; no cambia el progreso, el historial ni la sincronización."] },
   { version: "1.22.0", date: "9 de octubre de 2026", title: "Conexiones juntas y consola de progreso", items: ["La web en Android y las PWA muestran Conectar con el celular; ya no se confunden con la APK.", "Dispositivos reúne PC, web, Android y ambos enlaces en el mismo lugar.", "Progreso con energía segmentada, cofre que refleja su carga, botones de metal e indicadores de conexión con circuitos animados.", "Apertura más fluida, icono con márgenes seguros para móvil, tutorial de seis pasos y nueva vista de actualización.", "Detección automática del idioma en instalaciones nuevas; las elecciones anteriores se conservan."] },
@@ -862,9 +865,9 @@ function pointRoundTriggerLabel(trigger: PointRoundTrigger, language: UiLanguage
   return language !== "es" ? "Manual save" : "Guardado manual";
 }
 
-async function showOverlay(show: boolean) {
+async function showOverlay(label: PositionedOverlay, show: boolean) {
   if (!isTauri() || IS_ANDROID) return;
-  const overlay = await WebviewWindow.getByLabel("overlay");
+  const overlay = await WebviewWindow.getByLabel(label);
   if (!overlay) return;
   if (show) await overlay.show();
   else await overlay.hide();
@@ -895,6 +898,7 @@ export default function App() {
     try { localStorage.setItem("caja-fantasma.tutorial.seen.v1", "1"); } catch { /* Tutorial preference must not block progress saving. */ }
   }, []);
   const [homeOverlayConfigOpen, setHomeOverlayConfigOpen] = useState(false);
+  const pointer = pointerSettings(state.settings.pointer);
   const [localSyncInfo, setLocalSyncInfo] = useState<LocalSyncInfo>();
   const [localSyncStatus, setLocalSyncStatus] = useState("Sin conexión local");
   const [localSyncBusy, setLocalSyncBusy] = useState(false);
@@ -1622,8 +1626,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    void showOverlay(state.settings.overlayEnabled);
+    void showOverlay("overlay", state.settings.overlayEnabled).catch(() => undefined);
   }, [state.settings.overlayEnabled]);
+
+  useEffect(() => {
+    void showOverlay("pointer", pointer.enabled).catch(() => undefined);
+  }, [pointer.enabled]);
 
   useEffect(() => {
     if (!personalRestoreReady || cycle.phase !== "active" || state.settings.lastPointRoundEventStartedAt === cyclePhaseStartedAt) return;
@@ -1707,8 +1715,9 @@ export default function App() {
     });
   }, [state.settings.autoStartEnabled]);
 
-  const addActivity = (activity: Activity, vision?: Vision) => {
-    if (!activity.enabled || activity.points <= 0 || (vision && !vision.enabled)) return;
+  const addActivity = (activity: Activity, vision?: Vision, phase?: RewardPhase) => {
+    const points = activityRewardPoints(activity, phase);
+    if (!points || (vision && !vision.enabled)) return;
     if (isTeamMode && !teamReady) {
       setToast("Selecciona al menos dos personajes para registrar en Equipo");
       window.setTimeout(() => setToast(""), 2600);
@@ -1720,7 +1729,7 @@ export default function App() {
       activityName: activity.name,
       visionId: vision?.id,
       visionName: vision?.name,
-      points: activity.points,
+      points,
       occurredAt: new Date().toISOString(),
       characterIds: isTeamMode ? [...state.teamMemberIds] : [activeCharacter.id],
       trackingMode: isTeamMode ? "team" : "solo",
@@ -1737,7 +1746,7 @@ export default function App() {
       occurredAt: action.occurredAt,
     };
     commitState((current) => ({ ...current, actions: [...current.actions, action], activityHistory: [...current.activityHistory, historyRecord].slice(-100_000) }));
-    setToast(isTeamMode ? `+${activity.points} para ${state.teamMemberIds.length} personajes · ${activity.name}` : `+${activity.points} · ${activity.name}`);
+    setToast(isTeamMode ? `+${points} para ${state.teamMemberIds.length} personajes · ${activity.name}` : `+${points} · ${activity.name}`);
     window.setTimeout(() => setToast(""), 1800);
   };
 
@@ -2144,6 +2153,7 @@ export default function App() {
 
   return (
     <div className="app-shell" data-event={cycle.phase === "active" ? visionVisualTheme(selectedVision) : "neutral"}>
+      {(IS_WEB || IS_ANDROID) && pointer.enabled && <span className="pointer-dot in-app-pointer" style={{ backgroundColor: pointer.color }} aria-hidden="true" />}
       <input ref={importRef} hidden type="file" accept="application/json,.json" onChange={(event) => void onImport(event.target.files?.[0])} />
       <AppUpdater language={language} beforeInstall={async () => {
         if (isTauri() && !restoreReadyRef.current) throw new Error("El respaldo inicial todavía se está recuperando. Intenta actualizar de nuevo.");
@@ -2280,7 +2290,7 @@ export default function App() {
                 currentCount={currentPointRoundActions.filter((action) => action.visionId === vision?.id && action.activityId === activity.id).length}
                 dailyCount={activityCount(activity, vision).todayCount}
                 totalCount={activityCount(activity, vision).count}
-                onAdd={() => addActivity(activity, vision)}
+                onAdd={(phase) => addActivity(activity, vision, phase)}
                 onRemove={() => removeLastActivity(activity.id, vision?.id)}
               />} />
 
@@ -2291,8 +2301,24 @@ export default function App() {
               <div className="home-overlay-actions">
                 <button type="button" className="secondary" aria-expanded={homeOverlayConfigOpen} aria-controls="home-overlay-size-panel" onClick={() => setHomeOverlayEditing(!homeOverlayConfigOpen)}><Settings2 size={17} /> {homeOverlayConfigOpen ? tx("Terminar ajuste", "Finish editing") : tx("Abrir configuración", "Open settings")}</button>
                 {!IS_WEB && !IS_ANDROID && <button type="button" className={`secondary overlay-home-button ${state.settings.overlayEnabled ? "enabled" : ""}`} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayEnabled: !current.settings.overlayEnabled } }))}><Eye size={16} /> {state.settings.overlayEnabled ? tx("Quitar ventana", "Remove overlay") : tx("Agregar ventana", "Add overlay")}</button>}
+                <button type="button" className={`secondary overlay-home-button ${pointer.enabled ? "enabled" : ""}`} aria-pressed={pointer.enabled} onClick={() => commitState((current) => {
+                  const preference = pointerSettings(current.settings.pointer);
+                  return { ...current, settings: { ...current.settings, pointer: { ...preference, enabled: !preference.enabled } } };
+                })}><span className="pointer-dot" style={{ backgroundColor: pointer.color }} aria-hidden="true" />{tx("Puntero", "Pointer")}</button>
               </div>
               {homeOverlayConfigOpen && <div id="home-overlay-size-panel" className={`home-overlay-size-panel ${IS_WEB || IS_ANDROID ? "in-app" : ""}`}>
+                <div className="pointer-controls">
+                  <label>{tx("Color del puntero", "Pointer color")}<input type="color" value={pointer.color} onChange={(event) => {
+                    const color = event.currentTarget.value;
+                    commitState((current) => ({ ...current, settings: { ...current.settings, pointer: { ...pointerSettings(current.settings.pointer), color } } }));
+                  }} /></label>
+                  {!IS_WEB && !IS_ANDROID && <button type="button" className="secondary compact" onClick={() => {
+                    void WebviewWindow.getByLabel("pointer").then((window) => window?.center()).catch(() => undefined);
+                  }}>{tx("Centrar puntero", "Center pointer")}</button>}
+                  <small>{IS_WEB || IS_ANDROID
+                    ? tx("El punto queda en el centro de la aplicación.", "The dot stays in the center of the app.")
+                    : tx("Activa el puntero y arrástralo con este panel abierto. Al terminar, los clics pasarán al juego.", "Turn on the pointer and drag it with this panel open. When finished, clicks pass through to the game.")}</small>
+                </div>
                 <div className={`mock-overlay ${cycle.phase} vision-${selectedVision?.id ?? "none"} shape-${state.settings.overlayShape} counter-${state.settings.overlayCounterStyle}`}><span>{transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</span><strong>{overlayDisplayTimer}</strong></div>
                 <div className="overlay-style-config">
                   <label>{tx("Forma", "Shape")}<select value={state.settings.overlayShape} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayShape: event.target.value as OverlayShape } }))}><option value="event">{tx("Automática por evento", "Automatic by event")}</option><option value="rectangle">{tx("Rectangular", "Rectangle")}</option><option value="square">{tx("Cuadrada", "Square")}</option><option value="vertical">{tx("Vertical", "Vertical")}</option><option value="round">{tx("Redonda", "Round")}</option></select></label>
@@ -2631,18 +2657,23 @@ function VisionAtmosphere({ visionId, active }: { visionId?: string; active: boo
   </div>;
 }
 
-function ActivityCard({ activity, currentCount, dailyCount, totalCount, language, disabled = false, onAdd, onRemove }: { activity: Activity; currentCount: number; dailyCount: number; totalCount: number; language: UiLanguage; disabled?: boolean; onAdd: () => void; onRemove: () => void }) {
+function ActivityCard({ activity, currentCount, dailyCount, totalCount, language, disabled = false, onAdd, onRemove }: { activity: Activity; currentCount: number; dailyCount: number; totalCount: number; language: UiLanguage; disabled?: boolean; onAdd: (phase?: RewardPhase) => void; onRemove: () => void }) {
   const english = language !== "es";
   const inactive = disabled || !activity.enabled || activity.points <= 0;
   return (
-    <article className={`activity-card ${inactive ? "disabled" : ""}`} title={activity.note}>
-      <div className="activity-points"><strong>{activity.points}</strong><small>PTS</small></div>
+    <article className={`activity-card ${activity.phaseCount ? "phase-activity-card" : ""} ${inactive ? "disabled" : ""}`} title={activity.note}>
+      <div className="activity-points"><strong>{activity.phaseCount ? "1–3" : activity.points}</strong><small>PTS</small></div>
       <div className="activity-copy"><strong>{activity.name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
+      {activity.phaseCount && <div className="activity-phases" role="group" aria-label={`${activity.name} · ${english ? "Highest phase reached" : "Fase más alta alcanzada"}`}>
+        {REWARD_PHASES.map((phase) => <button key={phase} type="button" disabled={inactive} onClick={() => onAdd(phase)}>
+          <span>{english ? "Phase" : "Fase"} {phase}</span><strong>+{phase}</strong>
+        </button>)}
+      </div>}
       <div className="activity-counts">
         <div className="activity-counter">
           <button type="button" aria-label={`${english ? "Remove one" : "Quitar una de"} ${activity.name}`} disabled={currentCount === 0} onClick={onRemove}><Minus size={15} /></button>
           <span aria-label={`${currentCount} ${english ? "in the current round" : "en la ronda actual"}`}>{currentCount}</span>
-          <button type="button" aria-label={`${english ? "Add" : "Sumar"} ${activity.name}`} disabled={inactive} onClick={onAdd}><Plus size={19} /></button>
+          {!activity.phaseCount && <button type="button" aria-label={`${english ? "Add" : "Sumar"} ${activity.name}`} disabled={inactive} onClick={() => onAdd()}><Plus size={19} /></button>}
         </div>
         <small>{english ? "Today" : "Hoy"} {dailyCount} · {english ? "All time" : "Histórico"} {totalCount}</small>
       </div>

@@ -1,6 +1,6 @@
 import type { UiLanguage } from "./i18n";
 
-export type ActivityMapId = "general" | "manibus" | "dream" | "abyss";
+export type ActivityMapId = "general" | "manibus" | "dream" | "abyss" | "winter";
 
 export type Activity = {
   id: string;
@@ -9,7 +9,17 @@ export type Activity = {
   enabled: boolean;
   note?: string;
   mapId?: ActivityMapId;
+  phaseCount?: 3;
 };
+
+export const REWARD_PHASES = [1, 2, 3] as const;
+export type RewardPhase = typeof REWARD_PHASES[number];
+
+export function activityRewardPoints(activity: Activity, phase?: RewardPhase) {
+  if (!activity.enabled || activity.points <= 0) return 0;
+  if (!activity.phaseCount) return phase === undefined ? activity.points : 0;
+  return phase !== undefined && REWARD_PHASES.includes(phase) ? phase : 0;
+}
 
 export type Vision = {
   id: string;
@@ -148,6 +158,7 @@ export type Settings = {
   overlayCounterStyle: OverlayCounterStyle;
   overlayNameMode: OverlayNameMode;
   overlayCustomName: string;
+  pointer?: { enabled: boolean; color: string };
   transitionDelayMilliseconds: number;
   /** Valor legado leído al migrar configuraciones de 1.12.0. */
   transitionDelaySeconds?: number;
@@ -208,7 +219,7 @@ export type CountdownTransitionSnapshot = {
   progress: number;
 };
 
-export const APP_VERSION = "1.25.0";
+export const APP_VERSION = "1.26.0";
 export const AUTHOR = "OscarD0823";
 export const AUTHOR_PROFILE_URL = `https://github.com/${AUTHOR}`;
 export const DEFAULT_CHARACTER_ID = "character-main";
@@ -612,7 +623,7 @@ export function splitPlatformCarryover(actions: PointAction[], now = Date.now(),
 export function validateCatalog(value: unknown): value is Catalog {
   if (!value || typeof value !== "object") return false;
   const catalog = value as Partial<Catalog>;
-  const validActivity = (activity: Activity) => Boolean(activity && typeof activity.id === "string" && typeof activity.name === "string" && Number.isFinite(activity.points) && typeof activity.enabled === "boolean");
+  const validActivity = (activity: Activity) => Boolean(activity && typeof activity.id === "string" && typeof activity.name === "string" && Number.isFinite(activity.points) && typeof activity.enabled === "boolean" && (activity.phaseCount === undefined || activity.phaseCount === 3));
   const timing = catalog.eventTiming;
   const validTiming = timing === undefined || (typeof timing.selectedVisionId === "string"
     && Number.isFinite(timing.waitMinutes) && timing.waitMinutes >= 1 && timing.waitMinutes <= 525_600

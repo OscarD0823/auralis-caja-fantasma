@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import { LogicalSize, PhysicalPosition } from "@tauri-apps/api/dpi";
-import { emit, listen } from "@tauri-apps/api/event";
-import { getCurrentWindow, Window } from "@tauri-apps/api/window";
+import { LogicalSize } from "@tauri-apps/api/dpi";
+import { emit } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { PersistedState } from "./model";
 import { clampNumber, computeCountdownTransition, computeCycle, computeGravityWhale } from "./model";
 import OverlayVisual, { overlayDesignSize } from "./OverlayVisual";
-import { loadOverlayPosition, loadState, saveOverlayPosition } from "./storage";
+import { loadState } from "./storage";
+import { useOverlayInteraction, useOverlayPosition } from "./floatingOverlay";
 
 export default function Overlay() {
   const [state, setState] = useState<PersistedState>(() => loadState());
   const [now, setNow] = useState(Date.now());
-  const [editMode, setEditMode] = useState(false);
-  const [interactive, setInteractive] = useState(false);
+  const interactive = useOverlayInteraction();
+  useOverlayPosition("overlay");
   const cycle = computeCycle(state.settings, now);
   const transition = computeCountdownTransition(state.settings, now);
   const whale = computeGravityWhale(state.settings, now);
@@ -36,68 +37,6 @@ export default function Overlay() {
       document.body.classList.remove("overlay-document");
     };
   }, []);
-
-  useEffect(() => {
-    let unlisten: (() => void) | undefined;
-    void listen<{ enabled?: boolean }>("caja-fantasma-overlay-edit-mode", ({ payload }) => {
-      setEditMode(payload?.enabled === true);
-    }).then((stop) => { unlisten = stop; });
-    return () => unlisten?.();
-  }, []);
-
-  useEffect(() => {
-    const overlayWindow = getCurrentWindow();
-    let stopped = false;
-    let fallbackTimer = 0;
-    let queuedRefresh = 0;
-    let lastInteractive = false;
-    const unlisteners: Array<() => void> = [];
-    const updateInteraction = async () => {
-      if (stopped) return;
-      try {
-        const mainWindow = await Window.getByLabel("main");
-        const [visible, minimized, mainFocused, overlayFocused] = await Promise.all([
-          mainWindow?.isVisible() ?? Promise.resolve(false),
-          mainWindow?.isMinimized() ?? Promise.resolve(true),
-          mainWindow?.isFocused() ?? Promise.resolve(false),
-          overlayWindow.isFocused(),
-        ]);
-        const nextInteractive = editMode && visible && !minimized && (mainFocused || overlayFocused);
-        if (nextInteractive !== lastInteractive) {
-          lastInteractive = nextInteractive;
-          setInteractive(nextInteractive);
-          await overlayWindow.setIgnoreCursorEvents(!nextInteractive);
-        }
-      } catch {
-        if (lastInteractive !== false) {
-          lastInteractive = false;
-          setInteractive(false);
-          await overlayWindow.setIgnoreCursorEvents(true).catch(() => undefined);
-        }
-      }
-    };
-    const queueRefresh = (delay = 20) => {
-      window.clearTimeout(queuedRefresh);
-      queuedRefresh = window.setTimeout(() => void updateInteraction(), delay);
-    };
-    const start = async () => {
-      await overlayWindow.setIgnoreCursorEvents(true).catch(() => undefined);
-      await updateInteraction();
-      if (stopped) return;
-      const mainWindow = await Window.getByLabel("main");
-      if (mainWindow) unlisteners.push(await mainWindow.onFocusChanged(() => queueRefresh()));
-      unlisteners.push(await overlayWindow.onFocusChanged(() => queueRefresh()));
-      fallbackTimer = window.setInterval(() => void updateInteraction(), 2_000);
-    };
-    void start();
-    return () => {
-      stopped = true;
-      window.clearInterval(fallbackTimer);
-      window.clearTimeout(queuedRefresh);
-      unlisteners.forEach((unlisten) => unlisten());
-      void overlayWindow.setIgnoreCursorEvents(true);
-    };
-  }, [editMode]);
 
   useEffect(() => {
     const onStorage = () => setState(loadState());
@@ -131,22 +70,6 @@ export default function Overlay() {
     const overlayWindow = getCurrentWindow();
     void overlayWindow.setSize(new LogicalSize(Math.round(designSize.width * overlayScale), Math.round(designSize.height * overlayScale)));
   }, [designSize.height, designSize.width, overlayScale]);
-
-  useEffect(() => {
-    const overlayWindow = getCurrentWindow();
-    const savedPosition = loadOverlayPosition();
-    if (savedPosition) void overlayWindow.setPosition(new PhysicalPosition(savedPosition.x, savedPosition.y));
-    let unlisten: (() => void) | undefined;
-    let pendingSave: number | undefined;
-    void overlayWindow.onMoved(({ payload }) => {
-      if (pendingSave !== undefined) window.clearTimeout(pendingSave);
-      pendingSave = window.setTimeout(() => saveOverlayPosition({ x: payload.x, y: payload.y }), 180);
-    }).then((stop) => { unlisten = stop; });
-    return () => {
-      unlisten?.();
-      if (pendingSave !== undefined) window.clearTimeout(pendingSave);
-    };
-  }, []);
 
   return (
     <div className={`floating-overlay ${interactive ? "interactive" : "passive"}`} onMouseDown={(event) => { if (!interactive || (event.target as HTMLElement).closest("button")) return; void getCurrentWindow().startDragging(); }}>

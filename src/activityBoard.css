@@ -49,6 +49,7 @@
 .scenario-activity-panel { --map-accent: #d6b57c; padding: 12px; border: 1px solid #58787555; border-top: 2px solid var(--map-accent); border-radius: 8px; background: #0b202a; }
 .scenario-activity-panel.map-dream { --map-accent: #bbacff; }
 .scenario-activity-panel.map-abyss { --map-accent: #69cbe9; }
+.scenario-activity-panel.map-winter { --map-accent: #b1e2fd; }
 .scenario-activity-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
 .scenario-activity-heading .eyebrow { font-size: 8px; color: var(--map-accent); }
 .scenario-activity-heading p { margin: 4px 0 0; color: #9bb5bc; font-size: 10px; }
@@ -57,9 +58,25 @@
 .activity-map-tabs > button.selected { border-color: var(--map-accent); color: #effffb; background: #223c44; box-shadow: inset 0 -2px var(--map-accent); }
 .activity-map-tabs > button > small { min-width: 17px; padding: 2px 4px; border-radius: 3px; background: #ffffff0d; font-size: 9px; }
 .activity-board .map-activity-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.map-abyss .map-activity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.phase-activity-card .activity-points strong { font-size: 12px; }
+.activity-phases { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.activity-phases > button { display: grid; place-content: center; gap: 2px; min-height: 42px; padding: 4px 2px; border: 1px solid #40756f; border-radius: 6px; color: #c7f4e7; background: #193c3e; font-size: 10px; cursor: pointer; }
+.activity-phases > button strong { font-size: 14px; }
+.activity-phases > button:hover:not(:disabled), .activity-phases > button:focus-visible { background: #28615f; border-color: #8ae1d2; }
+.activity-phases > button:disabled { opacity: .35; cursor: default; }
+.activity-board .phase-activity-card .activity-counter > button { width: 38px; color: inherit; background: #102f3a; }
 .activity-map-empty { grid-column: 1 / -1; margin: 0; padding: 16px; color: #9bb5bc; font-size: 12px; }
 .progress-page > .home-overlay-controls { margin: 0 0 14px; }
+.home-overlay-actions { flex-wrap: wrap; }
+.pointer-controls { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 10px; border: 1px solid #52757b66; border-radius: 6px; }
+.pointer-controls label { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.pointer-controls input[type="color"] { width: 40px; height: 32px; padding: 2px; cursor: pointer; }
+.pointer-controls small { flex: 1 1 220px; color: #a8c1c6; font-size: 11px; }
+.pointer-dot { display: inline-block; width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; box-shadow: 0 0 0 1px #000d; }
+.pointer-surface { display: grid; place-items: center; width: 100vw; height: 100vh; user-select: none; }
+.pointer-surface.editing { cursor: move; }
+.pointer-surface.editing .pointer-dot { box-shadow: 0 0 0 1px #000d, 0 0 0 7px #daf9ff44; }
+.in-app-pointer { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 80; pointer-events: none; }
 .activity-editor.has-map { grid-template-columns: minmax(130px, 1fr) 70px 150px minmax(130px, 1.2fr) 30px 30px; }
 
 @media (min-width: 1250px) {
@@ -99,7 +116,10 @@
   .common-activity-groups { grid-template-columns: minmax(0, 1fr); }
   .activity-board .activity-counter > button { height: 44px; }
   .activity-board .activity-card { padding: 10px; }
-  .activity-map-tabs { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .activity-board .phase-activity-card { grid-column: 1 / -1; }
+  .activity-phases > button { min-height: 44px; }
+  .progress-page > .home-overlay-controls { grid-template-columns: minmax(0, 1fr); }
+  .activity-map-tabs { width: 100%; display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; }
   .activity-map-tabs > button { justify-content: center; padding: 9px 5px; font-size: 11px; min-height: 44px; }
   .activity-map-tabs > button > small { display: none; }
   .scenario-activity-panel { padding: 10px; }

@@ -311,7 +311,12 @@ pub fn run() {
         ])
         .setup(|app| {
             #[cfg(target_os = "windows")]
-            windows_shutdown::install(app.handle()).map_err(std::io::Error::other)?;
+            {
+                windows_shutdown::install(app.handle()).map_err(std::io::Error::other)?;
+                if let Some(pointer) = app.get_webview_window("pointer") {
+                    pointer.set_ignore_cursor_events(true)?;
+                }
+            }
             let open = MenuItem::with_id(app, "open", "Abrir Caja Fantasma", true, None::<&str>)?;
             let overlay = MenuItem::with_id(
                 app,
