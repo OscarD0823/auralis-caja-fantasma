@@ -78,6 +78,10 @@ try {
   await speakMessage("Voz nativa", "pt");
   assert.deepEqual(calls, [{ command: "plugin:android-updater|speak", args: { text: "Voz nativa", language: "pt-BR" } }]);
   assert.equal(spoken.length, 2, "Native Android speech must work independently of Web Speech support.");
+  Object.defineProperty(globalThis, "navigator", { configurable: true, value: { userAgent: "Windows" } });
+  await speakMessage("Voz de Windows", "es");
+  assert.deepEqual(calls.at(-1), { command: "speak_native", args: { text: "Voz de Windows", language: "es-CO" } });
+  assert.equal(spoken.length, 2, "Native Windows speech must work without browser autoplay.");
   fakeWindow.__TAURI_INTERNALS__.invoke = async () => { throw new Error("voice-language-missing"); };
   await assert.rejects(speakMessage("Sin paquete", "pt"), /voice-language-missing/);
 } finally {

@@ -67,8 +67,12 @@ export function preferredVoice(voices: readonly SpeechSynthesisVoice[], locale: 
 let currentUtterance: SpeechSynthesisUtterance | undefined;
 
 export function speakMessage(message: string, language: UiLanguage): Promise<void> {
-  if (runtimePlatform(isTauri(), navigator.userAgent) === "android") {
+  const platform = runtimePlatform(isTauri(), navigator.userAgent);
+  if (platform === "android") {
     return invoke("plugin:android-updater|speak", { text: message, language: localeForLanguage(language) });
+  }
+  if (platform === "windows") {
+    return invoke("speak_native", { text: message, language: localeForLanguage(language) });
   }
   if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
     return Promise.reject(new Error("voice-unavailable"));

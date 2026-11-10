@@ -10,6 +10,8 @@ mod android_background_status_tests;
 mod single_instance;
 #[cfg(all(desktop, target_os = "windows"))]
 mod windows_shutdown;
+#[cfg(all(desktop, target_os = "windows"))]
+mod windows_voice;
 
 use local_sync::mobile_sync_exchange;
 use local_sync::{
@@ -43,6 +45,22 @@ fn load_native_personal_backup(app: tauri::AppHandle) -> Result<Option<String>, 
         .app_data_dir()
         .map_err(|error| format!("No se encontró la carpeta de respaldo: {error}"))?;
     native_backup::load(&directory)
+}
+
+#[cfg(desktop)]
+#[tauri::command]
+async fn speak_native(text: String, language: String) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        tauri::async_runtime::spawn_blocking(move || windows_voice::speak(&text, &language))
+            .await
+            .map_err(|_| "voice-playback-failed".to_string())?
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = (text, language);
+        Err("voice-unavailable".into())
+    }
 }
 
 #[tauri::command]
@@ -307,7 +325,8 @@ pub fn run() {
             save_native_personal_backup,
             flush_desktop_progress,
             finish_desktop_close,
-            cache_desktop_progress
+            cache_desktop_progress,
+            speak_native
         ])
         .setup(|app| {
             #[cfg(target_os = "windows")]
