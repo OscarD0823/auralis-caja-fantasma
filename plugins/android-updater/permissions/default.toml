@@ -9,4 +9,7 @@ permissions = [
   "allow-update-background-sync",
   "allow-read-background-sync",
   "allow-stop-background-sync",
+  "allow-speak",
+  "allow-configure-voice",
+  "allow-request-voice-alarm-permission",
 ]

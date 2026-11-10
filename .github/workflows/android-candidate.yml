@@ -49,6 +49,9 @@ jobs:
         env:
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/30.0.16248370
           CARGO_BUILD_JOBS: 4
+      - name: Probar los relojes y avisos nativos
+        working-directory: src-tauri/gen/android
+        run: ./gradlew :tauri-plugin-android-updater:testDebugUnitTest --no-daemon
       - uses: actions/upload-artifact@v5
         with:
           name: Caja-Fantasma-Android-${{ steps.version.outputs.app }}-sin-firma

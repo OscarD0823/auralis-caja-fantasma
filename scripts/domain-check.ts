@@ -42,8 +42,8 @@ for (const id of ["pro-monolith-boss", "pro-silo", "dream-manibus-challenge", "p
   assert.ok(catalog.proActivities.some((item) => item.id === id), `Falta la recompensa editable ${id}.`);
 }
 const calamityBosses = [
-  { id: "calamity-tower", name: "Faro · Torre de calamidad", points: 3 },
-  { id: "calamity-owl", name: "Búho de calamidad", points: 1 },
+  { id: "calamity-tower", name: "Torre de calamidad", points: 3 },
+  { id: "calamity-owl", name: "Búho de Calamidad", points: 1 },
   { id: "calamity-zone", name: "Zona de calamidad", points: 1 },
 ];
 const calamityActions: PointAction[] = calamityBosses.flatMap((boss) => {
@@ -62,8 +62,8 @@ const calamityActions: PointAction[] = calamityBosses.flatMap((boss) => {
   }));
 });
 assert.deepEqual(buildBreakdown(calamityActions).map(({ name, count, points }) => ({ name, count, points })), [
-  { name: "Faro · Torre de calamidad", count: 3, points: 9 },
-  { name: "Búho de calamidad", count: 3, points: 3 },
+  { name: "Torre de calamidad", count: 3, points: 9 },
+  { name: "Búho de Calamidad", count: 3, points: 3 },
   { name: "Zona de calamidad", count: 3, points: 3 },
 ], "Las actividades deben conservar contadores independientes y sumar el valor de cada recompensa.");
 const previousBossCatalog = structuredClone(catalog) as Catalog;

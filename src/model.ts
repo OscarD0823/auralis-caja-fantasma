@@ -10,6 +10,8 @@ export type Activity = {
   note?: string;
   mapId?: ActivityMapId;
   phaseCount?: 3;
+  names?: Partial<Record<UiLanguage, string>>;
+  phaseActivities?: [string, string, string];
 };
 
 export const REWARD_PHASES = [1, 2, 3] as const;
@@ -219,7 +221,7 @@ export type CountdownTransitionSnapshot = {
   progress: number;
 };
 
-export const APP_VERSION = "1.26.0";
+export const APP_VERSION = "1.27.0";
 export const AUTHOR = "OscarD0823";
 export const AUTHOR_PROFILE_URL = `https://github.com/${AUTHOR}`;
 export const DEFAULT_CHARACTER_ID = "character-main";
@@ -623,7 +625,10 @@ export function splitPlatformCarryover(actions: PointAction[], now = Date.now(),
 export function validateCatalog(value: unknown): value is Catalog {
   if (!value || typeof value !== "object") return false;
   const catalog = value as Partial<Catalog>;
-  const validActivity = (activity: Activity) => Boolean(activity && typeof activity.id === "string" && typeof activity.name === "string" && Number.isFinite(activity.points) && typeof activity.enabled === "boolean" && (activity.phaseCount === undefined || activity.phaseCount === 3));
+  const validActivity = (activity: Activity) => Boolean(activity && typeof activity.id === "string" && typeof activity.name === "string" && Number.isFinite(activity.points) && typeof activity.enabled === "boolean"
+    && (activity.phaseCount === undefined || activity.phaseCount === 3)
+    && (activity.names === undefined || (activity.names && typeof activity.names === "object" && !Array.isArray(activity.names) && Object.values(activity.names).every((name) => typeof name === "string" && name.trim().length > 0 && name.length <= 120)))
+    && (activity.phaseActivities === undefined || (activity.phaseCount === 3 && Array.isArray(activity.phaseActivities) && activity.phaseActivities.length === 3 && activity.phaseActivities.every((id) => typeof id === "string"))));
   const timing = catalog.eventTiming;
   const validTiming = timing === undefined || (typeof timing.selectedVisionId === "string"
     && Number.isFinite(timing.waitMinutes) && timing.waitMinutes >= 1 && timing.waitMinutes <= 525_600

@@ -1,13 +1,13 @@
 {
   "name": "caja-fantasma-once-human",
   "private": true,
-  "version": "1.26.0",
+  "version": "1.27.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "tsc --noEmit",
-    "test": "node ./scripts/signing-migration-check.mjs && node --experimental-strip-types ./scripts/migration-progress-check.ts && node --experimental-strip-types ./scripts/activity-maps-check.ts && node --experimental-strip-types ./scripts/domain-check.ts && node --experimental-strip-types ./scripts/settings-check.ts && node --experimental-strip-types ./scripts/desktop-progress-check.ts && node --experimental-strip-types ./scripts/direct-peer-check.ts && node --experimental-strip-types ./scripts/phone-bridge-check.ts && node --experimental-strip-types ./scripts/locale-check.ts && node ./scripts/runtime-links-check.mjs && node ./scripts/android-update-manifest-check.mjs && node --experimental-strip-types ./scripts/pwa-install-check.ts && node ./scripts/pwa-check.mjs && node ./scripts/interface-check.mjs",
+    "test": "node ./scripts/signing-migration-check.mjs && node --experimental-strip-types ./scripts/migration-progress-check.ts && node --experimental-strip-types ./scripts/activity-maps-check.ts && node --experimental-strip-types ./scripts/domain-check.ts && node --experimental-strip-types ./scripts/settings-check.ts && node --experimental-strip-types ./scripts/desktop-progress-check.ts && node --experimental-strip-types ./scripts/direct-peer-check.ts && node --experimental-strip-types ./scripts/phone-bridge-check.ts && node --experimental-strip-types ./scripts/locale-check.ts && node --experimental-strip-types ./scripts/voice-check.ts && node ./scripts/runtime-links-check.mjs && node ./scripts/android-update-manifest-check.mjs && node --experimental-strip-types ./scripts/pwa-install-check.ts && node ./scripts/pwa-check.mjs && node ./scripts/interface-check.mjs",
     "icons": "node ./scripts/generate-icons.mjs",
     "chest:surfaces": "node ./scripts/render-chest-surfaces.mjs",
     "chest:video": "node ./scripts/render-opening-video.mjs",

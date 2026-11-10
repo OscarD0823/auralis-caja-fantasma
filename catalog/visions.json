@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 59,
-  "updatedAt": "2026-11-10T05:51:23.000Z",
+  "catalogVersion": 60,
+  "updatedAt": "2026-11-10T23:12:44.334Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -22,7 +22,17 @@
       "points": 1,
       "enabled": true,
       "note": "Solo cuenta en dificultad Pro.",
-      "mapId": "general"
+      "mapId": "general",
+      "names": {
+        "en": "Monolith boss",
+        "pt": "Chefe de monólito",
+        "fr": "Boss de monolithe",
+        "de": "Monolith-Boss",
+        "ru": "Босс монолита",
+        "ja": "モノリスのボス",
+        "ko": "모노리스 보스",
+        "zh": "巨楔首领"
+      }
     },
     {
       "id": "pro-silo",
@@ -30,7 +40,17 @@
       "points": 1,
       "enabled": true,
       "note": "Solo cuenta en dificultad Pro.",
-      "mapId": "general"
+      "mapId": "general",
+      "names": {
+        "en": "Securement Silo",
+        "pt": "Silo de Segurança",
+        "fr": "Silo de sécurisation",
+        "de": "Sicherungssilo",
+        "ru": "Бункер безопасности",
+        "ja": "収容サイロ",
+        "ko": "안전 사일로",
+        "zh": "收容井"
+      }
     },
     {
       "id": "pro-war",
@@ -38,7 +58,17 @@
       "points": 2,
       "enabled": true,
       "note": "Recompensa reclamada de la guerra.",
-      "mapId": "manibus"
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Pro",
+        "pt": "Guerra Primordial · Pro",
+        "fr": "Guerre primordiale · Pro",
+        "de": "Urkrieg · Pro",
+        "ru": "Первая война · Pro",
+        "ja": "根源の戦い · Pro",
+        "ko": "근원전 · Pro",
+        "zh": "根源之战 · 专家"
+      }
     },
     {
       "id": "manibus-event",
@@ -46,7 +76,17 @@
       "points": 1,
       "enabled": true,
       "note": "Recompensa del evento de Manibus.",
-      "mapId": "manibus"
+      "mapId": "manibus",
+      "names": {
+        "en": "Manibus Event",
+        "pt": "Evento Manibus",
+        "fr": "Événement Manibus",
+        "de": "Manibus-Ereignis",
+        "ru": "Событие Манибуса",
+        "ja": "マニブスイベント",
+        "ko": "터치 오브 스카이 이벤트",
+        "zh": "天空之触事件"
+      }
     },
     {
       "id": "manibus-war",
@@ -54,7 +94,17 @@
       "points": 1,
       "enabled": true,
       "note": "Recompensa de Guerra Manibus.",
-      "mapId": "manibus"
+      "mapId": "manibus",
+      "names": {
+        "en": "Manibus War",
+        "pt": "Guerra Manibus",
+        "fr": "Guerre de Manibus",
+        "de": "Manibus-Krieg",
+        "ru": "Война Манибуса",
+        "ja": "マニブスの戦い",
+        "ko": "터치 오브 스카이 전쟁",
+        "zh": "天空之触战役"
+      }
     },
     {
       "id": "manibus-manibus",
@@ -62,7 +112,17 @@
       "points": 2,
       "enabled": true,
       "note": "Recompensa del encuentro de Manibus.",
-      "mapId": "manibus"
+      "mapId": "manibus",
+      "names": {
+        "en": "Manibus encounter",
+        "pt": "Encontro Manibus",
+        "fr": "Rencontre Manibus",
+        "de": "Manibus-Begegnung",
+        "ru": "Бой с Манибусом",
+        "ja": "マニブス戦",
+        "ko": "터치 오브 스카이 전투",
+        "zh": "天空之触遭遇战"
+      }
     },
     {
       "id": "manibus-lea",
@@ -71,7 +131,17 @@
       "enabled": true,
       "note": "Registra una vez la fase más alta del intento.",
       "mapId": "manibus",
-      "phaseCount": 3
+      "phaseCount": 3,
+      "names": {
+        "en": "LEA Research Lab",
+        "pt": "Laboratório de Pesquisa LEA",
+        "fr": "Institut d'évolution",
+        "de": "LEA-Forschungslabor",
+        "ru": "Исследовательская лаборатория LEA",
+        "ja": "LEA研究所",
+        "ko": "LEA 연구소",
+        "zh": "生命形态进化研究所"
+      }
     },
     {
       "id": "dreamer-light",
@@ -79,7 +149,17 @@
       "points": 1,
       "enabled": true,
       "note": "Light Dreamer de Endless Dream.",
-      "mapId": "dream"
+      "mapId": "dream",
+      "names": {
+        "en": "Light Dreamer",
+        "pt": "Sonhador de Luz",
+        "fr": "Rêveur de Lumière",
+        "de": "Leichter Träumer",
+        "ru": "Светлый Сновидец",
+        "ja": "シャロウスリープ",
+        "ko": "얕은 잠",
+        "zh": "浅眠"
+      }
     },
     {
       "id": "dreamer-deep",
@@ -87,7 +167,17 @@
       "points": 1,
       "enabled": true,
       "note": "Deep Dreamer de Endless Dream.",
-      "mapId": "dream"
+      "mapId": "dream",
+      "names": {
+        "en": "Deep Dreamer",
+        "pt": "Sonhador Profundo",
+        "fr": "Rêveur profond",
+        "de": "Tiefer Träumer",
+        "ru": "Глубокий сновидец",
+        "ja": "ディープスリープ",
+        "ko": "깊은 잠",
+        "zh": "深眠"
+      }
     },
     {
       "id": "dreamer-eternal",
@@ -95,7 +185,17 @@
       "points": 1,
       "enabled": true,
       "note": "Eternal Dreamer de Endless Dream.",
-      "mapId": "dream"
+      "mapId": "dream",
+      "names": {
+        "en": "Eternal Dreamer",
+        "pt": "Sonhador Eterno",
+        "fr": "Rêveur éternel",
+        "de": "Ewiger Träumer",
+        "ru": "Вечный сновидец",
+        "ja": "エターナルスリープ",
+        "ko": "영원한 잠",
+        "zh": "永眠"
+      }
     },
     {
       "id": "dream-zone-invasion",
@@ -103,7 +203,17 @@
       "points": 1,
       "enabled": true,
       "note": "Invasión de Endless Dream.",
-      "mapId": "dream"
+      "mapId": "dream",
+      "names": {
+        "en": "Dream Zone Invasion",
+        "pt": "Invasão da Zona Onírica",
+        "fr": "Invasion de zone onirique",
+        "de": "Traumzonen-Invasion",
+        "ru": "Вторжение в зону снов",
+        "ja": "夢の領域への侵攻",
+        "ko": "꿈의 영역 침공",
+        "zh": "梦境区域入侵"
+      }
     },
     {
       "id": "dream-manibus-nightmare",
@@ -111,7 +221,17 @@
       "points": 1,
       "enabled": true,
       "note": "Recompensa de Manibus Pesadilla en Dream.",
-      "mapId": "dream"
+      "mapId": "dream",
+      "names": {
+        "en": "Manibus, the Nightmare",
+        "pt": "Manibus, o Pesadelo",
+        "fr": "Manibus, le cauchemar",
+        "de": "Manibus, der Albtraum",
+        "ru": "Манибус, Кошмар",
+        "ja": "マニブス・ナイトメア",
+        "ko": "악몽의 터치 오브 스카이",
+        "zh": "噩梦天空之触"
+      }
     },
     {
       "id": "dream-manibus-challenge",
@@ -119,23 +239,53 @@
       "points": 1,
       "enabled": true,
       "note": "Recompensa completa del desafío.",
-      "mapId": "dream"
+      "mapId": "dream",
+      "names": {
+        "en": "Manibus Challenge · Endless Dream",
+        "pt": "Desafio Manibus · Sonho Infinito",
+        "fr": "Défi Manibus · Rêve infini",
+        "de": "Manibus-Herausforderung · Endloser Traum",
+        "ru": "Испытание Манибуса · Бесконечный сон",
+        "ja": "マニブスチャレンジ · 永い夢",
+        "ko": "터치 오브 스카이 도전 · 무한한 꿈",
+        "zh": "天空之触挑战 · 无尽长梦"
+      }
     },
     {
       "id": "calamity-tower",
-      "name": "Faro · Torre de calamidad",
+      "name": "Torre de calamidad",
       "points": 3,
       "enabled": true,
       "note": "Cuenta al reclamar la recompensa.",
-      "mapId": "abyss"
+      "mapId": "abyss",
+      "names": {
+        "en": "Calamity Tower",
+        "pt": "Torre da Calamidade",
+        "fr": "Tour de la calamité",
+        "de": "Katastrophenturm",
+        "ru": "Башня бедствия",
+        "ja": "災厄の塔",
+        "ko": "재앙의 탑",
+        "zh": "灾厄塔"
+      }
     },
     {
       "id": "calamity-owl",
-      "name": "Búho de calamidad",
+      "name": "Búho de Calamidad",
       "points": 1,
       "enabled": true,
       "note": "Recompensa del Búho en el Nido de calamidad.",
-      "mapId": "abyss"
+      "mapId": "abyss",
+      "names": {
+        "en": "Calamity Owl",
+        "pt": "Coruja da Calamidade",
+        "fr": "Calamity Owl",
+        "de": "Katastropheneule",
+        "ru": "Сова бедствия",
+        "ja": "災厄の梟",
+        "ko": "재앙의 올빼미",
+        "zh": "灾厄祸枭"
+      }
     },
     {
       "id": "calamity-zone",
@@ -143,24 +293,59 @@
       "points": 1,
       "enabled": true,
       "note": "Cuenta al reclamar la recompensa.",
-      "mapId": "abyss"
+      "mapId": "abyss",
+      "names": {
+        "en": "Sea Calamity Zone",
+        "pt": "Zona de Calamidade Marítima",
+        "fr": "Zone de calamité maritime",
+        "de": "See-Katastrophenzone",
+        "ru": "Морская зона бедствия",
+        "ja": "海上災厄エリア",
+        "ko": "해상 재앙 구역",
+        "zh": "海上灾厄区"
+      }
     },
     {
       "id": "sunken-lord",
-      "name": "The Sunken Lord",
+      "name": "Señor Hundido",
       "points": 1,
       "enabled": true,
       "note": "Registra una vez la fase más alta del intento.",
       "mapId": "abyss",
-      "phaseCount": 3
+      "phaseCount": 3,
+      "names": {
+        "en": "The Sunken Lord",
+        "pt": "Senhor Submerso",
+        "fr": "Seigneur englouti",
+        "de": "Versunkener Lord",
+        "ru": "Затонувший Лорд",
+        "ja": "海墟の王",
+        "ko": "해허의 왕",
+        "zh": "海墟之王"
+      },
+      "phaseActivities": [
+        "calamity-owl",
+        "calamity-tower",
+        "sunken-lord"
+      ]
     },
     {
       "id": "winter-chaosweaver",
-      "name": "Tejedores del caos",
+      "name": "Tejedor del Caos",
       "points": 1,
       "enabled": true,
       "note": "Recompensa de un tejedor (Chaosweaver).",
-      "mapId": "winter"
+      "mapId": "winter",
+      "names": {
+        "en": "Chaosweaver",
+        "pt": "Tecelão do Caos",
+        "fr": "Tramechaos",
+        "de": "Chaosweber",
+        "ru": "Ткач Хаоса",
+        "ja": "エクスターミネーター",
+        "ko": "엔드브링어",
+        "zh": "灭绝者"
+      }
     }
   ],
   "visions": [
@@ -186,14 +371,34 @@
           "name": "Ballena",
           "points": 1,
           "enabled": true,
-          "note": "Recompensa de la Ballena."
+          "note": "Recompensa de la Ballena.",
+          "names": {
+            "en": "Whale",
+            "pt": "Baleia",
+            "fr": "Baleine",
+            "de": "Wal",
+            "ru": "Кит",
+            "ja": "クジラ",
+            "ko": "고래",
+            "zh": "鲸鱼"
+          }
         },
         {
           "id": "gravity-platforms",
           "name": "Plataformas",
           "points": 4,
           "enabled": true,
-          "note": "Recompensa de Plataformas."
+          "note": "Recompensa de Plataformas.",
+          "names": {
+            "en": "Platforms",
+            "pt": "Plataformas",
+            "fr": "Plateformes",
+            "de": "Plattformen",
+            "ru": "Платформы",
+            "ja": "プラットフォーム",
+            "ko": "플랫폼",
+            "zh": "平台"
+          }
         }
       ]
     },
@@ -210,21 +415,51 @@
           "name": "Araña",
           "points": 1,
           "enabled": false,
-          "note": "Sin puntos mientras el evento esté desactivado."
+          "note": "Sin puntos mientras el evento esté desactivado.",
+          "names": {
+            "en": "Spider",
+            "pt": "Aranha",
+            "fr": "Araignée",
+            "de": "Spinne",
+            "ru": "Паук",
+            "ja": "クモ",
+            "ko": "거미",
+            "zh": "蜘蛛"
+          }
         },
         {
           "id": "symbiosis-antenna",
           "name": "Antena",
           "points": 1,
           "enabled": false,
-          "note": "Sin puntos mientras el evento esté desactivado."
+          "note": "Sin puntos mientras el evento esté desactivado.",
+          "names": {
+            "en": "Antenna",
+            "pt": "Antena",
+            "fr": "Antenne",
+            "de": "Antenne",
+            "ru": "Антенна",
+            "ja": "アンテナ",
+            "ko": "안테나",
+            "zh": "天线"
+          }
         },
         {
           "id": "symbiosis-big-one",
           "name": "Grandulón",
           "points": 1,
           "enabled": false,
-          "note": "Sin puntos mientras el evento esté desactivado."
+          "note": "Sin puntos mientras el evento esté desactivado.",
+          "names": {
+            "en": "Big One",
+            "pt": "Grandão",
+            "fr": "Gros costaud",
+            "de": "Großer Kerl",
+            "ru": "Здоровяк",
+            "ja": "大物",
+            "ko": "덩치",
+            "zh": "大块头"
+          }
         }
       ]
     }

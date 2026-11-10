@@ -1,0 +1,71 @@
+{
+  "maps": {
+    "general": {
+      "es": "Generales",
+      "en": "General",
+      "pt": "Gerais",
+      "fr": "Général",
+      "de": "Allgemein",
+      "it": "Generali",
+      "pl": "Ogólne",
+      "tr": "Genel",
+      "ru": "Общие",
+      "ja": "共通",
+      "ko": "공통",
+      "zh": "通用"
+    },
+    "manibus": {
+      "es": "Manibus",
+      "en": "Manibus",
+      "pt": "Manibus",
+      "fr": "Manibus",
+      "de": "Manibus",
+      "ru": "Манибус",
+      "ja": "マニブス",
+      "ko": "터치 오브 스카이",
+      "zh": "天空之触"
+    },
+    "dream": {
+      "en": "Endless Dream",
+      "pt": "Sonho Infinito",
+      "fr": "Rêve infini",
+      "de": "Endloser Traum",
+      "ru": "Бесконечный сон",
+      "ja": "永い夢",
+      "ko": "무한한 꿈",
+      "zh": "无尽长梦",
+      "es": "Sueño infinito"
+    },
+    "abyss": {
+      "en": "Isles of Abyss",
+      "pt": "Ilhas do Abismo",
+      "fr": "Îles de l'Abîme",
+      "de": "Inseln des Abgrunds",
+      "ru": "Острова Бездны",
+      "ja": "禁断の島",
+      "ko": "금기의 섬",
+      "zh": "禁忌岛",
+      "es": "Islas del Abismo"
+    },
+    "winter": {
+      "en": "The Way of Winter",
+      "pt": "O Caminho do Inverno",
+      "fr": "La voie de l'hiver",
+      "de": "Der Weg des Winters",
+      "ru": "Путь зимы",
+      "ja": "白銀の荒野",
+      "ko": "혹독한 겨울",
+      "zh": "雪国人生",
+      "es": "El camino del invierno"
+    }
+  },
+  "sources": [
+    "https://www.oncehuman.game/news/update/20261021/40780_1317280.html",
+    "https://oncehuman.th.gl/es/maps/El%20camino%20del%20invierno",
+    "https://wikily.gg/es-419/once-human/items/30380004",
+    "https://wikily.gg/fr/once-human/items/30380004/",
+    "https://wikily.gg/de/once-human/items/30380004/",
+    "https://wikily.gg/pt/once-human/items/30380004/",
+    "https://wikily.gg/ru/once-human/items/30380004/"
+  ]
+}

@@ -45,6 +45,67 @@ pub struct InstallResult {
     pub status: String,
 }
 
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SpeakArgs {
+    text: String,
+    language: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VoiceConfiguration {
+    enabled: bool,
+    next_start_at: u64,
+    repeat_ms: u64,
+    lead_ms: u64,
+    language: String,
+    message: String,
+    singular_message: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VoiceStatus {
+    exact: bool,
+    enabled: bool,
+    last_error: Option<String>,
+}
+
+#[tauri::command]
+async fn speak<R: Runtime>(
+    app: AppHandle<R>,
+    text: String,
+    language: String,
+) -> Result<(), String> {
+    app.state::<AndroidUpdater<R>>()
+        .0
+        .run_mobile_plugin_async("speak", SpeakArgs { text, language })
+        .await
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn configure_voice<R: Runtime>(
+    app: AppHandle<R>,
+    configuration: VoiceConfiguration,
+) -> Result<VoiceStatus, String> {
+    app.state::<AndroidUpdater<R>>()
+        .0
+        .run_mobile_plugin_async("configureVoice", configuration)
+        .await
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn request_voice_alarm_permission<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+    app.state::<AndroidUpdater<R>>()
+        .0
+        .run_mobile_plugin_async("requestVoiceAlarmPermission", ())
+        .await
+        .map_err(|error| error.to_string())
+}
+
 #[tauri::command]
 async fn check<R: Runtime>(app: AppHandle<R>) -> Result<AndroidRelease, String> {
     app.state::<AndroidUpdater<R>>()
@@ -164,7 +225,10 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             start_background_sync,
             update_background_sync,
             read_background_sync,
-            stop_background_sync
+            stop_background_sync,
+            speak,
+            configure_voice,
+            request_voice_alarm_permission
         ])
         .build()
 }

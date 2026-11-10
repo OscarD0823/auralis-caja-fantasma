@@ -16,7 +16,7 @@ Las descargas llevan a la **última versión publicada**, no a versiones en prep
 
 **¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**1.26.0 · Jefes por fases y puntero flotante.** Registra hasta tres puntos por intento en LEA y The Sunken Lord. En Windows, coloca un punto de color sobre el juego junto al contador de la rueda. [Qué cambió](docs/versiones/NOTAS-VERSION-1.26.0.md) · [Historial de versiones](docs/versiones/).
+**1.27.0 · Mapas y jefes por idioma, avisos por voz.** Señor Hundido muestra los nombres de sus tres fases. El aviso de Gravedad utiliza el idioma elegido y Android cuenta con voz nativa y avisos programados en segundo plano. [Qué cambió](docs/versiones/NOTAS-VERSION-1.27.0.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 

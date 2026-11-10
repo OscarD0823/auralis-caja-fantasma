@@ -40,6 +40,23 @@ class InstallArgs {
 }
 
 @InvokeArg
+class SpeakArgs {
+    lateinit var text: String
+    lateinit var language: String
+}
+
+@InvokeArg
+class VoiceConfigurationArgs {
+    var enabled: Boolean = false
+    var nextStartAt: Long = 0
+    var repeatMs: Long = 0
+    var leadMs: Long = 0
+    var language: String = "es-CO"
+    var message: String = ""
+    var singularMessage: String = ""
+}
+
+@InvokeArg
 class BackgroundSyncArgs {
     lateinit var address: String
     lateinit var pairingCode: String
@@ -51,6 +68,51 @@ class BackgroundSyncArgs {
 
 @TauriPlugin
 class AndroidUpdaterPlugin(private val activity: Activity) : Plugin(activity) {
+    @Command
+    fun speak(invoke: Invoke) {
+        val args = try { invoke.parseArgs(SpeakArgs::class.java) } catch (_: Exception) {
+            invoke.reject("voice-invalid-request")
+            return
+        }
+        if (args.text.length !in 1..500 || !args.language.matches(Regex("^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$"))) {
+            invoke.reject("voice-invalid-request")
+            return
+        }
+        var replied = false
+        NativeSpeech.speak(activity, args.text, args.language, started = {
+            VoiceAlerts.clearError(activity)
+            if (!replied) { replied = true; invoke.resolve() }
+        }, finished = { error ->
+            if (!replied) {
+                replied = true
+                if (error == null) invoke.resolve() else invoke.reject(error)
+            }
+        })
+    }
+
+    @Command
+    fun configureVoice(invoke: Invoke) {
+        try {
+            invoke.resolve(VoiceAlerts.configure(activity, invoke.parseArgs(VoiceConfigurationArgs::class.java)))
+        } catch (_: Exception) {
+            invoke.reject("voice-schedule-failed")
+        }
+    }
+
+    @Command
+    fun requestVoiceAlarmPermission(invoke: Invoke) {
+        activity.runOnUiThread {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !VoiceAlerts.exactAllowed(activity)) {
+                    activity.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${activity.packageName}")))
+                }
+                invoke.resolve()
+            } catch (_: Exception) {
+                invoke.reject("voice-alarm-permission-unavailable")
+            }
+        }
+    }
+
     @Command
     fun startBackgroundSync(invoke: Invoke) {
         val args = parseBackgroundSyncArgs(invoke) ?: return

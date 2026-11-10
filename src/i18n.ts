@@ -31,6 +31,9 @@ export function localeForLanguage(language: UiLanguage) { return UI_LANGUAGES.fi
 
 type TranslationRow = Partial<Record<Exclude<UiLanguage, "es" | "en">, string>>;
 const CORE: Record<string, TranslationRow> = {
+  Phase: { pt: "Fase", fr: "Phase", de: "Phase", it: "Fase", pl: "Faza", tr: "Aşama", ru: "Фаза", ja: "段階", ko: "단계", zh: "阶段" },
+  Today: { pt: "Hoje", fr: "Aujourd’hui", de: "Heute", it: "Oggi", pl: "Dzisiaj", tr: "Bugün", ru: "Сегодня", ja: "今日", ko: "오늘", zh: "今天" },
+  "All time": { pt: "Total", fr: "Total", de: "Gesamt", it: "Totale", pl: "Łącznie", tr: "Toplam", ru: "Всего", ja: "累計", ko: "누적", zh: "累计" },
   Crate: { pt: "Caixa", fr: "Caisse", de: "Kiste", it: "Cassa", pl: "Skrzynia", tr: "Sandık", ru: "Ящик", ja: "クレート", ko: "상자", zh: "箱子" },
   Characters: { pt: "Personagens", fr: "Personnages", de: "Charaktere", it: "Personaggi", pl: "Postacie", tr: "Karakterler", ru: "Персонажи", ja: "キャラクター", ko: "캐릭터", zh: "角色" },
   "Visional Wheel": { pt: "Roda Visional", fr: "Roue visionnelle", de: "Visionsrad", it: "Ruota visionale", pl: "Koło wizji", tr: "Vizyon çarkı", ru: "Колесо видения", ja: "ヴィジョンホイール", ko: "비전 휠", zh: "幻视轮盘" },

@@ -3,9 +3,9 @@ import type { Activity, ActivityMapId } from "./model.ts";
 export const ACTIVITY_MAPS: { id: ActivityMapId; name: string; englishName: string; description: string; englishDescription: string }[] = [
   { id: "general", name: "Generales", englishName: "General", description: "Jefes y silos · dificultad Pro", englishDescription: "Bosses and silos · Pro difficulty" },
   { id: "manibus", name: "Manibus", englishName: "Manibus", description: "Guerras, eventos y laboratorio LEA", englishDescription: "Wars, events and LEA Research Lab" },
-  { id: "dream", name: "Dream", englishName: "Dream", description: "Soñadores, invasiones y desafíos", englishDescription: "Dreamers, invasions and challenges" },
-  { id: "abyss", name: "Islas del Abismo", englishName: "Isles of Abyss", description: "The Sunken Lord y calamidad", englishDescription: "The Sunken Lord and calamity" },
-  { id: "winter", name: "Winter", englishName: "Winter", description: "Tejedores del Camino del Invierno", englishDescription: "The Way of Winter Chaosweavers" },
+  { id: "dream", name: "Sueño infinito", englishName: "Endless Dream", description: "Soñadores, invasiones y desafíos", englishDescription: "Dreamers, invasions and challenges" },
+  { id: "abyss", name: "Islas del Abismo", englishName: "Isles of Abyss", description: "Señor Hundido y calamidad", englishDescription: "The Sunken Lord and calamity" },
+  { id: "winter", name: "El camino del invierno", englishName: "The Way of Winter", description: "Tejedores del Camino del Invierno", englishDescription: "The Way of Winter Chaosweavers" },
 ];
 
 const LEGACY_MAPS: Record<string, ActivityMapId> = {

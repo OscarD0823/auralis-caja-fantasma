@@ -111,6 +111,8 @@ import { usePwaInstall } from "./usePwaInstall";
 import StartupOpeningVideo from "./StartupOpeningVideo";
 import CounterChestArt from "./CounterChestArt";
 import { persistDesktopProgress } from "./desktopProgress";
+import { activityName, activityPhaseNames, localizedActivityRecord } from "./gameNames";
+import { gravityVoiceMessage, speakMessage, voiceSchedule, VOICE_MESSAGES } from "./voice";
 import PhoneBridgeSyncPanel from "./PhoneBridgeSyncPanel";
 import { runtimePlatform } from "./runtimePlatform";
 import { usePhoneBridgeSync } from "./usePhoneBridgeSync";
@@ -217,6 +219,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.27.0", date: "10 de noviembre de 2026", title: "Mapas y jefes por idioma, avisos por voz", items: ["Los mapas muestran sus nombres completos y los jefes cambian con el idioma elegido.", "Señor Hundido muestra las fases Búho de Calamidad, Torre de calamidad y Señor Hundido.", "Prueba de voz con confirmación de reproducción, idioma del aviso y voz nativa con horario en segundo plano para Android."] },
   { version: "1.26.0", date: "10 de noviembre de 2026", title: "Jefes por fases y puntero flotante", items: ["Laboratorio LEA en Manibus y The Sunken Lord en Islas del Abismo. Registra un intento con 1, 2 o 3 puntos según la fase.", "Faro de calamidad de 3 puntos, búho de 1 y nueva pestaña Winter con tejedores de 1 punto.", "Puntero de color ajustable junto a los controles de la Rueda Visional. En Windows se puede colocar sobre el juego."] },
   { version: "1.22.2", date: "10 de octubre de 2026", title: "Cofre fluido y animaciones ligeras", items: ["Apertura del cofre en vídeo local a 60 FPS, sin cargar el modelo 3D pesado durante el inicio.", "El fantasma emerge y se aleja de forma continua, sin las pausas de la trayectoria anterior.", "El cofre junto a los puntos conserva su tapa y fantasma con cerca de un 95 % menos de elementos; se pausa fuera de pantalla y en segundo plano.", "Reproducción adaptada a Windows, Android y web, con alternativa estática si falla el vídeo o se prefiere reducir movimiento.", "Conserva los puntos, las cajas, los personajes, los módulos y la sincronización existente."] },
   { version: "1.22.1", date: "9 de octubre de 2026", title: "Cofre con profundidad e iconos fieles", items: ["Cofre con herrajes en relieve, tapa curva, cerradura profunda y paredes interiores; conserva la apertura del módulo y el fantasma.", "Acabado de metal envejecido con tornillos, ranuras y desgaste sutil, sin el aspecto plástico anterior.", "El logo y los iconos de Windows, Android y web se generan desde el mismo cofre tridimensional, con proporciones y márgenes seguros.", "Piezas estáticas reutilizadas y animaciones que respetan movimiento reducido; no cambia el progreso, el historial ni la sincronización."] },
@@ -772,18 +775,6 @@ function pointsLabel(points: number, language: UiLanguage = "es") {
   return `${points} ${language === "es" ? (points === 1 ? "punto" : "puntos") : (points === 1 ? "point" : "points")}`;
 }
 
-function speakMessage(message: string) {
-  if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") return false;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(message);
-  utterance.lang = "es-CO";
-  utterance.rate = 0.92;
-  utterance.pitch = 1;
-  utterance.volume = 1;
-  window.speechSynthesis.speak(utterance);
-  return true;
-}
-
 function normalizeCycleState(state: PersistedState, now: number): PersistedState {
   const cycle = computeCycle(state.settings, now);
   const durationMinutes = cycle.phase === "active" ? state.settings.activeMinutes : state.settings.waitMinutes;
@@ -931,6 +922,12 @@ export default function App() {
   const [selectedShinyModId, setSelectedShinyModId] = useState("");
   const importRef = useRef<HTMLInputElement>(null);
   const voiceAlertRef = useRef("");
+  const voiceRetryAtRef = useRef(0);
+  const [voiceError, setVoiceError] = useState("");
+  const [voiceTesting, setVoiceTesting] = useState(false);
+  const [voiceAlarmExact, setVoiceAlarmExact] = useState(true);
+  const [voicePermissionRevision, setVoicePermissionRevision] = useState(0);
+  const voiceScheduleJson = JSON.stringify(voiceSchedule(state.settings));
   const personalSyncUpdatedAtRef = useRef(loadPersonalSyncUpdatedAt());
   const personalSyncJsonRef = useRef(JSON.stringify(personalSyncPayload(state)));
   const localSyncInFlightRef = useRef(false);
@@ -974,9 +971,14 @@ export default function App() {
   const visiblePointRounds = useMemo(() => state.pointRounds.filter((record) => isTeamMode ? record.trackingMode === "team" : record.trackingMode === "solo" && record.characterId === activeCharacter.id), [activeCharacter.id, isTeamMode, state.pointRounds]);
   const savedPointRoundTotal = useMemo(() => visiblePointRounds.reduce((sum, record) => sum + record.points, 0), [visiblePointRounds]);
   const todayKey = gameDayKey(now);
-  const activitySummary = useMemo(() => activityHistorySummary(state.activityHistory, new Date(`${todayKey}T12:00:00`)), [state.activityHistory, todayKey]);
+  const activitySummary = useMemo(() => activityHistorySummary(
+    state.activityHistory.map((record) => ({ ...record, ...localizedActivityRecord(record, state.catalog, language) })),
+    new Date(`${todayKey}T12:00:00`),
+  ), [language, state.activityHistory, state.catalog, todayKey]);
   const activityCount = (activity: Activity, vision?: Vision) => activitySummary.ranking.find((item) => item.key === `${vision?.id ?? "pro"}:${activity.id}`) ?? { todayCount: 0, count: 0 };
-  const breakdown = useMemo(() => buildBreakdown(currentActions), [currentActions]);
+  const breakdown = useMemo(() => buildBreakdown(currentActions.map((record) => ({
+    ...record, ...localizedActivityRecord(record, state.catalog, language),
+  }))), [currentActions, language, state.catalog]);
   const activeCharacterBoxes = useMemo(() => state.boxes.filter((box) => (box.characterId ?? DEFAULT_CHARACTER_ID) === activeCharacter.id), [state.boxes, activeCharacter.id]);
   const activeCharacterPoints = useMemo(() => activeCharacterActions.reduce((sum, action) => sum + action.points, 0), [activeCharacterActions]);
   const stats = useMemo(() => boxStatistics(activeCharacterBoxes, activeCharacterPoints, referencePoints), [activeCharacterBoxes, activeCharacterPoints, referencePoints]);
@@ -1655,21 +1657,47 @@ export default function App() {
   }, [commitState, cycle.phase, cyclePhaseStartedAt, now, personalRestoreReady, selectedVision, state.settings.lastWhalePointRoundWaitStartedAt]);
 
   useEffect(() => {
+    if (!personalRestoreReady || !IS_ANDROID) return;
+    let active = true;
+    const configure = () => {
+      void invoke<{ exact: boolean; lastError?: string }>("plugin:android-updater|configure_voice", {
+        configuration: JSON.parse(voiceScheduleJson),
+      }).then((status) => {
+        if (!active) return;
+        setVoiceAlarmExact(status.exact);
+        if (status.lastError) setVoiceError(status.lastError);
+      }).catch(() => { if (active) setVoiceError("voice-schedule-failed"); });
+    };
+    configure();
+    window.addEventListener("focus", configure);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", configure);
+    };
+  }, [personalRestoreReady, voicePermissionRevision, voiceScheduleJson]);
+
+  useEffect(() => {
     const leadMinutes = clampNumber(state.settings.voiceLeadMinutes, 1, 60);
-    const phaseKey = state.settings.phaseStartedAt;
-    if (cycle.phase !== "waiting" || selectedVision?.id !== "gravity" || !state.settings.voiceNotificationsEnabled) return;
+    const phaseKey = cycle.phaseEndsAt;
+    if (!personalRestoreReady || IS_ANDROID || voiceTesting || cycle.phase !== "waiting" || selectedVision?.id !== "gravity" || !state.settings.voiceNotificationsEnabled) return;
     if (cycle.remainingMs > leadMinutes * 60_000 || state.settings.lastVoiceAlertPhaseStartedAt === phaseKey || voiceAlertRef.current === phaseKey) return;
+    if (Date.now() < voiceRetryAtRef.current) return;
 
     voiceAlertRef.current = phaseKey;
     const remainingMinutes = Math.max(1, Math.ceil(cycle.remainingMs / 60_000));
-    const message = `Atención. La Rueda Visional de Gravedad comienza en ${remainingMinutes} ${remainingMinutes === 1 ? "minuto" : "minutos"}.`;
-    speakMessage(message);
-    commitState((current) => ({
-      ...current,
-      settings: { ...current.settings, lastVoiceAlertPhaseStartedAt: phaseKey },
-    }));
+    void speakMessage(gravityVoiceMessage(language, remainingMinutes), language).then(() => {
+      setVoiceError("");
+      commitState((current) => ({
+        ...current,
+        settings: { ...current.settings, lastVoiceAlertPhaseStartedAt: phaseKey },
+      }));
+    }).catch((error) => {
+      setVoiceError(error instanceof Error ? error.message : String(error));
+      voiceRetryAtRef.current = Date.now() + 60_000;
+      voiceAlertRef.current = "";
+    });
 
-  }, [commitState, cycle.phase, cycle.remainingMs, selectedVision?.id, state.settings.lastVoiceAlertPhaseStartedAt, state.settings.phaseStartedAt, state.settings.voiceLeadMinutes, state.settings.voiceNotificationsEnabled]);
+  }, [commitState, cycle.phase, cycle.phaseEndsAt, cycle.remainingMs, language, personalRestoreReady, selectedVision?.id, state.settings.lastVoiceAlertPhaseStartedAt, state.settings.voiceLeadMinutes, state.settings.voiceNotificationsEnabled, voiceTesting]);
 
   const syncCatalog = useCallback(async (silent = false) => {
     if (!silent) setSyncStatus(tx("Buscando catálogo público…", "Checking the public catalog…"));
@@ -1746,7 +1774,8 @@ export default function App() {
       occurredAt: action.occurredAt,
     };
     commitState((current) => ({ ...current, actions: [...current.actions, action], activityHistory: [...current.activityHistory, historyRecord].slice(-100_000) }));
-    setToast(isTeamMode ? `+${points} para ${state.teamMemberIds.length} personajes · ${activity.name}` : `+${points} · ${activity.name}`);
+    const name = activityName(activity, language);
+    setToast(isTeamMode ? `+${points} para ${state.teamMemberIds.length} personajes · ${name}` : `+${points} · ${name}`);
     window.setTimeout(() => setToast(""), 1800);
   };
 
@@ -2286,6 +2315,7 @@ export default function App() {
                 key={`${vision?.id ?? "map"}:${activity.id}`}
                 language={language}
                 activity={activity}
+                phaseNames={activityPhaseNames(activity, state.catalog.proActivities, language)}
                 disabled={!teamReady || (vision !== undefined && !vision.enabled)}
                 currentCount={currentPointRoundActions.filter((action) => action.visionId === vision?.id && action.activityId === activity.id).length}
                 dailyCount={activityCount(activity, vision).todayCount}
@@ -2570,7 +2600,44 @@ export default function App() {
                 <div className="settings-icon"><Clock3 /></div><div><h3>{tx("Duración pública del ciclo", "Public cycle duration")}</h3><p>{tx("Estos valores los define el administrador y se sincronizan junto con la rueda y sus puntos.", "These values are set by the administrator and synced with the wheel and its points.")}</p><div className="timing-summary-values"><span><small>{tx("Espera", "Waiting")}</small><strong>{state.settings.waitMinutes} min</strong></span><span><small>{tx("Activa", "Active")}</small><strong>{state.settings.activeMinutes} min</strong></span><span><small>{tx("Transición al cierre", "End transition")}</small><strong>{state.settings.transitionDelayMilliseconds} ms</strong></span></div><small>{tx("El propietario puede modificarlos en el editor general inferior y enviarlos todos con un solo botón.", "The owner can edit them below and publish everything with one button.")}</small></div>
               </article>
               <article className="settings-card voice-settings panel">
-                <div className="settings-icon"><Volume2 /></div><div><h3>{tx("Aviso por voz · Gravedad", "Voice alert · Gravity")}</h3><p>{tx("Habla antes de que empiece el evento aunque la aplicación esté minimizada.", "Speaks before the event starts even when the app is minimized.")}</p><div className="voice-controls"><label>{tx("Anticipación (minutos)", "Lead time (minutes)")}<input type="number" min={1} max={60} value={state.settings.voiceLeadMinutes} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, voiceLeadMinutes: clampNumber(Number(event.target.value), 1, 60), lastVoiceAlertPhaseStartedAt: undefined } }))} /></label><button type="button" className="secondary compact" onClick={() => { speakMessage(tx("Prueba de voz. El aviso de Gravedad está funcionando.", "Voice test. The Gravity alert is working.")); setToast(tx("Prueba de voz reproducida", "Voice test played")); window.setTimeout(() => setToast(""), 1800); }}><Volume2 size={15} /> {tx("Probar voz", "Test voice")}</button></div></div><button type="button" className={`switch ${state.settings.voiceNotificationsEnabled ? "on" : ""}`} aria-pressed={state.settings.voiceNotificationsEnabled} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, voiceNotificationsEnabled: !current.settings.voiceNotificationsEnabled } }))}><span /></button>
+                <div className="settings-icon"><Volume2 /></div>
+                <div>
+                  <h3>{tx("Aviso por voz · Gravedad", "Voice alert · Gravity")}</h3>
+                  <p>{IS_WEB
+                    ? tx("Pulsa Probar voz una vez y mantén la página abierta para recibir el aviso.", "Select Test voice once and keep this page open to receive alerts.")
+                    : tx("Habla antes de que empiece el evento aunque la aplicación esté minimizada.", "Speaks before the event starts even when the app is minimized.")}</p>
+                  <div className="voice-controls">
+                    <label>{tx("Anticipación (minutos)", "Lead time (minutes)")}<input type="number" min={1} max={60} value={state.settings.voiceLeadMinutes} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, voiceLeadMinutes: clampNumber(Number(event.target.value), 1, 60), lastVoiceAlertPhaseStartedAt: undefined } }))} /></label>
+                    <button type="button" className="secondary compact" disabled={voiceTesting} onClick={async () => {
+                      setVoiceTesting(true);
+                      setVoiceError("");
+                      voiceRetryAtRef.current = Date.now() + 15_000;
+                      try {
+                        await speakMessage(VOICE_MESSAGES[language].test, language);
+                        setToast(tx("Prueba de voz iniciada", "Voice test started"));
+                      } catch (error) {
+                        setVoiceError(error instanceof Error ? error.message : String(error));
+                      } finally {
+                        setVoiceTesting(false);
+                        window.setTimeout(() => setToast(""), 1800);
+                      }
+                    }}><Volume2 size={15} />{voiceTesting ? tx("Probando voz…", "Testing voice…") : tx("Probar voz", "Test voice")}</button>
+                  </div>
+                  {voiceError && <p className="voice-error" role="status">{voiceError.includes("language-missing")
+                    ? tx("Instala la voz del idioma elegido en los ajustes de texto a voz del dispositivo y vuelve a probar.", "Install a voice for the selected language in your device text-to-speech settings, then try again.")
+                    : voiceError.includes("not-allowed")
+                      ? tx("El navegador necesita que pulses Probar voz para permitir el sonido.", "Select Test voice to allow sound in this browser.")
+                      : tx("La voz no pudo reproducirse. Revisa el volumen y las voces disponibles en el dispositivo y vuelve a probar.", "Speech could not play. Check your device volume and installed voices, then try again.")}</p>}
+                  {IS_ANDROID && state.settings.voiceNotificationsEnabled && !voiceAlarmExact && <div className="voice-alarm-permission">
+                    <p>{tx("Android está usando un horario aproximado para el aviso en segundo plano.", "Android is using approximate timing for background alerts.")}</p>
+                    <button type="button" className="secondary compact" onClick={() => {
+                      void invoke("plugin:android-updater|request_voice_alarm_permission").then(() => {
+                        setVoicePermissionRevision((revision) => revision + 1);
+                      }).catch(() => setVoiceError("voice-schedule-failed"));
+                    }}>{tx("Permitir avisos puntuales", "Allow precise alerts")}</button>
+                  </div>}
+                </div>
+                <button type="button" className={`switch ${state.settings.voiceNotificationsEnabled ? "on" : ""}`} aria-label={tx("Activar aviso por voz", "Enable voice alert")} aria-pressed={state.settings.voiceNotificationsEnabled} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, voiceNotificationsEnabled: !current.settings.voiceNotificationsEnabled } }))}><span /></button>
               </article>
               {!IS_ANDROID && <><SettingToggle icon={MonitorUp} title={tx("Iniciar con Windows", "Start with Windows")} description={tx("Arranca en segundo plano; la ventana principal no interrumpe al encender el PC.", "Starts in the background without interrupting you when the PC boots.")} enabled={state.settings.autoStartEnabled} onToggle={(enabled) => { commitState((current) => ({ ...current, settings: { ...current.settings, autoStartEnabled: enabled } })); void toggleAutostart(enabled); }} /><SettingToggle icon={Eye} title={tx("Ventana flotante", "Floating overlay")} description={tx("Contador pequeño, movible y siempre encima del juego.", "A small movable countdown that stays above the game.")} enabled={state.settings.overlayEnabled} onToggle={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayEnabled: !current.settings.overlayEnabled } }))} /><SettingToggle icon={Zap} title={tx("Contador de Ballena", "Whale countdown")} description={tx("Muestra la Ballena y su rayo durante Gravedad; puede ocultarse sin quitar la ventana flotante.", "Shows the Whale and its beam during Gravity; it can be hidden without disabling the main overlay.")} enabled={state.settings.overlayWhaleEnabled} onToggle={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayWhaleEnabled: !current.settings.overlayWhaleEnabled } }))} /></>}
             </div>
@@ -2657,25 +2724,26 @@ function VisionAtmosphere({ visionId, active }: { visionId?: string; active: boo
   </div>;
 }
 
-function ActivityCard({ activity, currentCount, dailyCount, totalCount, language, disabled = false, onAdd, onRemove }: { activity: Activity; currentCount: number; dailyCount: number; totalCount: number; language: UiLanguage; disabled?: boolean; onAdd: (phase?: RewardPhase) => void; onRemove: () => void }) {
+function ActivityCard({ activity, phaseNames, currentCount, dailyCount, totalCount, language, disabled = false, onAdd, onRemove }: { activity: Activity; phaseNames?: string[]; currentCount: number; dailyCount: number; totalCount: number; language: UiLanguage; disabled?: boolean; onAdd: (phase?: RewardPhase) => void; onRemove: () => void }) {
   const english = language !== "es";
+  const name = activityName(activity, language);
   const inactive = disabled || !activity.enabled || activity.points <= 0;
   return (
     <article className={`activity-card ${activity.phaseCount ? "phase-activity-card" : ""} ${inactive ? "disabled" : ""}`} title={activity.note}>
       <div className="activity-points"><strong>{activity.phaseCount ? "1–3" : activity.points}</strong><small>PTS</small></div>
-      <div className="activity-copy"><strong>{activity.name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
-      {activity.phaseCount && <div className="activity-phases" role="group" aria-label={`${activity.name} · ${english ? "Highest phase reached" : "Fase más alta alcanzada"}`}>
+      <div className="activity-copy"><strong title={activity.names?.en}>{name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
+      {activity.phaseCount && <div className="activity-phases" role="group" aria-label={`${name} · ${english ? "Highest phase reached" : "Fase más alta alcanzada"}`}>
         {REWARD_PHASES.map((phase) => <button key={phase} type="button" disabled={inactive} onClick={() => onAdd(phase)}>
-          <span>{english ? "Phase" : "Fase"} {phase}</span><strong>+{phase}</strong>
+          <span>{translate(language, "Fase", "Phase")} {phase}</span>{phaseNames?.[phase - 1] && <span className="phase-boss-name">{phaseNames[phase - 1]}</span>}<strong>+{phase}</strong>
         </button>)}
       </div>}
       <div className="activity-counts">
         <div className="activity-counter">
-          <button type="button" aria-label={`${english ? "Remove one" : "Quitar una de"} ${activity.name}`} disabled={currentCount === 0} onClick={onRemove}><Minus size={15} /></button>
+          <button type="button" aria-label={`${english ? "Remove one" : "Quitar una de"} ${name}`} disabled={currentCount === 0} onClick={onRemove}><Minus size={15} /></button>
           <span aria-label={`${currentCount} ${english ? "in the current round" : "en la ronda actual"}`}>{currentCount}</span>
-          {!activity.phaseCount && <button type="button" aria-label={`${english ? "Add" : "Sumar"} ${activity.name}`} disabled={inactive} onClick={() => onAdd()}><Plus size={19} /></button>}
+          {!activity.phaseCount && <button type="button" aria-label={`${english ? "Add" : "Sumar"} ${name}`} disabled={inactive} onClick={() => onAdd()}><Plus size={19} /></button>}
         </div>
-        <small>{english ? "Today" : "Hoy"} {dailyCount} · {english ? "All time" : "Histórico"} {totalCount}</small>
+        <small>{translate(language, "Hoy", "Today")} {dailyCount} · {translate(language, "Histórico", "All time")} {totalCount}</small>
       </div>
     </article>
   );

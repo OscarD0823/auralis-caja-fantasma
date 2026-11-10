@@ -3,6 +3,7 @@ import { ChevronRight, Moon, Snowflake, Swords, Waves } from "lucide-react";
 import type { Activity, ActivityMapId, Vision } from "./model";
 import { activitiesByMap } from "./activityMaps";
 import type { UiLanguage } from "./i18n";
+import { activityMapName } from "./gameNames";
 
 const MAP_PREFERENCE = "caja-fantasma.activity-map.v1";
 const MAP_ICONS = { manibus: Swords, dream: Moon, abyss: Waves, winter: Snowflake };
@@ -35,8 +36,8 @@ export default function ActivityMapBoard({ activities, vision, language, renderA
 
   return <section className="activity-board" aria-label={english ? "Quick reward tracking" : "Registro rápido de recompensas"}>
     <div className="common-activity-groups">
-      <section className="quick-activity-group" aria-label={english ? general.englishName : general.name}>
-        <header><h2>{english ? general.englishName : general.name}</h2><small>{english ? general.englishDescription : general.description}</small></header>
+      <section className="quick-activity-group" aria-label={activityMapName(general.id, language)}>
+        <header><h2>{activityMapName(general.id, language)}</h2><small>{english ? general.englishDescription : general.description}</small></header>
         <div className="activity-grid quick-activity-grid">{general.activities.map((activity) => renderActivity(activity))}</div>
       </section>
       <section className="quick-activity-group vision-activity-group" aria-label={english ? "Active wheel rewards" : "Recompensas de la visión activa"}>
@@ -57,7 +58,7 @@ export default function ActivityMapBoard({ activities, vision, language, renderA
         }}>
           {scenarios.map((map) => {
             const Icon = MAP_ICONS[map.id as ScenarioMapId];
-            return <button key={map.id} id={`activity-map-tab-${map.id}`} type="button" role="tab" aria-selected={selected === map.id} aria-controls="activity-map-panel" tabIndex={selected === map.id ? 0 : -1} className={selected === map.id ? "selected" : ""} onClick={() => select(map.id as ScenarioMapId)}><Icon size={17} aria-hidden="true" /><span>{english ? map.englishName : map.name}</span><small>{map.activities.length}</small></button>;
+            return <button key={map.id} id={`activity-map-tab-${map.id}`} type="button" role="tab" title={map.englishName} aria-selected={selected === map.id} aria-controls="activity-map-panel" tabIndex={selected === map.id ? 0 : -1} className={selected === map.id ? "selected" : ""} onClick={() => select(map.id as ScenarioMapId)}><Icon size={17} aria-hidden="true" /><span>{activityMapName(map.id, language)}</span><small>{map.activities.length}</small></button>;
           })}
         </div>
       </div>
