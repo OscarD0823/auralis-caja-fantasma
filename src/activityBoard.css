@@ -140,6 +140,19 @@
 .vision-schedule-notice strong { font-size: 12px; }
 .vision-schedule-notice span { color: #9ab1b6; font-size: 10px; line-height: 1.5; }
 .vision-schedule-notice button { flex: none; font-size: 11px; }
+.app-shell > main > .vision-schedule-notice { margin: 14px 24px 0; }
+.vision-season-countdown { flex: none; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.vision-schedule-notice.ending-soon { border-color: #d1ac5b77; }
+.vision-schedule-notice.urgent { background: #a578291a; border-color: #e0b763; }
+.browser-overlay-tools { margin-bottom: 16px; padding: 18px; scroll-margin-top: 140px; }
+.browser-overlay-tools > header { display: flex; gap: 11px; align-items: center; color: #84d7ce; }
+.browser-overlay-tools h2 { margin: 4px 0 0; font-size: 17px; }
+.browser-overlay-tools > p { color: #a6bfc5; font-size: 12px; line-height: 1.65; }
+.browser-tool-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 13px 0; }
+.browser-tool-help { display: block; font-size: 11px; color: #8da7b0; line-height: 1.7; }
+.browser-overlay-tools .browser-tool-error { color: #e0c38b; }
+.browser-overlay-tools .web-install-notice { margin: 15px 0 0; }
+@media (max-width: 1100px) { .browser-tools-quick span { display: none; } }
 .vision-information { margin-bottom: 18px; padding: 22px; background: radial-gradient(ellipse at top right, #cfb77c12, transparent 65%), #0b1c25; border-color: #cdb67b44; }
 .vision-information > header { display: flex; gap: 13px; align-items: center; color: #ddc990; }
 .vision-information h2 { margin: 5px 0 0; font-size: 21px; }
@@ -152,6 +165,9 @@
 .vision-information > a { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; color: #73d0c6; font-size: 12px; }
 .shiny-search-controls { grid-template-columns: minmax(180px, 1fr) minmax(160px, 260px); }
 @media (max-width: 620px) {
+  .browser-overlay-tools { scroll-margin-top: 280px; }
+  .app-shell > main > .vision-schedule-notice { margin: 12px 14px 0; }
+  .vision-season-countdown { font-size: 12px; }
   .vision-schedule-notice { gap: 8px; padding: 10px; flex-wrap: wrap; }
   .vision-schedule-notice > div { min-width: 190px; }
   .vision-schedule-notice button { margin-left: auto; }

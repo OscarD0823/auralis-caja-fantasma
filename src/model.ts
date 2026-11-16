@@ -33,6 +33,7 @@ export type Vision = {
   activities: Activity[];
   /** Fecha del cambio automático del contador, en un instante UTC explícito. */
   startsAt?: string;
+  transitionReason?: "maintenance-start";
   /** false mientras no se haya confirmado el horario repetitivo de la visión. */
   cycleConfirmed?: boolean;
   information?: { es: string[]; en: string[]; sourceUrl: string };
@@ -226,7 +227,7 @@ export type CountdownTransitionSnapshot = {
   progress: number;
 };
 
-export const APP_VERSION = "1.28.0";
+export const APP_VERSION = "1.29.0";
 export const AUTHOR = "OscarD0823";
 export const AUTHOR_PROFILE_URL = `https://github.com/${AUTHOR}`;
 export const DEFAULT_CHARACTER_ID = "character-main";
@@ -427,6 +428,14 @@ export function visionAvailable(vision: Vision, now = Date.now()) {
 export function upcomingVision(catalog: Catalog, now = Date.now()) {
   return catalog.visions.filter((vision) => vision.enabled && vision.startsAt && Date.parse(vision.startsAt) > now)
     .sort((left, right) => Date.parse(left.startsAt!) - Date.parse(right.startsAt!))[0];
+}
+
+export function visionSeasonChange(catalog: Catalog, now = Date.now()) {
+  const next = upcomingVision(catalog, now);
+  const current = catalog.visions.find((vision) => vision.id === sharedVisionId(catalog, "gravity", now));
+  if (!next?.startsAt || !current || next.id === current.id) return undefined;
+  const remainingMs = Date.parse(next.startsAt) - now;
+  return { current, next, remainingMs, endingSoon: remainingMs <= 7 * 86_400_000, urgent: remainingMs <= 86_400_000 };
 }
 
 export function sharedVisionId(catalog: Catalog, fallback = "gravity", now = Date.now()) {
@@ -676,6 +685,7 @@ export function validateCatalog(value: unknown): value is Catalog {
     && Array.isArray(catalog.visions)
     && catalog.visions.every((vision) => vision && typeof vision.id === "string" && typeof vision.name === "string" && (vision.englishName === undefined || typeof vision.englishName === "string") && (vision.visualTheme === undefined || ["gravity", "lunar", "symbiosis", "neutral"].includes(vision.visualTheme)) && typeof vision.enabled === "boolean" && typeof vision.description === "string" && Array.isArray(vision.activities) && vision.activities.every(validActivity)
       && (vision.startsAt === undefined || (typeof vision.startsAt === "string" && /(?:Z|[+-]\d{2}:\d{2})$/.test(vision.startsAt) && Number.isFinite(Date.parse(vision.startsAt))))
+      && (vision.transitionReason === undefined || vision.transitionReason === "maintenance-start")
       && (vision.cycleConfirmed === undefined || typeof vision.cycleConfirmed === "boolean")
       && (vision.information === undefined || (vision.information && [vision.information.es, vision.information.en].every((lines) => Array.isArray(lines) && lines.length <= 12 && lines.every((line) => typeof line === "string" && line.length <= 600)) && typeof vision.information.sourceUrl === "string" && /^https:\/\//.test(vision.information.sourceUrl))))
     && (timing === undefined || catalog.visions.some((vision) => vision.id === timing.selectedVisionId && vision.enabled))

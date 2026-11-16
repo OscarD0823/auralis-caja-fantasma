@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import catalogData from "../catalog/visions.json" with { type: "json" };
-import { applyRemoteCatalog, applyScheduledVision, sharedVisionId, upcomingVision, validateCatalog, type Catalog } from "../src/model.ts";
+import { applyRemoteCatalog, applyScheduledVision, sharedVisionId, upcomingVision, validateCatalog, visionSeasonChange, type Catalog } from "../src/model.ts";
 import { initialState, personalSyncPayload } from "../src/storage.ts";
 import { voiceSchedule } from "../src/voice.ts";
 
@@ -12,6 +12,15 @@ assert.equal(sharedVisionId(catalog, "gravity", changeAt), "resonance");
 assert.equal(sharedVisionId(catalog, "gravity", changeAt + 30 * 86_400_000), "resonance");
 assert.equal(upcomingVision(catalog, changeAt - 1)?.id, "resonance");
 assert.equal(upcomingVision(catalog, changeAt), undefined);
+const ending = visionSeasonChange(catalog, changeAt - 3 * 86_400_000)!;
+assert.equal(ending.current.id, "gravity");
+assert.equal(ending.next.id, "resonance");
+assert.equal(ending.next.transitionReason, "maintenance-start");
+assert.equal(ending.remainingMs, 3 * 86_400_000);
+assert.equal(ending.endingSoon, true);
+assert.equal(ending.urgent, false);
+assert.equal(visionSeasonChange(catalog, changeAt - 86_400_000)?.urgent, true);
+assert.equal(visionSeasonChange(catalog, changeAt), undefined, "El aviso de cierre termina al comenzar el mantenimiento.");
 const state = initialState();
 state.catalog = catalog;
 state.settings.selectedVisionId = "gravity";

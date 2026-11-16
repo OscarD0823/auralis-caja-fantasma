@@ -116,6 +116,7 @@ import { persistDesktopProgress } from "./desktopProgress";
 import { activityName, activityPhaseNames, localizedActivityRecord } from "./gameNames";
 import { gravityVoiceMessage, speakMessage, voiceSchedule, VOICE_MESSAGES } from "./voice";
 import { VisionInformation, VisionScheduleNotice } from "./VisionInformation";
+import { BrowserOverlayControls, useBrowserOverlay } from "./BrowserOverlayTools";
 import PhoneBridgeSyncPanel from "./PhoneBridgeSyncPanel";
 import { runtimePlatform } from "./runtimePlatform";
 import { usePhoneBridgeSync } from "./usePhoneBridgeSync";
@@ -222,6 +223,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.29.0", date: "15 de noviembre de 2026", title: "Aviso de cierre y herramientas del navegador", items: ["La rueda cambia al iniciar el mantenimiento del 18 de noviembre a las 18:00 de Colombia. Un aviso en todas las pestañas muestra cuánto le queda a Gravedad.", "El contador y un puntero de color pueden abrirse en una ventana flotante del navegador, sin el programa de Windows.", "Instalación de la web con acceso a las herramientas. El puntero web se muestra dentro de su ventana; el navegador no permite un punto transparente a los clics sobre un juego externo."] },
   { version: "1.28.0", date: "15 de noviembre de 2026", title: "Resonancia disonante y módulos sin duplicados", items: ["S5 incorpora su información oficial y cambia automáticamente el 18 de noviembre a las 18:00 de Colombia, hora prevista de la actualización. El juego abre tras el mantenimiento.", "Los módulos del catálogo muestran solo las 809 entradas normales, con equivalencias para reconocer los seguimientos Brillantes antiguos.", "Los puntos y el horario repetitivo de S5 quedan por confirmar; el cambio conserva todo el progreso y detiene los avisos de Gravedad."] },
   { version: "1.27.1", date: "10 de noviembre de 2026", title: "Las tres fases de LEA", items: ["LEA identifica las fases 2 gigantes, Dr. Mannheim y Madre de la vida. Registra una vez la fase más alta para sumar 1, 2 o 3 puntos.", "Incluye los nombres de mapas y jefes por idioma y las voces del sistema de Windows y Android."] },
   { version: "1.27.0", date: "10 de noviembre de 2026", title: "Mapas y jefes por idioma, avisos por voz", items: ["Los mapas muestran sus nombres completos y los jefes cambian con el idioma elegido.", "Señor Hundido muestra las fases Búho de Calamidad, Torre de calamidad y Señor Hundido.", "Voz del sistema en Windows y Android, prueba con confirmación de reproducción, idioma del aviso y horario en segundo plano para Android."] },
@@ -1045,6 +1047,15 @@ export default function App() {
 
   const commitState = useCallback((update: PersistedState | ((current: PersistedState) => PersistedState)) => {
     setState((current) => typeof update === "function" ? update(current) : update);
+  }, []);
+
+  const updateBrowserPointerColor = useCallback((color: string) => {
+    if (!/^#[a-f\d]{6}$/i.test(color)) return;
+    commitState(current => ({ ...current, settings: { ...current.settings, pointer: { ...pointerSettings(current.settings.pointer), color } } }));
+  }, [commitState]);
+  const browserOverlay = useBrowserOverlay(state, language, IS_WEB, updateBrowserPointerColor);
+  useEffect(() => {
+    if (IS_WEB && new URLSearchParams(window.location.search).get("tools") === "1") document.getElementById("browser-overlay-tools")?.scrollIntoView({ block: "start" });
   }, []);
 
   useEffect(() => { document.documentElement.lang = localeForLanguage(language); }, [language]);
@@ -2192,6 +2203,7 @@ export default function App() {
 
   return (
     <div className="app-shell" data-event={cycle.phase === "active" ? visionVisualTheme(selectedVision) : "neutral"}>
+      {browserOverlay.portal}
       {(IS_WEB || IS_ANDROID) && pointer.enabled && <span className="pointer-dot in-app-pointer" style={{ backgroundColor: pointer.color }} aria-hidden="true" />}
       <input ref={importRef} hidden type="file" accept="application/json,.json" onChange={(event) => void onImport(event.target.files?.[0])} />
       <AppUpdater language={language} beforeInstall={async () => {
@@ -2264,17 +2276,18 @@ export default function App() {
               <Languages size={15} aria-hidden="true" />
               <select value={state.settings.uiLanguageMode === "auto" ? "auto" : language} onChange={(event) => { const automatic = event.target.value === "auto"; commitState(current => ({ ...current, settings: { ...current.settings, uiLanguageMode: automatic ? "auto" : "manual", uiLanguage: automatic ? detectUiLanguage() : event.target.value as UiLanguage } })); }}><option value="auto">Auto · {language.toUpperCase()}</option>{UI_LANGUAGES.map((item) => <option key={item.code} value={item.code}>{item.short}</option>)}</select>
             </label>
+            {IS_WEB && browserOverlay.supported && <button type="button" className="secondary compact browser-tools-quick" disabled={browserOverlay.opening} onClick={() => void browserOverlay.open("counter")} aria-label={tx("Abrir contador flotante del navegador", "Open browser floating counter")} title={tx("Contador y puntero del navegador", "Browser counter and pointer")}><MonitorUp size={18} /><span>{tx("Flotante", "Pop out")}</span></button>}
             <button type="button" className="secondary tutorial-open" onClick={() => setTutorialOpen(true)} aria-label={tx("Abrir tutorial", "Open tutorial")}><CircleHelp size={18} /><span>{tx("Tutorial", "Tutorial")}</span></button>
           </div>
         </header>
 
         {IS_ANDROID && personalRestoreReady && tab === "progress" && personalHistoryCount(state) === 0 && <MigrationGuide language={language} android onImport={() => importRef.current?.click()} onDevices={() => setTab("devices")} />}
         {IS_WEB && tab !== "progress" && <WebInstallNotice pwa={pwa} language={language} />}
+        <VisionScheduleNotice vision={nextVision} currentVision={selectedVision} now={now} language={language} onDetails={() => setTab("vision")} />
         {tutorialNotice && !introVisible && <div className="tutorial-welcome"><CircleHelp size={20} /><span>{tx("¿Primera vez? Conoce Auralis Caja Fantasma en seis pasos.", "First time? Learn Auralis Caja Fantasma in six steps.")}</span><button type="button" className="primary compact" onClick={() => setTutorialOpen(true)}>{tx("Ver tutorial", "View tutorial")}</button><button type="button" className="experience-close" aria-label={tx("Ocultar aviso", "Hide notice")} onClick={finishTutorial}><X size={16} /></button></div>}
 
         {tab === "progress" && (
           <section className="page progress-page">
-            <VisionScheduleNotice vision={nextVision} now={now} language={language} onDetails={() => setTab("vision")} />
             {state.characters.length > 1 && <article className="character-dashboard panel">
               <div className="character-dashboard-top">
                 <div><span className="eyebrow"><Users size={15} /> {tx("PERSONAJES", "CHARACTERS")}</span><h2>{isTeamMode ? tx("Registro compartido del equipo", "Shared team tracking") : `${tx("Jugando con", "Playing as")} ${activeCharacter.name}`}</h2></div>
@@ -2335,6 +2348,7 @@ export default function App() {
                 onRemove={() => removeLastActivity(activity.id, vision?.id)}
               />} />
 
+            {IS_WEB && <BrowserOverlayControls controller={browserOverlay} language={language} pwa={pwa} />}
             {IS_WEB && <WebInstallNotice pwa={pwa} language={language} />}
 
             <article className={`home-overlay-controls panel ${homeOverlayConfigOpen ? "expanded" : ""}`}>

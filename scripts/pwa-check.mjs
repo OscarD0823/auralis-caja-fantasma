@@ -10,6 +10,9 @@ assert(serviceWorker.includes(`const CACHE = "caja-fantasma-web-v${release.versi
 const manifest = JSON.parse(await readFile(resolve(root, "public/manifest.webmanifest"), "utf8"));
 assert.equal(manifest.display, "standalone");
 assert.equal(manifest.start_url, "./");
+const toolsShortcut = manifest.shortcuts.find(shortcut => shortcut.url === "./?tools=1");
+assert(toolsShortcut, "The installed web app must offer a counter and pointer shortcut.");
+assert.equal(new URL(toolsShortcut.url, "https://example.test/auralis-caja-fantasma/").pathname, "/auralis-caja-fantasma/", "Tools must keep the app's existing origin, scope, and personal storage.");
 for (const icon of manifest.icons) {
   const bytes = await readFile(resolve(root, "public", icon.src));
   const size = Number(icon.sizes.split("x")[0]);

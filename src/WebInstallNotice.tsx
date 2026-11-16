@@ -6,11 +6,11 @@ import type { PwaInstallState } from "./usePwaInstall";
 
 const DISMISS_KEY = "caja-fantasma.web-install-notice.dismissed";
 
-function WebInstallNotice({ pwa, language, variant = "notice" }: { pwa: PwaInstallState; language: UiLanguage; variant?: "notice" | "panel" }) {
+function WebInstallNotice({ pwa, language, variant = "notice", initialHelpOpen = false }: { pwa: PwaInstallState; language: UiLanguage; variant?: "notice" | "panel"; initialHelpOpen?: boolean }) {
   const [dismissed, setDismissed] = useState(() => {
     try { return sessionStorage.getItem(DISMISS_KEY) === "true"; } catch { return false; }
   });
-  const [helpOpen, setHelpOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(initialHelpOpen);
   const helpId = useId();
   const guide = useMemo(() => pwaInstallGuide(navigator.userAgent, navigator.platform, navigator.maxTouchPoints), []);
   const tx = (es: string, en: string) => translate(language, es, en);

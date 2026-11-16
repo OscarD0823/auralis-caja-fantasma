@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 61,
-  "updatedAt": "2026-11-16T03:43:39.296Z",
+  "catalogVersion": 62,
+  "updatedAt": "2026-11-16T04:14:41.316Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -550,7 +550,8 @@
           "enabled": false,
           "note": "Puntos de recompensa por confirmar."
         }
-      ]
+      ],
+      "transitionReason": "maintenance-start"
     }
   ]
 }
