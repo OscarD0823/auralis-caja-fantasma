@@ -54,6 +54,7 @@ class VoiceConfigurationArgs {
     var language: String = "es-CO"
     var message: String = ""
     var singularMessage: String = ""
+    var expiresAt: Long = 0
 }
 
 @InvokeArg

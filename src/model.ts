@@ -31,6 +31,11 @@ export type Vision = {
   enabled: boolean;
   description: string;
   activities: Activity[];
+  /** Fecha del cambio automático del contador, en un instante UTC explícito. */
+  startsAt?: string;
+  /** false mientras no se haya confirmado el horario repetitivo de la visión. */
+  cycleConfirmed?: boolean;
+  information?: { es: string[]; en: string[]; sourceUrl: string };
 };
 
 export type VisionVisualTheme = "gravity" | "lunar" | "symbiosis" | "neutral";
@@ -221,7 +226,7 @@ export type CountdownTransitionSnapshot = {
   progress: number;
 };
 
-export const APP_VERSION = "1.27.1";
+export const APP_VERSION = "1.28.0";
 export const AUTHOR = "OscarD0823";
 export const AUTHOR_PROFILE_URL = `https://github.com/${AUTHOR}`;
 export const DEFAULT_CHARACTER_ID = "character-main";
@@ -370,15 +375,15 @@ export function sharedEventTimingFromSettings(settings: Settings, updatedAt: str
   };
 }
 
-export function applyRemoteCatalog(current: PersistedState, catalog: Catalog): PersistedState {
+export function applyRemoteCatalog(current: PersistedState, catalog: Catalog, now = Date.now()): PersistedState {
   if (catalog.catalogVersion < current.catalog.catalogVersion) return current;
   const hasNewCatalog = catalog.catalogVersion > current.catalog.catalogVersion;
   const timing = catalog.eventTiming;
-  if (!timing) return hasNewCatalog ? { ...current, catalog } : current;
+  if (!timing) return applyScheduledVision(hasNewCatalog ? { ...current, catalog } : current, now);
 
   const appliedTiming = Date.parse(current.settings.sharedTimingUpdatedAt ?? "");
   const remoteTiming = Date.parse(timing.updatedAt);
-  const selectedVisionId = sharedVisionId(catalog, current.settings.selectedVisionId);
+  const selectedVisionId = sharedVisionId(catalog, current.settings.selectedVisionId, now);
   // A higher catalog version is the administrator's authoritative publication.
   // Do not let a client clock or a previously stored future timestamp keep the
   // new durations/transition delay from reaching Windows or Android.
@@ -415,10 +420,30 @@ export function shouldShowGravityWhale(settings: Settings, now = Date.now()) {
   return elapsedWaitingMs <= 5 * 60_000;
 }
 
-export function sharedVisionId(catalog: Catalog, fallback = "gravity") {
-  const selectedId = catalog.eventTiming?.selectedVisionId;
-  if (selectedId && catalog.visions.some((vision) => vision.id === selectedId && vision.enabled)) return selectedId;
-  return catalog.visions.find((vision) => vision.enabled)?.id ?? fallback;
+export function visionAvailable(vision: Vision, now = Date.now()) {
+  return vision.enabled && (!vision.startsAt || Date.parse(vision.startsAt) <= now);
+}
+
+export function upcomingVision(catalog: Catalog, now = Date.now()) {
+  return catalog.visions.filter((vision) => vision.enabled && vision.startsAt && Date.parse(vision.startsAt) > now)
+    .sort((left, right) => Date.parse(left.startsAt!) - Date.parse(right.startsAt!))[0];
+}
+
+export function sharedVisionId(catalog: Catalog, fallback = "gravity", now = Date.now()) {
+  const timing = catalog.eventTiming;
+  const scheduled = catalog.visions.filter((vision) => vision.startsAt && visionAvailable(vision, now))
+    .sort((left, right) => Date.parse(right.startsAt!) - Date.parse(left.startsAt!))[0];
+  // Una publicación posterior a la fecha programada puede corregir el evento.
+  if (scheduled && (!timing || Date.parse(scheduled.startsAt!) > Date.parse(timing.updatedAt))) return scheduled.id;
+  if (timing && catalog.visions.some((vision) => vision.id === timing.selectedVisionId && visionAvailable(vision, now))) return timing.selectedVisionId;
+  return scheduled?.id ?? catalog.visions.find((vision) => visionAvailable(vision, now))?.id ?? fallback;
+}
+
+export function applyScheduledVision(current: PersistedState, now = Date.now()): PersistedState {
+  const selectedVisionId = sharedVisionId(current.catalog, current.settings.selectedVisionId, now);
+  if (selectedVisionId === current.settings.selectedVisionId) return current;
+  // El cambio de rueda no reinicia puntos, intentos, rondas ni colección.
+  return { ...current, settings: { ...current.settings, selectedVisionId, lastVoiceAlertPhaseStartedAt: undefined } };
 }
 
 export function computeGravityWhale(settings: Settings, now = Date.now()): GravityWhaleSnapshot {
@@ -649,7 +674,10 @@ export function validateCatalog(value: unknown): value is Catalog {
     && Array.isArray(catalog.proActivities)
     && catalog.proActivities.every(validActivity)
     && Array.isArray(catalog.visions)
-    && catalog.visions.every((vision) => vision && typeof vision.id === "string" && typeof vision.name === "string" && (vision.englishName === undefined || typeof vision.englishName === "string") && (vision.visualTheme === undefined || ["gravity", "lunar", "symbiosis", "neutral"].includes(vision.visualTheme)) && typeof vision.enabled === "boolean" && typeof vision.description === "string" && Array.isArray(vision.activities) && vision.activities.every(validActivity))
+    && catalog.visions.every((vision) => vision && typeof vision.id === "string" && typeof vision.name === "string" && (vision.englishName === undefined || typeof vision.englishName === "string") && (vision.visualTheme === undefined || ["gravity", "lunar", "symbiosis", "neutral"].includes(vision.visualTheme)) && typeof vision.enabled === "boolean" && typeof vision.description === "string" && Array.isArray(vision.activities) && vision.activities.every(validActivity)
+      && (vision.startsAt === undefined || (typeof vision.startsAt === "string" && /(?:Z|[+-]\d{2}:\d{2})$/.test(vision.startsAt) && Number.isFinite(Date.parse(vision.startsAt))))
+      && (vision.cycleConfirmed === undefined || typeof vision.cycleConfirmed === "boolean")
+      && (vision.information === undefined || (vision.information && [vision.information.es, vision.information.en].every((lines) => Array.isArray(lines) && lines.length <= 12 && lines.every((line) => typeof line === "string" && line.length <= 600)) && typeof vision.information.sourceUrl === "string" && /^https:\/\//.test(vision.information.sourceUrl))))
     && (timing === undefined || catalog.visions.some((vision) => vision.id === timing.selectedVisionId && vision.enabled))
     && validTiming;
 }

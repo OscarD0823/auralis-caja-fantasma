@@ -4,8 +4,10 @@ import catalog from "../catalog/visions.json" with { type: "json" };
 import { BASELINE_BOX_POINTS, DEFAULT_CHARACTER_ID, VISION_CYCLE_WAIT_STARTED_AT, actionsForCharacter, actionsForTeamSession, activityHistorySummary, applyRemoteCatalog, boxStatistics, buildBreakdown, buildPointRoundBreakdown, computeCountdownTransition, computeCycle, computeGravityWhale, createInitialCharacterTracking, detachCharacterFromActions, formatCompactDuration, gameDayKey, overlayVisionName, parseManualBaseline, pointActionsInRound, resolveTransitionDelayMilliseconds, sharedEventTimingFromSettings, sharedVisionId, shouldShowGravityWhale, splitPlatformCarryover, validateCatalog, type ActivityHistoryRecord, type BoxRecord, type Catalog, type PersistedState, type PointAction, type Settings } from "../src/model.ts";
 import { overlayDesignSize, whaleCounterLayoutWithinWindow, whaleCounterScaleWithinWindow, whaleScaleWithinWindow } from "../src/overlayGeometry.ts";
 import { completeLocalSyncAddress, isValidLocalSyncAddress, joinLocalSyncAddress, localSyncTargetAddressSpace, splitLocalSyncAddress } from "../src/localSyncAddress.ts";
-import { SHINY_MOD_CATALOG, SHINY_MOD_CATALOG_META, SHINY_MOD_GROUPS, matchesModSearch, normalizeModSearch } from "../src/shinyModsCatalog.ts";
+import { SHINY_MOD_CATALOG, SHINY_MOD_CATALOG_META, SHINY_MOD_GROUPS, canonicalModCatalogId, matchesModSearch, normalizeModSearch } from "../src/shinyModsCatalog.ts";
 import { initialState, mergePersonalSyncPayload, personalDurableHistoryCount, personalSyncPayload, recoverPersonalBackup } from "../src/storage.ts";
+
+const publicationNow = Date.parse("2026-11-15T12:00:00Z");
 
 const freshState = { ...createInitialCharacterTracking(Date.parse("2026-09-11T00:00:00Z")), actions: [] as PointAction[] };
 const presenceAt = Date.parse("2026-10-07T18:00:00Z");
@@ -31,13 +33,13 @@ assert.equal(localSyncTargetAddressSpace("127.0.0.1:48183"), "loopback", "La pá
 assert.equal(localSyncTargetAddressSpace("192.168.1.20:48183"), "local", "Una IP de la red debe solicitar acceso a la red local.");
 
 assert.equal(validateCatalog(catalog), true, "El catálogo incluido debe ser válido.");
-assert.equal(sharedVisionId(catalog), catalog.eventTiming.selectedVisionId, "La rueda pública debe ser la que eligió el administrador.");
-assert.equal(catalog.visions.find((vision) => vision.id === sharedVisionId(catalog))?.enabled, true, "La rueda pública no puede estar desactivada.");
+assert.equal(sharedVisionId(catalog, "gravity", publicationNow), catalog.eventTiming.selectedVisionId, "Antes de la siguiente fecha programada rige la selección publicada.");
+assert.equal(catalog.visions.find((vision) => vision.id === sharedVisionId(catalog, "gravity", publicationNow))?.enabled, true, "La rueda pública no puede estar desactivada.");
 const invalidDisabledSelection = structuredClone(catalog);
 invalidDisabledSelection.visions.find((vision) => vision.id === "lunar")!.enabled = true;
 invalidDisabledSelection.visions.find((vision) => vision.id === invalidDisabledSelection.eventTiming.selectedVisionId)!.enabled = false;
 assert.equal(validateCatalog(invalidDisabledSelection), false, "El administrador no puede publicar como actual una rueda desactivada.");
-assert.equal(sharedVisionId(invalidDisabledSelection), "lunar", "Si una copia antigua apunta a una rueda desactivada debe usar la primera habilitada.");
+assert.equal(sharedVisionId(invalidDisabledSelection, "gravity", publicationNow), "lunar", "Si una copia antigua apunta a una rueda desactivada debe usar la primera habilitada.");
 for (const id of ["pro-monolith-boss", "pro-silo", "dream-manibus-challenge", "pro-war", "manibus-manibus", "dream-zone-invasion", "dreamer-light", "dreamer-deep", "dreamer-eternal"]) {
   assert.ok(catalog.proActivities.some((item) => item.id === id), `Falta la recompensa editable ${id}.`);
 }
@@ -73,7 +75,7 @@ previousBossCatalog.proActivities = previousBossCatalog.proActivities.map((activ
   : activity);
 const priorTower = { ...calamityActions[0], activityName: "Torre de calamidad", points: 1 };
 const existingBossState = { ...initialState(), catalog: previousBossCatalog, actions: [priorTower] };
-const updatedBossState = applyRemoteCatalog(existingBossState, catalog as Catalog);
+const updatedBossState = applyRemoteCatalog(existingBossState, catalog as Catalog, publicationNow);
 assert.ok(calamityBosses.every((boss) => updatedBossState.catalog.proActivities.some((activity) => activity.id === boss.id)));
 assert.strictEqual(updatedBossState.actions, existingBossState.actions, "Actualizar los jefes no debe reemplazar los puntos existentes.");
 assert.equal(updatedBossState.actions[0].points, 1);
@@ -166,7 +168,7 @@ newerCatalog.eventTiming = {
   phaseStartedAt: "2026-09-12T12:30:00.000Z",
   updatedAt: "2026-09-12T12:31:00.000Z",
 };
-const remotelyUpdated = applyRemoteCatalog(localState, newerCatalog);
+const remotelyUpdated = applyRemoteCatalog(localState, newerCatalog, publicationNow);
 assert.equal(remotelyUpdated.catalog.catalogVersion, newerCatalog.catalogVersion);
 assert.deepEqual({
   selectedVisionId: remotelyUpdated.settings.selectedVisionId,
@@ -193,7 +195,7 @@ timingOnlyCatalog.eventTiming = {
   transitionDelaySeconds: .85,
   updatedAt: "2026-09-12T12:36:00.000Z",
 };
-const timingOnlyUpdated = applyRemoteCatalog(remotelyUpdated, timingOnlyCatalog);
+const timingOnlyUpdated = applyRemoteCatalog(remotelyUpdated, timingOnlyCatalog, publicationNow);
 assert.equal(timingOnlyUpdated.settings.waitMinutes, 55);
 assert.equal(timingOnlyUpdated.settings.activeMinutes, 25);
 assert.equal(timingOnlyUpdated.settings.transitionDelayMilliseconds, 850);
@@ -208,13 +210,13 @@ newerVersionWithOlderClock.eventTiming = {
   transitionDelaySeconds: 1.275,
   updatedAt: "2026-09-12T11:00:00.000Z",
 };
-const authoritativeVersionUpdate = applyRemoteCatalog(timingOnlyUpdated, newerVersionWithOlderClock);
+const authoritativeVersionUpdate = applyRemoteCatalog(timingOnlyUpdated, newerVersionWithOlderClock, publicationNow);
 assert.equal(authoritativeVersionUpdate.settings.waitMinutes, 61);
 assert.equal(authoritativeVersionUpdate.settings.activeMinutes, 29);
 assert.equal(authoritativeVersionUpdate.settings.transitionDelayMilliseconds, 1_275, "Una versión pública superior debe aplicar los tiempos aunque el reloj del cliente tenga una fecha posterior.");
 const staleCatalog = structuredClone(catalog) as Catalog;
 staleCatalog.catalogVersion = Math.max(0, catalog.catalogVersion - 1);
-assert.strictEqual(applyRemoteCatalog(remotelyUpdated, staleCatalog), remotelyUpdated, "Una respuesta antigua o cacheada no debe devolver el contador a una configuración anterior.");
+assert.strictEqual(applyRemoteCatalog(remotelyUpdated, staleCatalog, publicationNow), remotelyUpdated, "Una respuesta antigua o cacheada no debe devolver el contador a una configuración anterior.");
 
 for (const shape of ["event", "rectangle", "square", "vertical", "round"] as const) {
   for (const style of ["digital", "compact", "ring"] as const) {
@@ -409,16 +411,16 @@ const platformSplit = splitPlatformCarryover(platformActions, Date.parse("2026-0
 assert.deepEqual(platformSplit.completedAttempt.map((action) => action.id), ["old"]);
 assert.deepEqual(platformSplit.carryOver.map((action) => action.id), ["new-1", "new-2"]);
 
-assert.equal(SHINY_MOD_CATALOG.length, 1_618, "El catálogo debe contener los 1.618 registros del sistema actual.");
+assert.equal(SHINY_MOD_CATALOG.length, 809, "El catálogo solo debe mostrar las 809 entradas normales.");
 assert.deepEqual(SHINY_MOD_CATALOG_META, {
   sourceUrl: "https://wikily.gg/es-la/once-human/mods/",
   sourceCheckedAt: SHINY_MOD_CATALOG_META.sourceCheckedAt,
-  total: 1_618,
+  total: 809,
   normal: 809,
-  shiny: 809,
+  shiny: 0,
 });
 assert.equal(SHINY_MOD_CATALOG.filter((item) => item.system === "new" && !item.isCatalogShiny).length, 809);
-assert.equal(SHINY_MOD_CATALOG.filter((item) => item.system === "new" && item.isCatalogShiny).length, 809);
+assert.equal(SHINY_MOD_CATALOG.filter((item) => item.isCatalogShiny).length, 0);
 assert.equal(new Set(SHINY_MOD_CATALOG.map((item) => item.id)).size, SHINY_MOD_CATALOG.length);
 assert.ok(SHINY_MOD_GROUPS.filter((item) => item.category === "weapon").length >= 9);
 const rushHourNormal = SHINY_MOD_CATALOG.find((item) => item.englishName === "Rush Hour <Downstar>" && !item.isCatalogShiny);
@@ -426,8 +428,13 @@ const rushHourShiny = SHINY_MOD_CATALOG.find((item) => item.englishName === "Rus
 assert.equal(rushHourNormal?.name, "Hora punta <Estrella descendente>");
 assert.equal(rushHourNormal?.variant, "Estrella Descendente");
 assert.equal(rushHourNormal?.levelLabel, "Nivel 1–17");
-assert.equal(rushHourShiny?.name, "Hora punta <Estrella descendente>");
-assert.equal(rushHourShiny?.levelLabel, "Brillante");
+assert.equal(rushHourShiny, undefined);
+assert.equal(canonicalModCatalogId("new-shiny-19505234-2410234"), rushHourNormal?.id, "Un seguimiento Brillante anterior debe reconocer su equivalente normal.");
+assert.equal(canonicalModCatalogId("custom-id"), "custom-id");
+const aliases = SHINY_MOD_CATALOG.flatMap((item) => item.legacyShinyIds ?? []);
+assert.equal(aliases.length, 809);
+assert.equal(new Set(aliases).size, 809);
+assert.equal(matchesModSearch(rushHourNormal!, normalizeModSearch("19505234")), true, "El ID Brillante anterior sigue encontrando el módulo normal.");
 assert.equal(SHINY_MOD_CATALOG.every((item) => item.levelLabel === (item.isCatalogShiny ? "Brillante" : "Nivel 1–17")), true);
 assert.equal(matchesModSearch(rushHourNormal!, normalizeModSearch("19500542")), true);
 assert.equal(matchesModSearch(rushHourNormal!, normalizeModSearch("hora punta estrella descendente")), true);

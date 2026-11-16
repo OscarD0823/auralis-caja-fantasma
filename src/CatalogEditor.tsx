@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Github, Plus, RadioTower, Save, Trash2 } from "lucide-react";
 import { visionVisualImage } from "./assets";
 import type { Activity, Catalog, Vision, VisionVisualTheme } from "./model";
-import { AUTHOR, clampNumber, createId, resolveTransitionDelayMilliseconds } from "./model";
+import { AUTHOR, clampNumber, createId, resolveTransitionDelayMilliseconds, sharedVisionId, visionAvailable } from "./model";
 import { ACTIVITY_MAPS, activityMapId } from "./activityMaps";
 
 type Props = {
@@ -78,7 +78,7 @@ export default function CatalogEditor({ catalog, onSave, onPublish }: Props) {
   const prepareVersion = useCallback(() => {
     const updatedAt = new Date().toISOString();
     const timing = draft.eventTiming;
-    const selectedVisionId = timing?.selectedVisionId ?? draft.visions.find((vision) => vision.enabled)?.id ?? draft.visions[0]?.id ?? "gravity";
+    const selectedVisionId = sharedVisionId(draft);
     const transitionDelayMilliseconds = resolveTransitionDelayMilliseconds(timing);
     return {
       ...draft,
@@ -134,11 +134,11 @@ export default function CatalogEditor({ catalog, onSave, onPublish }: Props) {
         <div><span className="eyebrow"><RadioTower size={15} /> CONTROL PÚBLICO</span><h3>Rueda seleccionada para todos</h3><p>Solo la cuenta propietaria puede cambiarla. Al publicarse, reemplaza la selección local de los demás equipos.</p></div>
         <div className="admin-vision-options" aria-label="Ruedas configuradas">
           {draft.visions.map((vision) => {
-            const selected = draft.eventTiming?.selectedVisionId === vision.id;
-            return <button key={vision.id} type="button" disabled={!vision.enabled} className={`admin-vision-card ${selected ? "selected" : ""}`} onClick={() => selectPublicVision(vision.id)}>
+            const selected = sharedVisionId(draft) === vision.id;
+            return <button key={vision.id} type="button" disabled={!visionAvailable(vision)} className={`admin-vision-card ${selected ? "selected" : ""}`} onClick={() => selectPublicVision(vision.id)}>
               <img src={visionVisualImage(vision)} alt="" />
               <span className="admin-vision-shade" />
-              <span className={`admin-vision-state ${selected ? "published" : vision.enabled ? "available" : "disabled"}`}>{selected ? "Publicada" : vision.enabled ? "Disponible" : "Desactivada"}</span>
+              <span className={`admin-vision-state ${selected ? "published" : vision.enabled ? "available" : "disabled"}`}>{selected ? "Publicada" : vision.enabled && !visionAvailable(vision) ? "Programada" : vision.enabled ? "Disponible" : "Desactivada"}</span>
               <span className="admin-vision-copy"><strong>{vision.name}</strong><em>{vision.description || "Sin descripción"}</em></span>
               {selected && <Check size={18} />}
             </button>;
@@ -159,6 +159,8 @@ export default function CatalogEditor({ catalog, onSave, onPublish }: Props) {
       {draft.visions.map((vision) => (
         <EditorGroup key={vision.id} title={vision.name} subtitle={vision.enabled ? "Activa" : "Desactivada"} onAdd={() => addActivity(vision.id)} onRemove={draft.eventTiming?.selectedVisionId === vision.id ? undefined : () => removeVision(vision.id)}>
           <div className="vision-edit-fields">
+            <label>Cambio automático (fecha y hora UTC)<input type="datetime-local" value={vision.startsAt ? new Date(vision.startsAt).toISOString().slice(0, 16) : ""} onChange={(event) => { const startsAt = event.target.value ? new Date(`${event.target.value}Z`).toISOString() : undefined; change((current) => ({ ...current, visions: current.visions.map((item) => item.id === vision.id ? { ...item, startsAt } : item) })); }} /></label>
+            <label className="check-field"><input type="checkbox" checked={vision.cycleConfirmed !== false} onChange={(event) => change((current) => ({ ...current, visions: current.visions.map((item) => item.id === vision.id ? { ...item, cycleConfirmed: event.target.checked } : item) }))} /><span>Horario repetitivo confirmado</span></label>
             <label>Nombre en español<input value={vision.name} onChange={(event) => change((current) => ({ ...current, visions: current.visions.map((item) => item.id === vision.id ? { ...item, name: event.target.value } : item) }))} /></label>
             <label>Nombre en inglés<input value={vision.englishName ?? ""} onChange={(event) => change((current) => ({ ...current, visions: current.visions.map((item) => item.id === vision.id ? { ...item, englishName: event.target.value } : item) }))} /></label>
             <label>Imagen de la ficha<select value={vision.visualTheme ?? (vision.id === "gravity" || vision.id === "lunar" || vision.id === "symbiosis" ? vision.id : "neutral")} onChange={(event) => change((current) => ({ ...current, visions: current.visions.map((item) => item.id === vision.id ? { ...item, visualTheme: event.target.value as VisionVisualTheme } : item) }))}><option value="gravity">Abismo de Gravedad</option><option value="lunar">Lunar</option><option value="symbiosis">Progenie Aberrante</option><option value="neutral">Auralis Caja Fantasma</option></select></label>

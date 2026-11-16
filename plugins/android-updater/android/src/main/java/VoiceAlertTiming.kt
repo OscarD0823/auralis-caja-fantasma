@@ -2,6 +2,9 @@ package com.oscard0823.cajafantasma.updater
 
 internal data class VoiceAlarm(val eventStartsAt: Long, val alarmAt: Long)
 
+internal fun voiceAlertExpired(now: Long, eventStartsAt: Long, expiresAt: Long): Boolean =
+    expiresAt > 0 && (now >= expiresAt || eventStartsAt >= expiresAt)
+
 internal fun nextVoiceAlarm(
     anchor: Long,
     repeatMs: Long,

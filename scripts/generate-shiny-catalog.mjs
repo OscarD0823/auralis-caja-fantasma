@@ -1,12 +1,13 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalModCatalog } from "./normal-mod-catalog.mjs";
 
 const SOURCE_URL = "https://wikily.gg/es-la/once-human/mods/";
 const EXPECTED_COUNTS = {
-  total: 1_618,
+  total: 809,
   normal: 809,
-  shiny: 809,
+  shiny: 0,
 };
 
 const RANGE_NAMES = new Map([
@@ -107,9 +108,9 @@ const response = await fetch(SOURCE_URL);
 if (!response.ok) throw new Error(`La fuente respondió HTTP ${response.status}.`);
 const rawEntries = decodeEmbeddedMods(await response.text());
 // El sistema anterior quedó obsoleto con la renovación de enero de 2026.
-// El catálogo distribuido contiene solamente los módulos actuales y sus
-// equivalentes Brillantes; los seguimientos personales existentes no se tocan.
-const records = rawEntries.filter((entry) => entry.system !== "legacy").map(normalizeEntry);
+// Cada módulo actual aparece una sola vez. Brillante sigue siendo un estado
+// del seguimiento personal, y sus ID antiguos se conservan como alias.
+const records = normalModCatalog(rawEntries.filter((entry) => entry.system !== "legacy").map(normalizeEntry));
 
 const counts = {
   total: records.length,

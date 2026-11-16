@@ -1,6 +1,6 @@
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { localeForLanguage, type UiLanguage } from "./i18n.ts";
-import { clampNumber, computeCycle, type Settings } from "./model.ts";
+import { clampNumber, computeCycle, sharedVisionId, upcomingVision, type Catalog, type Settings } from "./model.ts";
 import { runtimePlatform } from "./runtimePlatform.ts";
 
 export const VOICE_MESSAGES: Record<UiLanguage, { test: string; alert: string }> = {
@@ -26,20 +26,24 @@ export type VoiceSchedule = {
   language: string;
   message: string;
   singularMessage: string;
+  expiresAt: number;
 };
 
-export function voiceSchedule(settings: Settings, now = Date.now()): VoiceSchedule {
+export function voiceSchedule(settings: Settings, now = Date.now(), catalog?: Catalog): VoiceSchedule {
   const cycle = computeCycle(settings, now);
   const waitMs = clampNumber(settings.waitMinutes, 1, 525_600) * 60_000;
   const activeMs = clampNumber(settings.activeMinutes, 1, 525_600) * 60_000;
+  const nextStartAt = Date.parse(cycle.phaseEndsAt) + (cycle.phase === "active" ? waitMs : 0);
+  const expiresAt = catalog ? Date.parse(upcomingVision(catalog, now)?.startsAt ?? "") || 0 : 0;
   return {
-    enabled: settings.voiceNotificationsEnabled && settings.selectedVisionId === "gravity",
-    nextStartAt: Date.parse(cycle.phaseEndsAt) + (cycle.phase === "active" ? waitMs : 0),
+    enabled: settings.voiceNotificationsEnabled && (catalog ? sharedVisionId(catalog, settings.selectedVisionId, now) : settings.selectedVisionId) === "gravity" && (!expiresAt || nextStartAt < expiresAt),
+    nextStartAt,
     repeatMs: waitMs + activeMs,
     leadMs: Math.min(waitMs, clampNumber(settings.voiceLeadMinutes, 1, 60) * 60_000),
     language: localeForLanguage(settings.uiLanguage),
     message: VOICE_MESSAGES[settings.uiLanguage].alert,
     singularMessage: gravityVoiceMessage(settings.uiLanguage, 1),
+    expiresAt,
   };
 }
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 60,
-  "updatedAt": "2026-11-10T23:12:44.334Z",
+  "catalogVersion": 61,
+  "updatedAt": "2026-11-16T03:43:39.296Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -460,6 +460,95 @@
             "ko": "덩치",
             "zh": "大块头"
           }
+        }
+      ]
+    },
+    {
+      "id": "resonance",
+      "name": "Resonancia disonante",
+      "englishName": "Dissonant Resonance",
+      "visualTheme": "neutral",
+      "enabled": true,
+      "startsAt": "2026-11-18T23:00:00.000Z",
+      "cycleConfirmed": false,
+      "description": "S5 · Movimientos Resonantes y Guerra del Eco. Disponible tras el mantenimiento del 18 de noviembre (PT).",
+      "information": {
+        "sourceUrl": "https://www.oncehuman.game/news/devBlog/20261113/40781_1319568.html",
+        "es": [
+          "Movimientos Resonantes: activa la Campana del Eco y completa tu partitura personal en Alegría, Ira, Lamento o Terror.",
+          "Guerra del Eco: hasta cuatro jugadores; Básico y Difícil. El portal aparece a los 15 minutos del evento.",
+          "Polvo disonante abre cajas de resonancia; estas entregan Ritmo divino para canjear en la tienda.",
+          "Incluye mundos visionales de Islas del Abismo; excluye Manibus Novato.",
+          "Canjea las monedas de Gravedad antes del cierre de su tienda el 2 de diciembre (PT)."
+        ],
+        "en": [
+          "Resonant Movements: ring the Echo Bell and complete your own score in Delight, Wrath, Lament, or Terror.",
+          "The Echo War: up to four players; Basic and Hard. Its portal appears 15 minutes into the event.",
+          "Dissonant Dust opens Resonance Boxes; these award Divine Rhythm for the shop.",
+          "Includes Isles of Abyss Vision worlds; excludes Manibus Novice.",
+          "Redeem Gravity currencies before its shop closes on December 2 (PT)."
+        ]
+      },
+      "activities": [
+        {
+          "id": "movement-delight",
+          "name": "Movimiento de Alegría",
+          "names": {
+            "en": "Movement of Delight"
+          },
+          "points": 0,
+          "enabled": false,
+          "note": "Puntos de recompensa por confirmar."
+        },
+        {
+          "id": "movement-wrath",
+          "name": "Movimiento de Ira",
+          "names": {
+            "en": "Movement of Wrath"
+          },
+          "points": 0,
+          "enabled": false,
+          "note": "Puntos de recompensa por confirmar."
+        },
+        {
+          "id": "movement-lament",
+          "name": "Movimiento de Lamento",
+          "names": {
+            "en": "Movement of Lament"
+          },
+          "points": 0,
+          "enabled": false,
+          "note": "Puntos de recompensa por confirmar."
+        },
+        {
+          "id": "movement-terror",
+          "name": "Movimiento de Terror",
+          "names": {
+            "en": "Movement of Terror"
+          },
+          "points": 0,
+          "enabled": false,
+          "note": "Puntos de recompensa por confirmar."
+        },
+        {
+          "id": "echo-war-basic",
+          "name": "Guerra del Eco · Básico",
+          "names": {
+            "en": "The Echo War · Basic"
+          },
+          "points": 0,
+          "enabled": false,
+          "note": "Puntos de recompensa por confirmar."
+        },
+        {
+          "id": "echo-war-hard",
+          "name": "Guerra del Eco · Difícil",
+          "names": {
+            "en": "The Echo War · Hard"
+          },
+          "points": 0,
+          "enabled": false,
+          "note": "Puntos de recompensa por confirmar."
         }
       ]
     }

@@ -37,13 +37,14 @@ export default function OverlayVisual({ vision, phase, remainingMs, progress, tr
   const whaleLayout = whaleCounterLayoutWithinWindow(normalizedAddonScale, normalizedWhaleCounterScale, shape, whaleCounterStyle);
   const eventName = overlayVisionName(vision, nameMode, customName);
   const designSize = OVERLAY_SHAPE_SIZES[shape] ?? OVERLAY_SHAPE_SIZES.event;
-  const transitionActive = transitionRemainingMs > 0;
+  const transitionActive = vision?.cycleConfirmed !== false && transitionRemainingMs > 0;
   const displayedMs = transitionActive ? transitionRemainingMs : remainingMs;
-  const timer = counterStyle === "compact" ? formatCompactDuration(displayedMs) : formatDuration(displayedMs);
+  const cycleReady = vision?.cycleConfirmed !== false;
+  const timer = !cycleReady ? "Por confirmar" : counterStyle === "compact" ? formatCompactDuration(displayedMs) : formatDuration(displayedMs);
   const visualStyle = {
     "--overlay-main-width": `${designSize.width - 8}px`,
     "--overlay-main-height": `${designSize.height - 8}px`,
-    "--overlay-progress": `${Math.round(Math.max(0, Math.min(1, progress)) * 360)}deg`,
+    "--overlay-progress": `${cycleReady ? Math.round(Math.max(0, Math.min(1, progress)) * 360) : 0}deg`,
   } as CSSProperties;
 
   return <div style={visualStyle} className={`overlay-visual ${phase} vision-${vision?.id ?? "none"} shape-${shape} counter-${counterStyle} ${transitionActive ? "transitioning" : ""} ${whale.visible ? "with-whale" : ""} ${preview ? "preview" : ""}`}>
@@ -56,7 +57,7 @@ export default function OverlayVisual({ vision, phase, remainingMs, progress, tr
       <span className="overlay-event-vignette" aria-hidden="true" />
       <div className="overlay-content">
         <div className="overlay-icon">{phase === "active" ? <Zap size={23} /> : <Box size={23} />}</div>
-        <div className="overlay-copy"><span>{transitionActive ? "Preparando próximo contador" : phase === "active" ? `${eventName} activa` : `Próxima ${eventName}`}</span>{counterStyle === "ring" ? <div className="overlay-timer-ring"><strong>{timer}</strong></div> : <strong>{timer}</strong>}</div>
+        <div className="overlay-copy"><span>{!cycleReady ? eventName : transitionActive ? "Preparando próximo contador" : phase === "active" ? `${eventName} activa` : `Próxima ${eventName}`}</span>{counterStyle === "ring" ? <div className="overlay-timer-ring"><strong>{timer}</strong></div> : <strong>{timer}</strong>}</div>
         {interactive && <GripHorizontal className="overlay-grip" size={18} />}
         {interactive && <button type="button" aria-label={preview ? "Vista previa del botón cerrar" : "Cerrar y desactivar contador"} onClick={onClose}><X size={15} /></button>}
       </div>

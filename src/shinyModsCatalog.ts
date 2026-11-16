@@ -19,6 +19,8 @@ export type ShinyModCatalogItem = {
   category: "weapon" | "armor";
   groupId: string;
   groupName: string;
+  legacyShinyIds?: string[];
+  legacyShinyItemIds?: string[];
 };
 
 export type ShinyModCatalogGroup = {
@@ -77,7 +79,12 @@ export function compareModCatalogItems(left: ShinyModCatalogItem, right: ShinyMo
   return left.itemId.localeCompare(right.itemId, "es", { numeric: true });
 }
 
-export const SHINY_MOD_CATALOG = [...document.records].sort(compareModCatalogItems);
+export const SHINY_MOD_CATALOG = document.records.filter((item) => !item.isCatalogShiny).sort(compareModCatalogItems);
+const catalogAliases = new Map(SHINY_MOD_CATALOG.flatMap((item) => [item.id, ...(item.legacyShinyIds ?? [])].map((id) => [id, item.id] as const)));
+
+export function canonicalModCatalogId(id?: string) {
+  return id ? catalogAliases.get(id) ?? id : undefined;
+}
 export const SHINY_MOD_CATALOG_META = {
   sourceUrl: document.sourceUrl,
   sourceCheckedAt: document.sourceCheckedAt,
@@ -123,6 +130,7 @@ export function matchesModSearch(item: ShinyModCatalogItem, search: string) {
     catalogStatusLabel(item),
     catalogOriginLabel(item),
     item.itemId,
+    ...(item.legacyShinyItemIds ?? []),
   ].join(" "));
   return search.split(/\s+/).filter(Boolean).every((term) => haystack.includes(term));
 }

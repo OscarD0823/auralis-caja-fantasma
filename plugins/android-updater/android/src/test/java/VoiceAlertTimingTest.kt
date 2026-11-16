@@ -1,12 +1,24 @@
 package com.oscard0823.cajafantasma.updater
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class VoiceAlertTimingTest {
     private val eventStart = 1_800_000_000_000L
     private val hour = 3_600_000L
     private val lead = 300_000L
+
+    @Test
+    fun stopsGravityAtTheSeasonChangeEvenWhenClosed() {
+        val changeAt = eventStart + hour
+        assertFalse(voiceAlertExpired(eventStart - lead, eventStart, changeAt))
+        assertTrue(voiceAlertExpired(eventStart, changeAt, changeAt))
+        assertTrue(voiceAlertExpired(changeAt, eventStart, changeAt))
+        assertTrue(voiceAlertExpired(changeAt + hour, eventStart, changeAt))
+        assertFalse(voiceAlertExpired(changeAt + hour, eventStart, 0))
+    }
 
     @Test
     fun schedulesBeforeTheEvent() {

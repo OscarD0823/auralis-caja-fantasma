@@ -135,3 +135,27 @@
   .activity-board .activity-counts > small { max-width: none; text-align: center; }
   .activity-map-tabs > button { flex-direction: column; gap: 3px; }
 }
+.vision-schedule-notice { display: flex; gap: 12px; align-items: center; padding: 12px 15px; border: 1px solid #cdb67b55; background: linear-gradient(100deg, #cdb67b0b, #45b9af08); border-radius: 7px; color: #dccb9f; }
+.vision-schedule-notice > div { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.vision-schedule-notice strong { font-size: 12px; }
+.vision-schedule-notice span { color: #9ab1b6; font-size: 10px; line-height: 1.5; }
+.vision-schedule-notice button { flex: none; font-size: 11px; }
+.vision-information { margin-bottom: 18px; padding: 22px; background: radial-gradient(ellipse at top right, #cfb77c12, transparent 65%), #0b1c25; border-color: #cdb67b44; }
+.vision-information > header { display: flex; gap: 13px; align-items: center; color: #ddc990; }
+.vision-information h2 { margin: 5px 0 0; font-size: 21px; }
+.vision-change-date { display: flex; align-items: flex-start; gap: 10px; margin: 20px 0 13px; padding: 13px; background: #0002; border-radius: 5px; }
+.vision-change-date > svg { flex: none; color: #cdb67b; }
+.vision-change-date > div { display: grid; gap: 6px; font-size: 11px; line-height: 1.6; }
+.vision-change-date span { color: #91abb3; }
+.vision-information ul { padding-left: 20px; margin: 14px 0; display: grid; gap: 9px; color: #c1d2d6; font-size: 12px; line-height: 1.7; }
+.vision-information .vision-unconfirmed { color: #e0c88c; font-size: 11px; line-height: 1.7; }
+.vision-information > a { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; color: #73d0c6; font-size: 12px; }
+.shiny-search-controls { grid-template-columns: minmax(180px, 1fr) minmax(160px, 260px); }
+@media (max-width: 620px) {
+  .vision-schedule-notice { gap: 8px; padding: 10px; flex-wrap: wrap; }
+  .vision-schedule-notice > div { min-width: 190px; }
+  .vision-schedule-notice button { margin-left: auto; }
+  .vision-information { padding: 16px; }
+  .vision-information h2 { font-size: 19px; }
+  .shiny-search-controls { grid-template-columns: minmax(0, 1fr); }
+}

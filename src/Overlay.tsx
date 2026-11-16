@@ -3,7 +3,7 @@ import { LogicalSize } from "@tauri-apps/api/dpi";
 import { emit } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { PersistedState } from "./model";
-import { clampNumber, computeCountdownTransition, computeCycle, computeGravityWhale } from "./model";
+import { applyScheduledVision, clampNumber, computeCountdownTransition, computeCycle, computeGravityWhale } from "./model";
 import OverlayVisual, { overlayDesignSize } from "./OverlayVisual";
 import { loadState } from "./storage";
 import { useOverlayInteraction, useOverlayPosition } from "./floatingOverlay";
@@ -13,11 +13,12 @@ export default function Overlay() {
   const [now, setNow] = useState(Date.now());
   const interactive = useOverlayInteraction();
   useOverlayPosition("overlay");
-  const cycle = computeCycle(state.settings, now);
-  const transition = computeCountdownTransition(state.settings, now);
-  const whale = computeGravityWhale(state.settings, now);
+  const effectiveState = useMemo(() => applyScheduledVision(state, now), [state, now]);
+  const cycle = computeCycle(effectiveState.settings, now);
+  const transition = computeCountdownTransition(effectiveState.settings, now);
+  const whale = computeGravityWhale(effectiveState.settings, now);
   const displayedWhale = state.settings.overlayWhaleEnabled ? whale : { ...whale, visible: false };
-  const selectedVision = useMemo(() => state.catalog.visions.find((vision) => vision.id === state.settings.selectedVisionId), [state.catalog.visions, state.settings.selectedVisionId]);
+  const selectedVision = effectiveState.catalog.visions.find((vision) => vision.id === effectiveState.settings.selectedVisionId);
   const overlayScale = clampNumber(state.settings.overlayScale, .2, 1.5);
   const designSize = overlayDesignSize(displayedWhale.visible, state.settings.overlayShape, state.settings.overlayAddonScale, state.settings.overlayWhaleCounterScale, state.settings.overlayWhaleCounterStyle, state.settings.overlayWhaleShowTime);
 

@@ -78,6 +78,7 @@ import {
   activityHistorySummary,
   activityRewardPoints,
   applyRemoteCatalog,
+  applyScheduledVision,
   actionsForCharacter,
   actionsForTeamSession,
   boxStatistics,
@@ -98,6 +99,7 @@ import {
   resolveTransitionDelayMilliseconds,
   sharedEventTimingFromSettings,
   sharedVisionId,
+  upcomingVision,
   splitPlatformCarryover,
   validateCatalog,
 } from "./model";
@@ -113,6 +115,7 @@ import CounterChestArt from "./CounterChestArt";
 import { persistDesktopProgress } from "./desktopProgress";
 import { activityName, activityPhaseNames, localizedActivityRecord } from "./gameNames";
 import { gravityVoiceMessage, speakMessage, voiceSchedule, VOICE_MESSAGES } from "./voice";
+import { VisionInformation, VisionScheduleNotice } from "./VisionInformation";
 import PhoneBridgeSyncPanel from "./PhoneBridgeSyncPanel";
 import { runtimePlatform } from "./runtimePlatform";
 import { usePhoneBridgeSync } from "./usePhoneBridgeSync";
@@ -142,7 +145,7 @@ function normalizeModSearch(value: string) {
 
 function matchesModSearch(item: ShinyModCatalogItem, search: string) {
   if (!search) return true;
-  const haystack = normalizeModSearch([item.name, item.englishName, item.baseName, item.baseEnglishName, item.variant, item.applyRange, item.modType, item.groupName, item.levelLabel, catalogStatusLabel(item, "en"), catalogOriginLabel(item), catalogOriginLabel(item, "en"), item.itemId].join(" "));
+  const haystack = normalizeModSearch([item.name, item.englishName, item.baseName, item.baseEnglishName, item.variant, item.applyRange, item.modType, item.groupName, item.levelLabel, catalogStatusLabel(item, "en"), catalogOriginLabel(item), catalogOriginLabel(item, "en"), item.itemId, ...(item.legacyShinyItemIds ?? [])].join(" "));
   return search.split(/\s+/).filter(Boolean).every((term) => haystack.includes(term));
 }
 
@@ -219,6 +222,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.28.0", date: "15 de noviembre de 2026", title: "Resonancia disonante y módulos sin duplicados", items: ["S5 incorpora su información oficial y cambia automáticamente el 18 de noviembre a las 18:00 de Colombia, hora prevista de la actualización. El juego abre tras el mantenimiento.", "Los módulos del catálogo muestran solo las 809 entradas normales, con equivalencias para reconocer los seguimientos Brillantes antiguos.", "Los puntos y el horario repetitivo de S5 quedan por confirmar; el cambio conserva todo el progreso y detiene los avisos de Gravedad."] },
   { version: "1.27.1", date: "10 de noviembre de 2026", title: "Las tres fases de LEA", items: ["LEA identifica las fases 2 gigantes, Dr. Mannheim y Madre de la vida. Registra una vez la fase más alta para sumar 1, 2 o 3 puntos.", "Incluye los nombres de mapas y jefes por idioma y las voces del sistema de Windows y Android."] },
   { version: "1.27.0", date: "10 de noviembre de 2026", title: "Mapas y jefes por idioma, avisos por voz", items: ["Los mapas muestran sus nombres completos y los jefes cambian con el idioma elegido.", "Señor Hundido muestra las fases Búho de Calamidad, Torre de calamidad y Señor Hundido.", "Voz del sistema en Windows y Android, prueba con confirmación de reproducción, idioma del aviso y horario en segundo plano para Android."] },
   { version: "1.26.0", date: "10 de noviembre de 2026", title: "Jefes por fases y puntero flotante", items: ["Laboratorio LEA en Manibus y The Sunken Lord en Islas del Abismo. Registra un intento con 1, 2 o 3 puntos según la fase.", "Faro de calamidad de 3 puntos, búho de 1 y nueva pestaña Winter con tejedores de 1 punto.", "Puntero de color ajustable junto a los controles de la Rueda Visional. En Windows se puede colocar sobre el juego."] },
@@ -777,6 +781,8 @@ function pointsLabel(points: number, language: UiLanguage = "es") {
 }
 
 function normalizeCycleState(state: PersistedState, now: number): PersistedState {
+  state = applyScheduledVision(state, now);
+  if (state.catalog.visions.find((vision) => vision.id === state.settings.selectedVisionId)?.cycleConfirmed === false) return state;
   const cycle = computeCycle(state.settings, now);
   const durationMinutes = cycle.phase === "active" ? state.settings.activeMinutes : state.settings.waitMinutes;
   const phaseStartedAt = new Date(new Date(cycle.phaseEndsAt).getTime() - durationMinutes * 60_000).toISOString();
@@ -918,7 +924,6 @@ export default function App() {
   const [shinyCatalogAttempt, setShinyCatalogAttempt] = useState(0);
   const [shinySearch, setShinySearch] = useState("");
   const [shinyGroupFilter, setShinyGroupFilter] = useState("all");
-  const [shinySystemFilter, setShinySystemFilter] = useState("all");
   const [shinyRecordSearch, setShinyRecordSearch] = useState("");
   const [selectedShinyModId, setSelectedShinyModId] = useState("");
   const importRef = useRef<HTMLInputElement>(null);
@@ -928,7 +933,8 @@ export default function App() {
   const [voiceTesting, setVoiceTesting] = useState(false);
   const [voiceAlarmExact, setVoiceAlarmExact] = useState(true);
   const [voicePermissionRevision, setVoicePermissionRevision] = useState(0);
-  const voiceScheduleJson = JSON.stringify(voiceSchedule(state.settings));
+  const scheduledVoice = voiceSchedule(state.settings, now, state.catalog);
+  const voiceScheduleJson = JSON.stringify(scheduledVoice);
   const personalSyncUpdatedAtRef = useRef(loadPersonalSyncUpdatedAt());
   const personalSyncJsonRef = useRef(JSON.stringify(personalSyncPayload(state)));
   const localSyncInFlightRef = useRef(false);
@@ -994,18 +1000,21 @@ export default function App() {
     ? selectedTeamSummaries.reduce((sum, summary) => sum + summary.chance, 0) / selectedTeamSummaries.length
     : stats.currentChancePercent;
   const teamReady = !isTeamMode || state.teamMemberIds.length >= 2;
-  const publicVisionId = sharedVisionId(state.catalog, state.settings.selectedVisionId);
+  const publicVisionId = sharedVisionId(state.catalog, state.settings.selectedVisionId, now);
   const selectedVision = state.catalog.visions.find((vision) => vision.id === publicVisionId) ?? state.catalog.visions.find((vision) => vision.enabled) ?? state.catalog.visions[0];
+  const nextVision = upcomingVision(state.catalog, now);
+  const cycleReady = selectedVision?.cycleConfirmed !== false;
   const localSyncAddressReady = isValidLocalSyncAddress(state.settings.localSyncAddress);
   const desktopLocalAddress = splitLocalSyncAddress(localSyncInfo?.address ?? "");
   const cycle = computeCycle(state.settings, now);
   const cycleDurationMinutes = cycle.phase === "active" ? state.settings.activeMinutes : state.settings.waitMinutes;
   const cyclePhaseStartedAt = new Date(Date.parse(cycle.phaseEndsAt) - cycleDurationMinutes * 60_000).toISOString();
-  const transition = computeCountdownTransition(state.settings, now);
+  const computedTransition = computeCountdownTransition(state.settings, now);
+  const transition = { ...computedTransition, active: cycleReady && computedTransition.active };
   const overlayDisplayName = overlayVisionName(selectedVision, state.settings.overlayNameMode, state.settings.overlayCustomName);
   const overlayDisplayMs = transition.active ? transition.remainingMs : cycle.remainingMs;
-  const overlayDisplayTimer = state.settings.overlayCounterStyle === "compact" ? formatCompactDuration(overlayDisplayMs) : formatDuration(overlayDisplayMs);
-  const whale = computeGravityWhale(state.settings, now);
+  const overlayDisplayTimer = !cycleReady ? tx("Por confirmar", "Unconfirmed") : state.settings.overlayCounterStyle === "compact" ? formatCompactDuration(overlayDisplayMs) : formatDuration(overlayDisplayMs);
+  const whale = computeGravityWhale({ ...state.settings, selectedVisionId: publicVisionId }, now);
   const whaleAvailable = selectedVision?.id === "gravity" && state.settings.activeMinutes > 15;
   const whaleNextMs = cycle.phase === "active" ? Math.max(0, 15 * 60_000 - (state.settings.activeMinutes * 60_000 - cycle.remainingMs)) : cycle.remainingMs + 15 * 60_000;
   const currentDevice: DeviceKind = IS_WEB ? "web" : IS_ANDROID ? "mobile" : "pc";
@@ -1014,10 +1023,8 @@ export default function App() {
   const normalizedShinySearch = normalizeModSearch(shinySearch);
   const filteredShinyCatalog = useMemo(() => SHINY_MOD_CATALOG.filter((item) => {
     if (shinyGroupFilter !== "all" && item.groupId !== shinyGroupFilter) return false;
-    if (shinySystemFilter === "normal" && (item.system !== "new" || item.isCatalogShiny)) return false;
-    if (shinySystemFilter === "shiny" && (item.system !== "new" || !item.isCatalogShiny)) return false;
     return matchesModSearch(item, normalizedShinySearch);
-  }), [SHINY_MOD_CATALOG, normalizedShinySearch, shinyGroupFilter, shinySystemFilter]);
+  }), [SHINY_MOD_CATALOG, normalizedShinySearch, shinyGroupFilter]);
   const visibleItemsPerGroup = shinyGroupFilter !== "all" || normalizedShinySearch ? 150 : 12;
   const groupedVisibleShinyCatalog = useMemo(() => SHINY_MOD_GROUPS.map((group) => ({
     ...group,
@@ -1031,8 +1038,10 @@ export default function App() {
   const activeShinyGoals = allActiveShinyGoals.filter(matchesRecordSearch);
   const obtainedShinyMods = allObtainedShinyMods.filter(matchesRecordSearch);
   const totalShinyAttempts = state.shinyMods.reduce((sum, item) => sum + item.attempts, 0);
-  const catalogShinyOwned = new Set(allObtainedShinyMods.flatMap((item) => item.catalogId ? [item.catalogId] : [])).size;
-  const shinyCollectionPercent = (catalogShinyOwned / SHINY_MOD_CATALOG.length) * 100;
+  const canonicalCatalogId = (id?: string) => shinyCatalogModule?.canonicalModCatalogId(id) ?? id;
+  const ownedCatalogIds = new Set(allObtainedShinyMods.flatMap((item) => item.catalogId ? [canonicalCatalogId(item.catalogId)] : []));
+  const catalogShinyOwned = SHINY_MOD_CATALOG.filter((item) => ownedCatalogIds.has(item.id)).length;
+  const shinyCollectionPercent = SHINY_MOD_CATALOG.length ? (catalogShinyOwned / SHINY_MOD_CATALOG.length) * 100 : 0;
 
   const commitState = useCallback((update: PersistedState | ((current: PersistedState) => PersistedState)) => {
     setState((current) => typeof update === "function" ? update(current) : update);
@@ -1637,13 +1646,13 @@ export default function App() {
   }, [pointer.enabled]);
 
   useEffect(() => {
-    if (!personalRestoreReady || cycle.phase !== "active" || state.settings.lastPointRoundEventStartedAt === cyclePhaseStartedAt) return;
+    if (!personalRestoreReady || !cycleReady || cycle.phase !== "active" || state.settings.lastPointRoundEventStartedAt === cyclePhaseStartedAt) return;
     commitState((current) => {
       if (current.settings.lastPointRoundEventStartedAt === cyclePhaseStartedAt) return current;
       const archived = archivePointRounds(current, "event-start", cyclePhaseStartedAt, selectedVision);
       return { ...archived, settings: { ...archived.settings, lastPointRoundEventStartedAt: cyclePhaseStartedAt } };
     });
-  }, [commitState, cycle.phase, cyclePhaseStartedAt, personalRestoreReady, selectedVision, state.settings.lastPointRoundEventStartedAt]);
+  }, [commitState, cycle.phase, cyclePhaseStartedAt, cycleReady, personalRestoreReady, selectedVision, state.settings.lastPointRoundEventStartedAt]);
 
   useEffect(() => {
     if (!personalRestoreReady || cycle.phase !== "waiting" || selectedVision?.id !== "gravity" || state.settings.lastWhalePointRoundWaitStartedAt === cyclePhaseStartedAt) return;
@@ -1680,7 +1689,7 @@ export default function App() {
   useEffect(() => {
     const leadMinutes = clampNumber(state.settings.voiceLeadMinutes, 1, 60);
     const phaseKey = cycle.phaseEndsAt;
-    if (!personalRestoreReady || IS_ANDROID || voiceTesting || cycle.phase !== "waiting" || selectedVision?.id !== "gravity" || !state.settings.voiceNotificationsEnabled) return;
+    if (!personalRestoreReady || IS_ANDROID || voiceTesting || !scheduledVoice.enabled || cycle.phase !== "waiting" || selectedVision?.id !== "gravity" || !state.settings.voiceNotificationsEnabled) return;
     if (cycle.remainingMs > leadMinutes * 60_000 || state.settings.lastVoiceAlertPhaseStartedAt === phaseKey || voiceAlertRef.current === phaseKey) return;
     if (Date.now() < voiceRetryAtRef.current) return;
 
@@ -1698,7 +1707,7 @@ export default function App() {
       voiceAlertRef.current = "";
     });
 
-  }, [commitState, cycle.phase, cycle.phaseEndsAt, cycle.remainingMs, language, personalRestoreReady, selectedVision?.id, state.settings.lastVoiceAlertPhaseStartedAt, state.settings.voiceLeadMinutes, state.settings.voiceNotificationsEnabled, voiceTesting]);
+  }, [commitState, cycle.phase, cycle.phaseEndsAt, cycle.remainingMs, language, personalRestoreReady, scheduledVoice.enabled, selectedVision?.id, state.settings.lastVoiceAlertPhaseStartedAt, state.settings.voiceLeadMinutes, state.settings.voiceNotificationsEnabled, voiceTesting]);
 
   const syncCatalog = useCallback(async (silent = false) => {
     if (!silent) setSyncStatus(tx("Buscando catálogo público…", "Checking the public catalog…"));
@@ -2005,7 +2014,7 @@ export default function App() {
     const groupName = custom ? "Módulo personalizado" : `${selectedShinyMod.groupName} · ${catalogStatusLabel(selectedShinyMod)}`;
     const englishName = custom ? undefined : selectedShinyMod.baseEnglishName;
     const variant = custom ? "Personalizado" : selectedShinyMod.variant;
-    const duplicate = state.shinyMods.some((item) => (catalogId ? item.catalogId === catalogId : normalizeModSearch(item.modName) === normalizeModSearch(modName)) && normalizeModSearch(item.variant) === normalizeModSearch(variant));
+    const duplicate = state.shinyMods.some((item) => (catalogId ? canonicalCatalogId(item.catalogId) === catalogId : normalizeModSearch(item.modName) === normalizeModSearch(modName)) && normalizeModSearch(item.variant) === normalizeModSearch(variant));
     if (duplicate) {
       setToast("Ese módulo y variante ya están en tu seguimiento");
       window.setTimeout(() => setToast(""), 2600);
@@ -2245,7 +2254,7 @@ export default function App() {
           <div className="topbar-actions">
             <div className={`phase-chip counter-${state.settings.overlayCounterStyle} ${cycle.phase} ${transition.active ? "transitioning" : ""}`} style={{ "--card-progress": `${Math.round(cycle.progress * 360)}deg` } as import("react").CSSProperties}>
               <span className="pulse" />
-              <div><small>{transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</small><strong>{overlayDisplayTimer}</strong></div>
+              <div><small>{!cycleReady ? overlayDisplayName : transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</small><strong>{overlayDisplayTimer}</strong></div>
             </div>
             <div className={`phase-chip whale-phase-chip counter-${state.settings.overlayWhaleCounterStyle} ${whale.visible && !whale.departing ? "active" : "waiting"}`} style={{ "--card-progress": `${Math.round((1 - whale.progress) * 360)}deg` } as import("react").CSSProperties}>
               <Zap size={15} />
@@ -2265,6 +2274,7 @@ export default function App() {
 
         {tab === "progress" && (
           <section className="page progress-page">
+            <VisionScheduleNotice vision={nextVision} now={now} language={language} onDetails={() => setTab("vision")} />
             {state.characters.length > 1 && <article className="character-dashboard panel">
               <div className="character-dashboard-top">
                 <div><span className="eyebrow"><Users size={15} /> {tx("PERSONAJES", "CHARACTERS")}</span><h2>{isTeamMode ? tx("Registro compartido del equipo", "Shared team tracking") : `${tx("Jugando con", "Playing as")} ${activeCharacter.name}`}</h2></div>
@@ -2350,7 +2360,7 @@ export default function App() {
                     ? tx("El punto queda en el centro de la aplicación.", "The dot stays in the center of the app.")
                     : tx("Activa el puntero y arrástralo con este panel abierto. Al terminar, los clics pasarán al juego.", "Turn on the pointer and drag it with this panel open. When finished, clicks pass through to the game.")}</small>
                 </div>
-                <div className={`mock-overlay ${cycle.phase} vision-${selectedVision?.id ?? "none"} shape-${state.settings.overlayShape} counter-${state.settings.overlayCounterStyle}`}><span>{transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</span><strong>{overlayDisplayTimer}</strong></div>
+                <div className={`mock-overlay ${cycle.phase} vision-${selectedVision?.id ?? "none"} shape-${state.settings.overlayShape} counter-${state.settings.overlayCounterStyle}`}><span>{!cycleReady ? overlayDisplayName : transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</span><strong>{overlayDisplayTimer}</strong></div>
                 <div className="overlay-style-config">
                   <label>{tx("Forma", "Shape")}<select value={state.settings.overlayShape} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayShape: event.target.value as OverlayShape } }))}><option value="event">{tx("Automática por evento", "Automatic by event")}</option><option value="rectangle">{tx("Rectangular", "Rectangle")}</option><option value="square">{tx("Cuadrada", "Square")}</option><option value="vertical">{tx("Vertical", "Vertical")}</option><option value="round">{tx("Redonda", "Round")}</option></select></label>
                   <label>{tx("Estilo del contador", "Countdown style")}<select value={state.settings.overlayCounterStyle} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayCounterStyle: event.target.value as OverlayCounterStyle } }))}><option value="digital">Digital</option><option value="compact">{tx("Compacto", "Compact")}</option><option value="ring">{tx("Anillo de progreso", "Progress ring")}</option></select></label>
@@ -2395,16 +2405,18 @@ export default function App() {
 
         {tab === "vision" && (
           <section className="page vision-page">
-            <div className="section-heading public-wheels-heading"><div><span className="eyebrow"><RadioTower size={15} /> {tx("RUEDAS PUBLICADAS", "PUBLISHED WHEELS")}</span><h2>{tx("Ruedas Visionales", "Visional Wheels")}</h2><p>{tx("OscarD0823 selecciona la rueda y sincroniza su estado para todos.", "OscarD0823 selects the wheel and synchronizes its status for everyone.")}</p></div></div>
+            <div className="section-heading public-wheels-heading"><div><span className="eyebrow"><RadioTower size={15} /> {tx("RUEDAS PUBLICADAS", "PUBLISHED WHEELS")}</span><h2>{tx("Ruedas Visionales", "Visional Wheels")}</h2><p>{tx("Las ruedas programadas cambian automáticamente al llegar su fecha, también al abrir la aplicación después.", "Scheduled wheels change automatically on their date, including when you reopen the app later.")}</p></div></div>
+            {state.catalog.visions.filter((vision) => vision.information).map((vision) => <VisionInformation key={vision.id} vision={vision} now={now} language={language} />)}
             <div className="public-vision-grid">
               {state.catalog.visions.map((vision) => {
                 const selected = vision.id === selectedVision?.id;
-                const publicState = selected ? transition.active ? tx("CAMBIO DE FASE", "PHASE CHANGE") : cycle.phase === "active" ? tx("EVENTO ACTIVO", "ACTIVE EVENT") : tx("PRÓXIMA RUEDA", "NEXT WHEEL") : tx("OTRA RUEDA", "OTHER WHEEL");
+                const upcoming = !!vision.startsAt && Date.parse(vision.startsAt) > now;
+                const publicState = upcoming ? tx("PROGRAMADA", "SCHEDULED") : selected && !cycleReady ? tx("RUEDA ACTUAL", "CURRENT WHEEL") : selected ? transition.active ? tx("CAMBIO DE FASE", "PHASE CHANGE") : cycle.phase === "active" ? tx("EVENTO ACTIVO", "ACTIVE EVENT") : tx("RUEDA ACTUAL", "CURRENT WHEEL") : tx("OTRA RUEDA", "OTHER WHEEL");
                 return <article key={vision.id} className={`public-wheel-card panel theme-${visionVisualTheme(vision)} ${selected ? "selected" : ""}`}>
                   <img src={visionVisualImage(vision)} alt={`${tx("Referencia visual de", "Visual reference for")} ${vision.name}`} />
                   <span className="public-wheel-shade" />
                   <span className={`public-wheel-state ${selected ? cycle.phase : "idle"}`}>{publicState}</span>
-                  <div><span className="eyebrow">{vision.englishName || "Visional Wheel"}</span><h2>{english ? vision.englishName || vision.name : vision.name}</h2><p>{vision.description || tx("Sin descripción publicada.", "No published description.")}</p>{selected && <strong>{transition.active ? formatDuration(overlayDisplayMs) : cycle.phase === "active" ? `${tx("Termina en", "Ends in")} ${formatDuration(cycle.remainingMs)}` : `${tx("Comienza en", "Starts in")} ${formatDuration(cycle.remainingMs)}`}</strong>}</div>
+                  <div><span className="eyebrow">{vision.englishName || "Visional Wheel"}</span><h2>{english ? vision.englishName || vision.name : vision.name}</h2><p>{vision.description || tx("Sin descripción publicada.", "No published description.")}</p>{selected && <strong>{!cycleReady ? tx("Horario del evento por confirmar", "Event cycle awaiting confirmation") : transition.active ? formatDuration(overlayDisplayMs) : cycle.phase === "active" ? `${tx("Termina en", "Ends in")} ${formatDuration(cycle.remainingMs)}` : `${tx("Comienza en", "Starts in")} ${formatDuration(cycle.remainingMs)}`}</strong>}</div>
                   {selected && <UserCheck size={22} />}
                 </article>;
               })}
@@ -2476,7 +2488,7 @@ export default function App() {
         )}
 
         {tab === "shiny" && (!shinyCatalogModule || !selectedShinyMod ? (
-          <section className="page shiny-page"><div className="empty-card shiny-catalog-loading"><RefreshCw size={28} /><strong>{shinyCatalogError || tx("Cargando los 1.618 módulos actuales…", "Loading the 1,618 current mods…")}</strong><span>{tx("El catálogo se abre solo al entrar aquí para que el inicio use menos memoria.", "The catalog opens only when you enter this page to reduce startup memory use.")}</span>{shinyCatalogError && <button type="button" className="secondary compact" onClick={() => { setShinyCatalogError(""); setShinyCatalogAttempt((current) => current + 1); }}>{tx("Reintentar", "Retry")}</button>}</div></section>
+          <section className="page shiny-page"><div className="empty-card shiny-catalog-loading"><RefreshCw size={28} /><strong>{shinyCatalogError || tx("Cargando los 809 módulos normales…", "Loading the 809 normal mods…")}</strong><span>{tx("El catálogo se abre solo al entrar aquí para que el inicio use menos memoria.", "The catalog opens only when you enter this page to reduce startup memory use.")}</span>{shinyCatalogError && <button type="button" className="secondary compact" onClick={() => { setShinyCatalogError(""); setShinyCatalogAttempt((current) => current + 1); }}>{tx("Reintentar", "Retry")}</button>}</div></section>
         ) : (
           <section className="page shiny-page">
             <div className="stats-grid shiny-stats">
@@ -2496,7 +2508,6 @@ export default function App() {
               <div className="shiny-search-controls">
                 <label className="shiny-search-field">{tx("Buscar nombre, variante, estilo o ID", "Search name, variant, style, or ID")}<div><Search size={16} /><input value={shinySearch} onChange={(event) => setShinySearch(event.target.value)} placeholder={tx("Ejemplo: Hora punta, Downstar o 19500542", "Example: Rush Hour, Downstar, or 19500542")} /></div></label>
                 <label>{tx("Estilo o pieza", "Style or slot")}<select value={shinyGroupFilter} onChange={(event) => setShinyGroupFilter(event.target.value)}><option value="all">{tx("Todas las armas y armaduras", "All weapons and armor")}</option><optgroup label={tx("ARMAS", "WEAPONS")}>{SHINY_MOD_GROUPS.filter((entry) => entry.category === "weapon").map((entry) => <option key={entry.id} value={entry.id}>{entry.name.replace("Arma · ", "")} ({entry.count})</option>)}</optgroup><optgroup label={tx("ARMADURA", "ARMOR")}>{SHINY_MOD_GROUPS.filter((entry) => entry.category === "armor").map((entry) => <option key={entry.id} value={entry.id}>{entry.name.replace("Armadura · ", "")} ({entry.count})</option>)}</optgroup></select></label>
-                <label>{tx("Nivel", "Level")}<select value={shinySystemFilter} onChange={(event) => setShinySystemFilter(event.target.value)}><option value="all">{tx("Todos los actuales", "All current mods")} ({SHINY_MOD_CATALOG_META.total.toLocaleString(english ? "en-US" : "es-CO")})</option><option value="normal">{tx("Nivel 1–17", "Level 1–17")} ({SHINY_MOD_CATALOG_META.normal})</option><option value="shiny">{tx("Brillante", "Shiny")} ({SHINY_MOD_CATALOG_META.shiny})</option></select></label>
               </div>
               <div className="shiny-result-summary"><span>{filteredShinyCatalog.length.toLocaleString(english ? "en-US" : "es-CO")} {tx("coincidencias en", "matches in")} {groupedVisibleShinyCatalog.length} {tx("grupos", "groups")}</span>{filteredShinyCatalog.length > visibleShinyCatalogCount && <small>{tx(`Se muestran ${visibleShinyCatalogCount}. Elige una pieza, estilo o escribe una búsqueda para ver más.`, `${visibleShinyCatalogCount} shown. Choose a slot or style, or enter a search to see more.`)}</small>}</div>
               <div className="shiny-catalog-results">
@@ -2509,7 +2520,7 @@ export default function App() {
                 <button type="button" className="primary" onClick={() => addShinyTracker()}><Plus size={17} /> {tx("Empezar en 0", "Start at 0")}</button>
                 <button type="button" className="secondary" disabled={!shinySearch.trim()} onClick={() => addShinyTracker(shinySearch)}><Plus size={17} /> {tx("Agregar nombre escrito", "Add typed name")}</button>
               </div>
-              <p className="catalog-source-note">{tx(`Los ${SHINY_MOD_CATALOG_META.total.toLocaleString("es-CO")} registros están ordenados por tipo de arma o pieza de armadura. Todos progresan de nivel 1 a 17; los ${SHINY_MOD_CATALOG_META.shiny} registros especiales representan el estado Brillante.`, `The ${SHINY_MOD_CATALOG_META.total.toLocaleString("en-US")} records are grouped by weapon style or armor slot. All progress from level 1 to 17; the ${SHINY_MOD_CATALOG_META.shiny} special records represent the Shiny state.`)}</p>
+              <p className="catalog-source-note">{tx(`Los ${SHINY_MOD_CATALOG_META.total.toLocaleString("es-CO")} módulos normales aparecen una sola vez por variante. Brillante se marca en tu seguimiento; se conservan tus intentos, fechas y conseguidos.`, `The ${SHINY_MOD_CATALOG_META.total.toLocaleString("en-US")} normal mods appear once per variant. Mark Shiny in your tracker; your attempts, dates, and obtained mods are preserved.`)}</p>
             </article>
 
             <label className="shiny-search-field shiny-record-search">{tx("Buscar en mi registro", "Search my records")}<div><Search size={16} /><input value={shinyRecordSearch} onChange={(event) => setShinyRecordSearch(event.target.value)} placeholder={tx("Buscar entre objetivos e historial Brillante", "Search goals and Shiny history")} /></div></label>
@@ -2731,7 +2742,7 @@ function ActivityCard({ activity, phaseNames, currentCount, dailyCount, totalCou
   const inactive = disabled || !activity.enabled || activity.points <= 0;
   return (
     <article className={`activity-card ${activity.phaseCount ? "phase-activity-card" : ""} ${inactive ? "disabled" : ""}`} title={activity.note}>
-      <div className="activity-points"><strong>{activity.phaseCount ? "1–3" : activity.points}</strong><small>PTS</small></div>
+      <div className="activity-points"><strong>{activity.phaseCount ? "1–3" : activity.points > 0 ? activity.points : "?"}</strong><small>PTS</small></div>
       <div className="activity-copy"><strong title={activity.names?.en}>{name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
       {activity.phaseCount && <div className="activity-phases" role="group" aria-label={`${name} · ${english ? "Highest phase reached" : "Fase más alta alcanzada"}`}>
         {REWARD_PHASES.map((phase) => <button key={phase} type="button" disabled={inactive} onClick={() => onAdd(phase)}>

@@ -29,12 +29,14 @@ internal object VoiceAlerts {
             require(args.language.matches(Regex("^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$")))
             require(args.message.length in 1..500 && args.message.contains("{minutes}"))
             require(args.singularMessage.length in 1..500)
+            require(args.expiresAt >= 0)
         }
         preferences(context).edit()
             .putBoolean("enabled", args.enabled)
             .putLong("anchor", args.nextStartAt)
             .putLong("repeatMs", args.repeatMs)
             .putLong("leadMs", args.leadMs)
+            .putLong("expiresAt", args.expiresAt)
             .putString("language", args.language)
             .putString("message", args.message)
             .putString("singularMessage", args.singularMessage)
@@ -62,6 +64,12 @@ internal object VoiceAlerts {
             stored.getLong("leadMs", 0), stored.getLong("lastAttemptedStart", 0),
             System.currentTimeMillis(),
         )
+        // No anunciar Gravedad después del cambio de rueda, incluso con la app cerrada.
+        if (voiceAlertExpired(System.currentTimeMillis(), next.eventStartsAt, stored.getLong("expiresAt", 0))) {
+            stored.edit().putLong("scheduledStart", 0).apply()
+            alarm.cancel(PendingIntent.getBroadcast(context, ALARM_REQUEST, intent, flags))
+            return
+        }
         stored.edit().putLong("scheduledStart", next.eventStartsAt).apply()
         intent.putExtra("eventStartsAt", next.eventStartsAt)
         val pending = PendingIntent.getBroadcast(context, ALARM_REQUEST, intent, flags)
@@ -81,7 +89,8 @@ internal object VoiceAlerts {
         val stored = preferences(context)
         val eventStart = intent.getLongExtra("eventStartsAt", 0)
         val now = System.currentTimeMillis()
-        if (!stored.getBoolean("enabled", false) || eventStart != stored.getLong("scheduledStart", 0)) {
+        if (!stored.getBoolean("enabled", false) || eventStart != stored.getLong("scheduledStart", 0)
+            || voiceAlertExpired(now, eventStart, stored.getLong("expiresAt", 0))) {
             done()
             return
         }
