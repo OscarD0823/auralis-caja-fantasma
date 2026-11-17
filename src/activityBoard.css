@@ -153,7 +153,9 @@
 .browser-overlay-tools .browser-tool-error { color: #e0c38b; }
 .browser-overlay-tools .web-install-notice { margin: 15px 0 0; }
 @media (max-width: 1100px) { .browser-tools-quick span { display: none; } }
-.vision-information { margin-bottom: 18px; padding: 22px; background: radial-gradient(ellipse at top right, #cfb77c12, transparent 65%), #0b1c25; border-color: #cdb67b44; }
+.vision-information { margin-bottom: 18px; padding: 22px; overflow: hidden; background: radial-gradient(ellipse at top right, #cfb77c12, transparent 65%), #0b1c25; border-color: #cdb67b44; }
+.vision-information-art { margin: -22px -22px 20px; background: #07131e; }
+.vision-information-art img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; }
 .vision-information > header { display: flex; gap: 13px; align-items: center; color: #ddc990; }
 .vision-information h2 { margin: 5px 0 0; font-size: 21px; }
 .vision-change-date { display: flex; align-items: flex-start; gap: 10px; margin: 20px 0 13px; padding: 13px; background: #0002; border-radius: 5px; }
@@ -172,6 +174,7 @@
   .vision-schedule-notice > div { min-width: 190px; }
   .vision-schedule-notice button { margin-left: auto; }
   .vision-information { padding: 16px; }
+  .vision-information-art { margin: -16px -16px 17px; }
   .vision-information h2 { font-size: 19px; }
   .shiny-search-controls { grid-template-columns: minmax(0, 1fr); }
 }

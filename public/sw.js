@@ -1,4 +1,4 @@
-const CACHE = "caja-fantasma-web-v1.29.0";
+const CACHE = "caja-fantasma-web-v1.29.1";
 const shell = new URL("./", self.registration.scope).href;
 self.addEventListener("install", (event) => event.waitUntil((async () => {
   const cache = await caches.open(CACHE);

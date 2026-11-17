@@ -2,6 +2,7 @@ import { Clock3, ExternalLink, Music2 } from "lucide-react";
 import type { Vision } from "./model";
 import { formatDuration } from "./model";
 import { localeForLanguage, type UiLanguage } from "./i18n";
+import { visionVisualImage } from "./assets";
 
 export function visionChangeDate(vision: Vision, language: UiLanguage) {
   return vision.startsAt ? new Date(vision.startsAt).toLocaleString(localeForLanguage(language), {
@@ -28,6 +29,7 @@ export function VisionInformation({ vision, now, language }: { vision: Vision; n
   const english = language !== "es";
   const upcoming = !!vision.startsAt && Date.parse(vision.startsAt) > now;
   return <article className="vision-information panel" data-vision={vision.id}>
+    <figure className="vision-information-art"><img src={visionVisualImage(vision)} width={1920} height={1080} decoding="async" alt={english ? `${vision.englishName || vision.name} · Once Human official artwork` : `${vision.name} · imagen oficial de Once Human`} /></figure>
     <header><Music2 size={25} aria-hidden="true" /><div><span className="eyebrow">{english ? "VISION INFORMATION" : "INFORMACIÓN DE LA RUEDA"}</span><h2>{english ? vision.englishName || vision.name : vision.name}</h2></div></header>
     {vision.startsAt && <div className="vision-change-date"><Clock3 size={17} aria-hidden="true" /><div><strong>{vision.transitionReason === "maintenance-start" ? (english ? "Changes when maintenance begins" : "Cambia al comenzar el mantenimiento") : (english ? "Automatic change of the tracker" : "Cambio automático del contador")}: {visionChangeDate(vision, language)} ({english ? "Colombia" : "hora de Colombia"})</strong><span>{upcoming ? `${english ? "In" : "Faltan"} ${formatDuration(Date.parse(vision.startsAt) - now)}. ` : ""}{english ? "The tracker changes at the start of maintenance, without waiting for servers to reopen." : "El contador cambia al iniciar el mantenimiento, sin esperar a que los servidores vuelvan a abrir."}</span></div></div>}
     <ul>{(english ? vision.information.en : vision.information.es).map((line) => <li key={line}>{line}</li>)}</ul>

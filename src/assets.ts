@@ -4,7 +4,7 @@ import symbiosisEventImage from "./assets/symbiosis-event.png";
 import gravityEventImageA from "./assets/gravity-event-a.png";
 import gravityEventImageB from "./assets/gravity-event-b.png";
 import gravityWhaleBossImage from "./assets/gravity-whale-boss-v2.webp";
-import resonanceEventImage from "./assets/resonance-event.svg";
+import resonanceEventImage from "./assets/resonance-event.png";
 import type { Vision } from "./model";
 
 // Ilustración del cofre de la página de proyectos de OscarD0823; reutilizada localmente, sin petición remota.
