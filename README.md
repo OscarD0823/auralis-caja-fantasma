@@ -16,7 +16,7 @@ Las descargas llevan a la **última versión publicada**, no a versiones en prep
 
 **¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**1.29.1 · Imagen de Resonancia disonante.** La rueda S5 muestra su portada oficial en la información y en la ficha. Incluida en PC, Android y web, con diseño adaptable y sin modificar los contadores. [Qué cambió](docs/versiones/NOTAS-VERSION-1.29.1.md) · [Historial de versiones](docs/versiones/).
+**Web 1.29.2 · Descarga directa para Windows.** La web conserva el contador flotante, retira las opciones del puntero y añade el botón para descargar el instalador de Windows. Las aplicaciones publicadas siguen en 1.29.1. [Qué cambió](docs/versiones/NOTAS-VERSION-1.29.2.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 

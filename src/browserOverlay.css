@@ -12,13 +12,5 @@ h1 { margin: 0; font-size: 17px; overflow-wrap: anywhere; }
 .pip-counter small { font-size: 10px; color: #9cb7c6; }
 .pip-progress { height: 3px; background: #ffffff12; overflow: hidden; border-radius: 3px; }
 .pip-progress i { display: block; height: 100%; background: #68cfc1; }
-.pip-pointer { flex: 1; min-height: 65px; position: relative; display: grid; place-items: center; padding: 17px; }
-.pip-pointer > span { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 4px #000; }
-.pip-pointer small { position: absolute; bottom: 0; font-size: 9px; color: #8fa8b0; }
-.mode-both .pip-pointer { flex: 0 0 65px; }
 .pip-season-warning { color: #dfc58a; background: #cba9550d; border: 1px solid #cba95530; border-radius: 3px; padding: 6px; text-align: center; font-size: 10px; }
-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 7px; border-top: 1px solid #ffffff12; }
-select { max-width: 65%; background: #102734; border: 1px solid #ffffff25; border-radius: 4px; padding: 4px 7px; font-size: 11px; }
-label { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #a3b4ba; }
-input[type=color] { width: 27px; height: 24px; border: 0; background: transparent; cursor: pointer; padding: 0; }
 button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid #8ae3d4; outline-offset: 2px; }

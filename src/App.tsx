@@ -117,6 +117,7 @@ import { activityName, activityPhaseNames, localizedActivityRecord } from "./gam
 import { gravityVoiceMessage, speakMessage, voiceSchedule, VOICE_MESSAGES } from "./voice";
 import { VisionInformation, VisionScheduleNotice } from "./VisionInformation";
 import { BrowserOverlayControls, useBrowserOverlay } from "./BrowserOverlayTools";
+import { useWindowsInstaller } from "./useWindowsInstaller";
 import PhoneBridgeSyncPanel from "./PhoneBridgeSyncPanel";
 import { runtimePlatform } from "./runtimePlatform";
 import { usePhoneBridgeSync } from "./usePhoneBridgeSync";
@@ -223,6 +224,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.29.2 · Web", date: "16 de noviembre de 2026", title: "Contador web y descarga directa de Windows", items: ["Se retiran las opciones del puntero de la web y se conserva el contador flotante.", "El botón Descargar instalador de Windows descarga directamente la última aplicación publicada. Los contadores e historiales se conservan."] },
   { version: "1.29.1", date: "16 de noviembre de 2026", title: "Imagen oficial de Resonancia disonante", items: ["La información y la ficha de S5 muestran su portada oficial de Once Human, adaptable a PC y móvil e incluida para usarla sin conexión."] },
   { version: "1.29.0", date: "15 de noviembre de 2026", title: "Aviso de cierre y herramientas del navegador", items: ["La rueda cambia al iniciar el mantenimiento del 18 de noviembre a las 18:00 de Colombia. Un aviso en todas las pestañas muestra cuánto le queda a Gravedad.", "El contador y un puntero de color pueden abrirse en una ventana flotante del navegador, sin el programa de Windows.", "Instalación de la web con acceso a las herramientas. El puntero web se muestra dentro de su ventana; el navegador no permite un punto transparente a los clics sobre un juego externo."] },
   { version: "1.28.0", date: "15 de noviembre de 2026", title: "Resonancia disonante y módulos sin duplicados", items: ["S5 incorpora su información oficial y cambia automáticamente el 18 de noviembre a las 18:00 de Colombia, hora prevista de la actualización. El juego abre tras el mantenimiento.", "Los módulos del catálogo muestran solo las 809 entradas normales, con equivalencias para reconocer los seguimientos Brillantes antiguos.", "Los puntos y el horario repetitivo de S5 quedan por confirmar; el cambio conserva todo el progreso y detiene los avisos de Gravedad."] },
@@ -1050,11 +1052,8 @@ export default function App() {
     setState((current) => typeof update === "function" ? update(current) : update);
   }, []);
 
-  const updateBrowserPointerColor = useCallback((color: string) => {
-    if (!/^#[a-f\d]{6}$/i.test(color)) return;
-    commitState(current => ({ ...current, settings: { ...current.settings, pointer: { ...pointerSettings(current.settings.pointer), color } } }));
-  }, [commitState]);
-  const browserOverlay = useBrowserOverlay(state, language, IS_WEB, updateBrowserPointerColor);
+  const browserOverlay = useBrowserOverlay(state, language, IS_WEB);
+  const windowsInstaller = useWindowsInstaller(IS_WEB);
   useEffect(() => {
     if (IS_WEB && new URLSearchParams(window.location.search).get("tools") === "1") document.getElementById("browser-overlay-tools")?.scrollIntoView({ block: "start" });
   }, []);
@@ -2176,7 +2175,7 @@ export default function App() {
 
   const openAndroidDownload = () => void openExternalAddress(ANDROID_APK_URL);
 
-  const openWindowsDownload = () => void openExternalAddress(WINDOWS_DOWNLOAD_URL);
+  const openWindowsDownload = () => void openExternalAddress(IS_WEB ? windowsInstaller.url : WINDOWS_DOWNLOAD_URL);
 
   const openWebApp = () => {
     void openExternalAddress(WEB_APP_URL).then((opened) => {
@@ -2205,7 +2204,7 @@ export default function App() {
   return (
     <div className="app-shell" data-event={cycle.phase === "active" ? visionVisualTheme(selectedVision) : "neutral"}>
       {browserOverlay.portal}
-      {(IS_WEB || IS_ANDROID) && pointer.enabled && <span className="pointer-dot in-app-pointer" style={{ backgroundColor: pointer.color }} aria-hidden="true" />}
+      {IS_ANDROID && pointer.enabled && <span className="pointer-dot in-app-pointer" style={{ backgroundColor: pointer.color }} aria-hidden="true" />}
       <input ref={importRef} hidden type="file" accept="application/json,.json" onChange={(event) => void onImport(event.target.files?.[0])} />
       <AppUpdater language={language} beforeInstall={async () => {
         if (isTauri() && !restoreReadyRef.current) throw new Error("El respaldo inicial todavía se está recuperando. Intenta actualizar de nuevo.");
@@ -2254,7 +2253,7 @@ export default function App() {
       </aside>
 
       <main className={tab === "progress" ? "progress-main" : undefined}>
-        <header className={`topbar vision-${selectedVision?.id ?? "none"} ${cycle.phase}`}>
+        <header className={`topbar ${IS_WEB ? "web-topbar" : ""} vision-${selectedVision?.id ?? "none"} ${cycle.phase}`}>
           <VisionAtmosphere visionId={selectedVision?.id} active={cycle.phase === "active"} />
           <div className="topbar-copy">
             <span className="eyebrow">{tab === "progress" ? tx("SEGUIMIENTO ACTUAL", "CURRENT TRACKING") : tab === "characters" ? tx("PERFILES DE JUEGO", "GAME PROFILES") : tab === "vision" ? tx("RUEDA VISIONAL", "VISIONAL WHEEL") : tab === "devices" ? tx("PC, WEB Y MÓVIL", "PC, WEB AND MOBILE") : tab === "history" ? tx("REGISTRO PERSONAL", "PERSONAL RECORD") : tab === "shiny" ? tx("COLECCIÓN DE MÓDULOS", "MOD COLLECTION") : tab === "changes" ? tx("NOVEDADES", "WHAT'S NEW") : tx("PREFERENCIAS", "PREFERENCES")}</span>
@@ -2277,7 +2276,8 @@ export default function App() {
               <Languages size={15} aria-hidden="true" />
               <select value={state.settings.uiLanguageMode === "auto" ? "auto" : language} onChange={(event) => { const automatic = event.target.value === "auto"; commitState(current => ({ ...current, settings: { ...current.settings, uiLanguageMode: automatic ? "auto" : "manual", uiLanguage: automatic ? detectUiLanguage() : event.target.value as UiLanguage } })); }}><option value="auto">Auto · {language.toUpperCase()}</option>{UI_LANGUAGES.map((item) => <option key={item.code} value={item.code}>{item.short}</option>)}</select>
             </label>
-            {IS_WEB && browserOverlay.supported && <button type="button" className="secondary compact browser-tools-quick" disabled={browserOverlay.opening} onClick={() => void browserOverlay.open("counter")} aria-label={tx("Abrir contador flotante del navegador", "Open browser floating counter")} title={tx("Contador y puntero del navegador", "Browser counter and pointer")}><MonitorUp size={18} /><span>{tx("Flotante", "Pop out")}</span></button>}
+            {IS_WEB && browserOverlay.supported && <button type="button" className="secondary compact browser-tools-quick" disabled={browserOverlay.opening} onClick={() => void browserOverlay.open()} aria-label={tx("Abrir contador flotante del navegador", "Open browser floating counter")} title={tx("Contador flotante del navegador", "Browser floating counter")}><MonitorUp size={18} /><span>{tx("Flotante", "Pop out")}</span></button>}
+            {IS_WEB && <a className="primary compact windows-installer-download topbar-installer" href={windowsInstaller.url} download={windowsInstaller.fileName} aria-label={tx("Descargar instalador de Windows", "Download Windows installer")}><Download size={17} /><span>{tx("Instalador Windows", "Windows installer")}</span></a>}
             <button type="button" className="secondary tutorial-open" onClick={() => setTutorialOpen(true)} aria-label={tx("Abrir tutorial", "Open tutorial")}><CircleHelp size={18} /><span>{tx("Tutorial", "Tutorial")}</span></button>
           </div>
         </header>
@@ -2349,7 +2349,7 @@ export default function App() {
                 onRemove={() => removeLastActivity(activity.id, vision?.id)}
               />} />
 
-            {IS_WEB && <BrowserOverlayControls controller={browserOverlay} language={language} pwa={pwa} />}
+            {IS_WEB && <BrowserOverlayControls controller={browserOverlay} language={language} pwa={pwa} installer={windowsInstaller} />}
             {IS_WEB && <WebInstallNotice pwa={pwa} language={language} />}
 
             <article className={`home-overlay-controls panel ${homeOverlayConfigOpen ? "expanded" : ""}`}>
@@ -2357,13 +2357,13 @@ export default function App() {
               <div className="home-overlay-actions">
                 <button type="button" className="secondary" aria-expanded={homeOverlayConfigOpen} aria-controls="home-overlay-size-panel" onClick={() => setHomeOverlayEditing(!homeOverlayConfigOpen)}><Settings2 size={17} /> {homeOverlayConfigOpen ? tx("Terminar ajuste", "Finish editing") : tx("Abrir configuración", "Open settings")}</button>
                 {!IS_WEB && !IS_ANDROID && <button type="button" className={`secondary overlay-home-button ${state.settings.overlayEnabled ? "enabled" : ""}`} onClick={() => commitState((current) => ({ ...current, settings: { ...current.settings, overlayEnabled: !current.settings.overlayEnabled } }))}><Eye size={16} /> {state.settings.overlayEnabled ? tx("Quitar ventana", "Remove overlay") : tx("Agregar ventana", "Add overlay")}</button>}
-                <button type="button" className={`secondary overlay-home-button ${pointer.enabled ? "enabled" : ""}`} aria-pressed={pointer.enabled} onClick={() => commitState((current) => {
+                {!IS_WEB && <button type="button" className={`secondary overlay-home-button ${pointer.enabled ? "enabled" : ""}`} aria-pressed={pointer.enabled} onClick={() => commitState((current) => {
                   const preference = pointerSettings(current.settings.pointer);
                   return { ...current, settings: { ...current.settings, pointer: { ...preference, enabled: !preference.enabled } } };
-                })}><span className="pointer-dot" style={{ backgroundColor: pointer.color }} aria-hidden="true" />{tx("Puntero", "Pointer")}</button>
+                })}><span className="pointer-dot" style={{ backgroundColor: pointer.color }} aria-hidden="true" />{tx("Puntero", "Pointer")}</button>}
               </div>
               {homeOverlayConfigOpen && <div id="home-overlay-size-panel" className={`home-overlay-size-panel ${IS_WEB || IS_ANDROID ? "in-app" : ""}`}>
-                <div className="pointer-controls">
+                {!IS_WEB && <div className="pointer-controls">
                   <label>{tx("Color del puntero", "Pointer color")}<input type="color" value={pointer.color} onChange={(event) => {
                     const color = event.currentTarget.value;
                     commitState((current) => ({ ...current, settings: { ...current.settings, pointer: { ...pointerSettings(current.settings.pointer), color } } }));
@@ -2374,7 +2374,7 @@ export default function App() {
                   <small>{IS_WEB || IS_ANDROID
                     ? tx("El punto queda en el centro de la aplicación.", "The dot stays in the center of the app.")
                     : tx("Activa el puntero y arrástralo con este panel abierto. Al terminar, los clics pasarán al juego.", "Turn on the pointer and drag it with this panel open. When finished, clicks pass through to the game.")}</small>
-                </div>
+                </div>}
                 <div className={`mock-overlay ${cycle.phase} vision-${selectedVision?.id ?? "none"} shape-${state.settings.overlayShape} counter-${state.settings.overlayCounterStyle}`}><span>{!cycleReady ? overlayDisplayName : transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</span><strong>{overlayDisplayTimer}</strong></div>
                 <div className="overlay-style-config">
                   <label>{tx("Forma", "Shape")}<select value={state.settings.overlayShape} onChange={(event) => commitState((current) => ({ ...current, settings: { ...current.settings, overlayShape: event.target.value as OverlayShape } }))}><option value="event">{tx("Automática por evento", "Automatic by event")}</option><option value="rectangle">{tx("Rectangular", "Rectangle")}</option><option value="square">{tx("Cuadrada", "Square")}</option><option value="vertical">{tx("Vertical", "Vertical")}</option><option value="round">{tx("Redonda", "Round")}</option></select></label>

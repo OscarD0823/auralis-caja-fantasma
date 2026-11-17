@@ -11,9 +11,9 @@
   "theme_color": "#07131e",
   "shortcuts": [
     {
-      "name": "Contador y puntero",
-      "short_name": "Herramientas",
-      "description": "Abre las herramientas flotantes desde el navegador.",
+      "name": "Contador flotante",
+      "short_name": "Contador",
+      "description": "Abre el contador flotante desde el navegador.",
       "url": "./?tools=1",
       "icons": [{ "src": "icons/app-192.png", "sizes": "192x192", "type": "image/png" }]
     }
