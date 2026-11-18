@@ -411,15 +411,18 @@ const platformSplit = splitPlatformCarryover(platformActions, Date.parse("2026-0
 assert.deepEqual(platformSplit.completedAttempt.map((action) => action.id), ["old"]);
 assert.deepEqual(platformSplit.carryOver.map((action) => action.id), ["new-1", "new-2"]);
 
-assert.equal(SHINY_MOD_CATALOG.length, 809, "El catálogo solo debe mostrar las 809 entradas normales.");
+assert.equal(SHINY_MOD_CATALOG.length, 831, "809 variantes anteriores y 22 variantes del mapa acuático, sin duplicados Shiny.");
 assert.deepEqual(SHINY_MOD_CATALOG_META, {
   sourceUrl: "https://wikily.gg/es-la/once-human/mods/",
   sourceCheckedAt: SHINY_MOD_CATALOG_META.sourceCheckedAt,
-  total: 809,
-  normal: 809,
+  total: 831,
+  normal: 831,
   shiny: 0,
+  abyssCheckedAt: "2026-11-17",
+  abyssSourceUrl: "https://www.oncehuman.game/news/update/20261021/40780_1317280.html",
+  abyssCount: 22,
 });
-assert.equal(SHINY_MOD_CATALOG.filter((item) => item.system === "new" && !item.isCatalogShiny).length, 809);
+assert.equal(SHINY_MOD_CATALOG.filter((item) => item.system === "new" && !item.isCatalogShiny).length, 831);
 assert.equal(SHINY_MOD_CATALOG.filter((item) => item.isCatalogShiny).length, 0);
 assert.equal(new Set(SHINY_MOD_CATALOG.map((item) => item.id)).size, SHINY_MOD_CATALOG.length);
 assert.ok(SHINY_MOD_GROUPS.filter((item) => item.category === "weapon").length >= 9);

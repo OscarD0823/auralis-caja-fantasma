@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "isles-of-abyss",
+  "releasedAt": "2026-10-21",
+  "checkedAt": "2026-11-17",
+  "officialSourceUrl": "https://www.oncehuman.game/news/update/20261021/40780_1317280.html",
+  "mods": [
+    {
+      "id": "precision-load",
+      "name": "Carga de precisión",
+      "englishName": "Precision Load",
+      "applyRange": "Pantalones",
+      "groupId": "armor-pantalones",
+      "sourceUrl": "https://oncehuman.th.gl/db/mods/mod_9321",
+      "sourceId": "mod_9321",
+      "variants": ["General", "Violencia", "Precisión", "Energía de aberración", "Resonancia", "Estrella Descendente", "Energía de aberración resonante", "Energía de aberración de estrella descendente", "Supervivencia", "Aero", "Energía de aberración aérea"]
+    },
+    {
+      "id": "turret-enhancement",
+      "name": "Mejora de torreta",
+      "englishName": "Turret Enhancement",
+      "applyRange": "Guantes",
+      "groupId": "armor-guantes",
+      "sourceUrl": "https://oncehuman.th.gl/db/mods/mod_9524",
+      "sourceId": "mod_9524",
+      "variants": ["General", "Violencia", "Precisión", "Energía de aberración", "Resonancia", "Creciente", "Energía de aberración resonante", "Energía de aberración creciente", "Supervivencia", "Aero", "Energía de aberración aérea"]
+    }
+  ]
+}

@@ -160,6 +160,34 @@ fn durable_record_ids(data: &serde_json::Map<String, Value>) -> BTreeSet<String>
     ids
 }
 
+fn mod_progress_time(record: &Value) -> &str {
+    // New progress revisions use UTC ISO strings, normalized by the importer.
+    record
+        .get("levelUpdatedAt")
+        .and_then(Value::as_str)
+        .or_else(|| {
+            if record.get("isShiny").and_then(Value::as_bool) == Some(true) {
+                record.get("obtainedAt").and_then(Value::as_str)
+            } else {
+                None
+            }
+        })
+        .filter(|stamp| stamp.len() == 24 && stamp.ends_with('Z'))
+        .unwrap_or("")
+}
+
+fn mod_progress_rank(record: &Value) -> i64 {
+    if record.get("isShiny").and_then(Value::as_bool) == Some(true) {
+        18
+    } else {
+        record
+            .get("level")
+            .and_then(Value::as_i64)
+            .map(|level| level.clamp(0, 17))
+            .unwrap_or(-1)
+    }
+}
+
 fn merge_id_array(current: Option<&Value>, incoming: Option<&Value>, field: &str) -> Value {
     let mut merged = current
         .and_then(Value::as_array)
@@ -192,6 +220,17 @@ fn merge_id_array(current: Option<&Value>, incoming: Option<&Value>, field: &str
             }
         }
         if field == "shinyMods" {
+            let current_mod = merged[index].clone();
+            let candidate_time = mod_progress_time(candidate);
+            let current_time = mod_progress_time(&current_mod);
+            let winner = if candidate_time > current_time
+                || (candidate_time == current_time
+                    && mod_progress_rank(candidate) > mod_progress_rank(&current_mod))
+            {
+                candidate
+            } else {
+                &current_mod
+            };
             let existing_attempts = merged[index]
                 .get("attempts")
                 .and_then(Value::as_u64)
@@ -200,14 +239,6 @@ fn merge_id_array(current: Option<&Value>, incoming: Option<&Value>, field: &str
                 .get("attempts")
                 .and_then(Value::as_u64)
                 .unwrap_or(0);
-            let existing_shiny = merged[index]
-                .get("isShiny")
-                .and_then(Value::as_bool)
-                .unwrap_or(false);
-            let incoming_shiny = candidate
-                .get("isShiny")
-                .and_then(Value::as_bool)
-                .unwrap_or(false);
             if let Some(existing) = merged[index].as_object_mut() {
                 existing.insert(
                     "attempts".into(),
@@ -215,11 +246,18 @@ fn merge_id_array(current: Option<&Value>, incoming: Option<&Value>, field: &str
                 );
                 existing.insert(
                     "isShiny".into(),
-                    Value::Bool(existing_shiny || incoming_shiny),
+                    Value::Bool(
+                        winner
+                            .get("isShiny")
+                            .and_then(Value::as_bool)
+                            .unwrap_or(false),
+                    ),
                 );
-                if existing.get("obtainedAt").and_then(Value::as_str).is_none() {
-                    if let Some(obtained_at) = candidate.get("obtainedAt") {
-                        existing.insert("obtainedAt".into(), obtained_at.clone());
+                for field in ["level", "levelUpdatedAt", "obtainedAt"] {
+                    if let Some(value) = winner.get(field) {
+                        existing.insert(field.into(), value.clone());
+                    } else {
+                        existing.remove(field);
                     }
                 }
             }
@@ -1440,6 +1478,7 @@ pub fn read_local_sync_state() -> Result<LocalSyncSnapshot, String> {
 #[cfg(all(test, desktop))]
 mod tests {
     use super::*;
+    use serde_json::json;
 
     fn assert_json_eq(left: &str, right: &str) {
         let left: Value = serde_json::from_str(left).expect("left JSON should be valid");
@@ -1466,6 +1505,28 @@ mod tests {
             Some("2026-09-21T10:05:00.000Z")
         );
         assert_eq!(value["teamMemberIds"].as_array().map(Vec::len), Some(2));
+    }
+
+    #[test]
+    fn merges_mod_levels_and_keeps_newer_corrections() {
+        let old = json!([{"id":"mod-1","attempts":31,"isShiny":true,"level":17,"levelUpdatedAt":"2026-11-17T14:00:00.000Z","obtainedAt":"2026-11-17T14:00:00.000Z"}]);
+        for level in [0, 8, 17] {
+            let corrected = json!([{"id":"mod-1","attempts":29,"isShiny":false,"level":level,"levelUpdatedAt":"2026-11-17T14:01:00.000Z"}]);
+            for (a, b) in [(&old, &corrected), (&corrected, &old)] {
+                let merged = merge_id_array(Some(a), Some(b), "shinyMods");
+                assert_eq!(merged[0]["level"], level);
+                assert_eq!(merged[0]["isShiny"], false);
+                assert_eq!(merged[0]["attempts"], 31);
+                assert!(merged[0].get("obtainedAt").is_none());
+            }
+        }
+        let unknown = json!([{"id":"mod-1","attempts":40,"isShiny":false}]);
+        let recorded = json!([{"id":"mod-1","attempts":0,"isShiny":false,"level":8,"levelUpdatedAt":"2026-11-17T14:02:00.000Z"}]);
+        for (a, b) in [(&unknown, &recorded), (&recorded, &unknown)] {
+            let merged = merge_id_array(Some(a), Some(b), "shinyMods");
+            assert_eq!(merged[0]["level"], 8);
+            assert_eq!(merged[0]["attempts"], 40);
+        }
     }
 
     #[test]

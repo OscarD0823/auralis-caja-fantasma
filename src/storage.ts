@@ -2,6 +2,7 @@ import defaultCatalog from "../catalog/visions.json" with { type: "json" };
 import type { ActivityHistoryRecord, BoxRecord, Catalog, CharacterProfile, OverlayCounterStyle, OverlayNameMode, OverlayShape, PersistedState, PointAction, PointRoundRecord, PointRoundTrigger, Settings, ShinyModRecord, WhaleCounterStyle } from "./model.ts";
 import { VISION_CYCLE_WAIT_STARTED_AT, applyRemoteCatalog, clampNumber, createInitialCharacterTracking, removeBoxCompletedActions, resolveTransitionDelayMilliseconds, sharedVisionId, validateCatalog } from "./model.ts";
 import { detectUiLanguage, restoredLanguage } from "./i18n.ts";
+import { mergeModProgress, normalizeModLevel } from "./modProgress.ts";
 
 export const STORAGE_KEY = "caja-fantasma.once-human.state.v1";
 const SAFETY_BACKUP_KEY = "caja-fantasma.once-human.safety-backup.v1";
@@ -84,6 +85,8 @@ function sanitizeShinyMods(value: unknown): ShinyModRecord[] {
       variant: candidate.variant,
       attempts: Math.min(100_000, Math.max(0, Math.floor(Number(candidate.attempts) || 0))),
       isShiny: candidate.isShiny === true,
+      ...(normalizeModLevel(candidate.level) !== undefined ? { level: candidate.isShiny === true ? 17 : normalizeModLevel(candidate.level) } : {}),
+      ...(typeof candidate.levelUpdatedAt === "string" && Number.isFinite(Date.parse(candidate.levelUpdatedAt)) ? { levelUpdatedAt: new Date(candidate.levelUpdatedAt).toISOString() } : {}),
       createdAt: typeof candidate.createdAt === "string" ? candidate.createdAt : new Date().toISOString(),
       obtainedAt: typeof candidate.obtainedAt === "string" ? candidate.obtainedAt : undefined,
     }];
@@ -586,12 +589,7 @@ export function mergePersonalSyncPayload(current: PersistedState, value: unknown
   for (const [key, candidate] of Object.entries(incomingPayload.pointRoundBoundaries)) {
     if (!boundaries[key] || candidate > boundaries[key]) boundaries[key] = candidate;
   }
-  const shinyMods = mergeRecordsById(currentPayload.shinyMods, incomingPayload.shinyMods, (existing, candidate) => ({
-    ...existing,
-    attempts: Math.max(existing.attempts, candidate.attempts),
-    isShiny: existing.isShiny || candidate.isShiny,
-    obtainedAt: existing.obtainedAt ?? candidate.obtainedAt,
-  }));
+  const shinyMods = mergeRecordsById(currentPayload.shinyMods, incomingPayload.shinyMods, mergeModProgress);
   return {
     ...current,
     actions,
