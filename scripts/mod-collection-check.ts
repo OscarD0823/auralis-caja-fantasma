@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { mergeModProgress, modLevel, normalizeModLevel, setModProgress } from "../src/modProgress.ts";
 import { importState, initialState, mergePersonalSyncPayload, personalSyncPayload } from "../src/storage.ts";
-import { MOD_PIECES, SHINY_MOD_CATALOG, canonicalModCatalogId } from "../src/shinyModsCatalog.ts";
+import { MOD_PIECES, SHINY_MOD_CATALOG, SHINY_MOD_GROUPS, canonicalModCatalogId, matchesModSearch, modVariantName, normalizeModSearch } from "../src/shinyModsCatalog.ts";
+import collectionReference from "../catalog/mod-collection-order.json" with { type: "json" };
 import type { ShinyModRecord } from "../src/model.ts";
 
 const old: ShinyModRecord = { id: "old", catalogId: "new-shiny-19505234-2410234", modName: "Hora punta", groupName: "Zapatos", variant: "Estrella Descendente", attempts: 31, isShiny: false, createdAt: "2026-10-01T10:00:00.000Z" };
@@ -55,9 +56,30 @@ assert.equal(malformed.shinyMods[0].level, 17);
 assert.equal(malformed.shinyMods[0].levelUpdatedAt, undefined);
 
 assert.deepEqual(MOD_PIECES.map(piece => piece.es), ["Arma", "Casco", "Superior", "Prenda inferior", "Zapatos", "Guantes", "Máscara"]);
+assert.deepEqual(SHINY_MOD_GROUPS.map(group => group.id), Object.keys(collectionReference.groups), "La referencia observada cubre todas las piezas y estilos.");
+for (const [groupId, families] of Object.entries(collectionReference.groups)) {
+  const observed = new Map<string, { baseName: string; scenarioId?: string; variantCount: number }>();
+  for (const item of SHINY_MOD_CATALOG.filter(entry => entry.groupId === groupId)) {
+    const key = `${item.baseName}:${item.scenarioId ?? ""}`;
+    const previous = observed.get(key);
+    if (previous) previous.variantCount += 1;
+    else observed.set(key, { baseName: item.baseName, ...(item.scenarioId ? { scenarioId: item.scenarioId } : {}), variantCount: 1 });
+  }
+  assert.deepEqual([...observed.values()], families, `Nombres, orden y variantes contrastados en el juego: ${groupId}`);
+}
+assert.equal(Object.values(collectionReference.groups).flat().length, collectionReference.counts.modules);
+assert.equal(SHINY_MOD_CATALOG.length, collectionReference.counts.variants);
+assert.deepEqual(SHINY_MOD_GROUPS.filter(group => group.category === "weapon").map(group => group.id), ["weapon-burn", "weapon-power-surge", "weapon-frost-vortex", "weapon-the-bull-s-eye", "weapon-fortress-warfare", "weapon-unstable-bomber", "weapon-fast-gunner", "weapon-bounce", "weapon-shrapnel"], "Orden de los nueve tipos observado en la colección del juego.");
 const burn = SHINY_MOD_CATALOG.filter(item => item.groupId === "weapon-burn");
 assert.equal(burn.length, 20, "Quemadura incluye sus cuatro módulos de la colección del juego.");
 assert.deepEqual([...new Set(burn.map(item => item.baseName))], ["Quemadura continua", "Brasas", "Bendición ígnea", "Ira ardiente"]);
+assert.equal(modVariantName("Violencia"), "Violencia", "La ficha actual del juego usa Violencia, no Violento.");
+const weaponAmplifier = SHINY_MOD_CATALOG.filter(item => item.groupId === "armor-guantes" && item.baseName === "Amplificación de arma");
+assert.equal(weaponAmplifier.length, 11, "Nombre actual de la fila de guantes verificado en el juego.");
+assert.ok(weaponAmplifier.every(item => item.searchAliases?.includes("Amplificador de municiones")), "El nombre anterior sigue siendo un alias de búsqueda.");
+assert.ok(weaponAmplifier.every(item => matchesModSearch(item, normalizeModSearch("Amplificador de municiones"))));
+assert.deepEqual([...new Set(SHINY_MOD_CATALOG.filter(item => item.groupId === "armor-parte-superior").map(item => item.baseName))], ["Fortificación de curación", "Regreso rápido", "Rejuvenecimiento", "Rescate crítico", "Conflicto frontal", "Líder de guardia", "Ventaja de resistencia", "Escudo duradero", "Inmune a estado", "Escudo ardiente"], "Escudo duradero ocupa la octava fila en la colección del juego.");
+assert.deepEqual(new Set(burn.filter(item => item.baseName === "Quemadura continua").map(item => item.variant)), new Set(["Supervivencia", "General", "Violencia", "Energía de aberración", "Quemadura"]));
 for (const [base, slot] of [["Precision Load", "armor-pantalones"], ["Turret Enhancement", "armor-guantes"]]) {
   const newMods = SHINY_MOD_CATALOG.filter(item => item.baseEnglishName === base);
   assert.equal(newMods.length, 11);
@@ -65,6 +87,7 @@ for (const [base, slot] of [["Precision Load", "armor-pantalones"], ["Turret Enh
   assert.equal(new Set(newMods.map(item => item.variant)).size, 11);
 }
 assert.equal(SHINY_MOD_CATALOG.filter(item => item.scenarioId).length, 22);
+assert.equal(SHINY_MOD_CATALOG.filter(item => matchesModSearch(item, normalizeModSearch("Precision Load Downstar Deviant Energy"))).length, 1, "La búsqueda reconoce también la variante inglesa del módulo nuevo.");
 assert.equal(SHINY_MOD_CATALOG.some(item => /Rhythm/.test(item.englishName)), false, "No presentar las variantes anunciadas para S5 como módulos ya publicados del mapa.");
 assert.equal(canonicalModCatalogId(old.catalogId), "new-normal-19500542-2400542");
 console.log("Colección: nivel recibido, 17, Shiny, correcciones, sincronización, respaldos, orden del juego y módulos acuáticos OK.");

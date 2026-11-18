@@ -1,0 +1,458 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-17",
+  "reference": "Colección de módulos del juego: filas completas contrastadas por estilo de arma y pieza, sin niveles personales.",
+  "counts": {
+    "modules": 102,
+    "variants": 831
+  },
+  "familyNames": [
+    {
+      "groupId": "armor-guantes",
+      "baseName": "Amplificador de municiones",
+      "displayName": "Amplificación de arma"
+    }
+  ],
+  "groups": {
+    "weapon-burn": [
+      {
+        "baseName": "Quemadura continua",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Brasas",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Bendición ígnea",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Ira ardiente",
+        "variantCount": 5
+      }
+    ],
+    "weapon-power-surge": [
+      {
+        "baseName": "Descarga devastadora",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Dispersión eléctrica",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Descarga estática",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Amplificador de repunte",
+        "variantCount": 5
+      }
+    ],
+    "weapon-frost-vortex": [
+      {
+        "baseName": "Hielo devastador",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Crioexplosión",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Catalizador Criogénico",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Bendición gélida",
+        "variantCount": 5
+      }
+    ],
+    "weapon-the-bull-s-eye": [
+      {
+        "baseName": "Marca de recuperación",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Beneficio del cazador",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Marcas expansivas",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Amplificador de vulnerabilidad",
+        "variantCount": 5
+      }
+    ],
+    "weapon-fortress-warfare": [
+      {
+        "baseName": "Resistencia unida",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Territorio duradero",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Territorio portátil",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Territorio final",
+        "variantCount": 5
+      }
+    ],
+    "weapon-unstable-bomber": [
+      {
+        "baseName": "Supercarga",
+        "variantCount": 6
+      },
+      {
+        "baseName": "Bombardero temerario",
+        "variantCount": 6
+      },
+      {
+        "baseName": "Recuerdo de Bombardero",
+        "variantCount": 6
+      },
+      {
+        "baseName": "Explosivos potentes",
+        "variantCount": 6
+      }
+    ],
+    "weapon-fast-gunner": [
+      {
+        "baseName": "Arsenal",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Aceleración de precisión",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Lluvia de disparos",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Vaquero",
+        "variantCount": 5
+      }
+    ],
+    "weapon-bounce": [
+      {
+        "baseName": "Superbala",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Rebote múltiple",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Balas bumerán",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Rebote devastador",
+        "variantCount": 5
+      }
+    ],
+    "weapon-shrapnel": [
+      {
+        "baseName": "Destrózalos a todos",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Recuerdo de Metralla",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Rotura de Metralla",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Antiescudos",
+        "variantCount": 5
+      }
+    ],
+    "armor-casco": [
+      {
+        "baseName": "Golpe preciso",
+        "variantCount": 9
+      },
+      {
+        "baseName": "Especialista en anomalías",
+        "variantCount": 9
+      },
+      {
+        "baseName": "Ventaja de primera acción",
+        "variantCount": 9
+      },
+      {
+        "baseName": "Expansión de cargador",
+        "variantCount": 9
+      },
+      {
+        "baseName": "Trabajo excelso",
+        "variantCount": 9
+      },
+      {
+        "baseName": "Impacto ominoso",
+        "variantCount": 8
+      },
+      {
+        "baseName": "Aumento de ímpetu",
+        "variantCount": 9
+      },
+      {
+        "baseName": "Caos elemental",
+        "variantCount": 9
+      },
+      {
+        "baseName": "Sinfonía de armas",
+        "variantCount": 9
+      },
+      {
+        "baseName": "Lanzamiento rápido",
+        "variantCount": 9
+      }
+    ],
+    "armor-parte-superior": [
+      {
+        "baseName": "Fortificación de curación",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Regreso rápido",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Rejuvenecimiento",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Rescate crítico",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Conflicto frontal",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Líder de guardia",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Ventaja de resistencia",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Escudo duradero",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Inmune a estado",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Escudo ardiente",
+        "variantCount": 14
+      }
+    ],
+    "armor-pantalones": [
+      {
+        "baseName": "Recarga devastadora",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Tres golpes",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Desvío de proyectiles",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Infalible",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Aumento anómalo",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Impulso cuerpo a cuerpo",
+        "variantCount": 8
+      },
+      {
+        "baseName": "Imparable",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Carga de precisión",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Resonancia elemental",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Oleada crítica",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Carga de precisión",
+        "scenarioId": "isles-of-abyss",
+        "variantCount": 11
+      }
+    ],
+    "armor-zapatos": [
+      {
+        "baseName": "Avance cubierto",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Recolector cruel",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Hora punta",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Carga feroz",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Golpe aislado",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Lento pero seguro",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Contra todo pronóstico",
+        "variantCount": 14
+      },
+      {
+        "baseName": "Energía de la perseverancia",
+        "variantCount": 14
+      }
+    ],
+    "armor-guantes": [
+      {
+        "baseName": "Aumento de crítico",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Amplificador de crítico",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Aumento de daño en punto débil",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Aumento de fuerza vital",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Quemadura continua",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Amplificación de arma",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Amplificador cuerpo a cuerpo",
+        "variantCount": 8
+      },
+      {
+        "baseName": "Sobrecarga elemental",
+        "variantCount": 11
+      },
+      {
+        "baseName": "Mejora de torreta",
+        "scenarioId": "isles-of-abyss",
+        "variantCount": 11
+      }
+    ],
+    "armor-mascara": [
+      {
+        "baseName": "Amplificador ígneo",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Creación de escarcha",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Metralla explosiva",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Rebotes precisos",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Ráfaga explosiva",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Golpe certero",
+        "variantCount": 6
+      },
+      {
+        "baseName": "Golpe apuntado",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Tronido",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Cañón ligero",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Indestructible",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Explosión con retroceso",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Masacre de Metralla",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Primera electrocución",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Ola gélida marchita",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Más buscado",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Interrumpir Rebote",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Relámpago",
+        "variantCount": 5
+      },
+      {
+        "baseName": "Estallido diferido",
+        "variantCount": 6
+      }
+    ]
+  }
+}

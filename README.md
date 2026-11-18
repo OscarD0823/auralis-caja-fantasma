@@ -16,13 +16,13 @@ Las descargas llevan a la **última versión publicada**, no a versiones en prep
 
 **¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**1.30.0 · Colección de módulos.** Registra cada variante desde el nivel que recibiste hasta 17 y Shiny, con piezas en el orden del juego y los dos módulos nuevos de Islas del Abismo. [Qué cambió](docs/versiones/NOTAS-VERSION-1.30.0.md) · [Historial de versiones](docs/versiones/).
+**1.30.1 · Colección de módulos revisada en el juego.** Los 102 módulos y sus 831 variantes están ordenados por pieza y estilo. Registra el nivel que recibiste hasta 17 y Shiny; incluye los dos módulos nuevos de Islas del Abismo. [Qué cambió](docs/versiones/NOTAS-VERSION-1.30.1.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 
 1. En **Caja**, pulsa **+** al reclamar una recompensa. **−** corrige un registro de la ronda actual. Los puntos se calculan automáticamente.
 2. Usa **Guardar ronda** para archivar el parcial sin reiniciar el total del intento. Al obtener la caja, pulsa **¡Salió la caja!**; si llegó por correo de Plataformas, usa su botón específico.
-3. En **Personajes**, crea tus perfiles o selecciona un equipo. En **Mods Brillantes**, busca el módulo, lleva sus intentos y marca los conseguidos.
+3. En **Personajes**, crea tus perfiles o selecciona un equipo. En **Módulos**, busca la pieza y la variante, anota su nivel y marca Shiny cuando lo consigas.
 
 No necesitas iniciar sesión. Pulsa **Tutorial** en la cabecera para recorrer las funciones. El inicio de sesión en GitHub es solo para el editor del propietario.
 
@@ -32,7 +32,7 @@ No necesitas iniciar sesión. Pulsa **Tutorial** en la cabecera para recorrer la
 - Ver el evento público y el tiempo de la Ballena. Solo el administrador cambia la rueda y sus horarios.
 - Personalizar los contadores en **Caja → Abrir configuración**. Windows ofrece una ventana flotante que deja pasar los clics al juego mientras no la estás ajustando.
 - Llevar personajes por separado o sumar actividades a un equipo.
-- Buscar módulos normales de nivel **1 a 17** y sus versiones **Brillantes**.
+- Registrar cada variante de módulo desde el nivel recibido hasta **17** y **Brillante**, sin entradas duplicadas.
 - Detectar el idioma del dispositivo o elegir entre 12 idiomas; se conserva tu elección manual. Los textos todavía sin traducción usan inglés.
 - Abrir o descargar las tres plataformas y conectar con PC o celular desde **Dispositivos**, en un mismo apartado.
 

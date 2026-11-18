@@ -1,5 +1,6 @@
 import catalogData from "../catalog/shiny-mods.json" with { type: "json" };
 import abyssData from "../catalog/abyss-mods.json" with { type: "json" };
+import collectionOrderData from "../catalog/mod-collection-order.json" with { type: "json" };
 
 export type ShinyModSystem = "new";
 
@@ -24,6 +25,7 @@ export type ShinyModCatalogItem = {
   legacyShinyItemIds?: string[];
   scenarioId?: string;
   sourceUrl?: string;
+  searchAliases?: string[];
 };
 
 export type ShinyModCatalogGroup = {
@@ -53,10 +55,10 @@ const GROUP_ORDER = [
   "weapon-frost-vortex",
   "weapon-the-bull-s-eye",
   "weapon-fortress-warfare",
-  "weapon-shrapnel",
-  "weapon-fast-gunner",
   "weapon-unstable-bomber",
+  "weapon-fast-gunner",
   "weapon-bounce",
+  "weapon-shrapnel",
   "weapon-todas-las-armas",
   "weapon-arma-a-distancia",
   "weapon-arma-cuerpo-a-cuerpo",
@@ -83,7 +85,7 @@ export const MOD_PIECES = [
 
 export const MOD_VARIANT_ORDER = [
   "General", "Violencia", "Precisión", "Energía de aberración", "Supervivencia",
-  "Quemadura", "Sobretensión", "Vórtice de escarcha", "Diana", "Guerra de fortalezas", "Metralla", "Disparo rápido", "Bombardero inestable", "Rebote",
+  "Quemadura", "Sobretensión", "Vórtice de escarcha", "Diana", "Guerra de fortalezas", "Bombardero inestable", "Disparo rápido", "Rebote", "Metralla",
   "Resonancia", "Energía de aberración resonante", "Lunar", "Energía de aberración lunar", "Batalla",
   "Espejo", "Energía de aberración de espejo", "Fantasmagórico", "Energía de aberración espectral",
   "Salvaje", "Energía de Aberración Salvaje", "Aero", "Energía de aberración aérea",
@@ -104,10 +106,14 @@ const ENGLISH_VARIANTS: Record<string, string> = {
 };
 
 export function modVariantName(variant: string, english = false) {
-  return english ? ENGLISH_VARIANTS[variant] ?? variant : variant === "Violencia" ? "Violento" : variant;
+  return english ? ENGLISH_VARIANTS[variant] ?? variant : variant;
 }
 
-function collectionGroup(item: ShinyModCatalogItem): ShinyModCatalogItem {
+const verifiedFamilyNames = new Map(collectionOrderData.familyNames.map(item => [`${item.groupId}:${item.baseName}`, item.displayName]));
+
+function collectionGroup(entry: ShinyModCatalogItem): ShinyModCatalogItem {
+  const displayName = verifiedFamilyNames.get(`${entry.groupId}:${entry.baseName}`);
+  const item = displayName ? { ...entry, baseName: displayName, searchAliases: [...(entry.searchAliases ?? []), entry.baseName] } : entry;
   if (item.category !== "weapon" || item.groupId !== "weapon-todas-las-armas") return item;
   const group = item.baseEnglishName === "Flame Resonance" ? ["weapon-burn", "Quemadura"]
     : item.baseEnglishName === "Cryo Catalyst" ? ["weapon-frost-vortex", "Vórtice de escarcha"]
@@ -136,10 +142,12 @@ export function compareModCatalogItems(left: ShinyModCatalogItem, right: ShinyMo
 }
 
 const items = [...document.records.filter((item) => !item.isCatalogShiny).map(collectionGroup), ...abyssItems];
+const collectionOrders = collectionOrderData.groups as Record<string, { baseName: string; scenarioId?: string }[]>;
+const verifiedFamilyOrder = new Map<string, number>(Object.entries(collectionOrders).flatMap(([groupId, families]) => families.map((family, index) => [`${groupId}:${family.baseName}:${family.scenarioId ?? ""}`, index] as const)));
 const baseOrder = new Map<string, number>();
 for (const [index, item] of items.entries()) {
   const key = `${item.groupId}:${item.baseName}:${item.scenarioId ?? ""}`;
-  baseOrder.set(key, Math.min(baseOrder.get(key) ?? Infinity, Number(item.itemId) || 99_000_000 + index));
+  baseOrder.set(key, verifiedFamilyOrder.get(key) ?? Math.min(baseOrder.get(key) ?? Infinity, Number(item.itemId) || 99_000_000 + index));
 }
 export const SHINY_MOD_CATALOG = items.sort(compareModCatalogItems);
 const catalogAliases = new Map(SHINY_MOD_CATALOG.flatMap((item) => [item.id, ...(item.legacyShinyIds ?? [])].map((id) => [id, item.id] as const)));
@@ -191,6 +199,7 @@ export function matchesModSearch(item: ShinyModCatalogItem, search: string) {
     item.baseName,
     item.baseEnglishName,
     item.variant,
+    modVariantName(item.variant, true),
     item.applyRange,
     item.modType,
     item.groupName,
@@ -198,6 +207,7 @@ export function matchesModSearch(item: ShinyModCatalogItem, search: string) {
     catalogOriginLabel(item),
     item.itemId,
     ...(item.legacyShinyItemIds ?? []),
+    ...(item.searchAliases ?? []),
   ].join(" "));
   return search.split(/\s+/).filter(Boolean).every((term) => haystack.includes(term));
 }
