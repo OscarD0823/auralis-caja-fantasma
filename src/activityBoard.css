@@ -46,6 +46,60 @@
 .activity-board .activity-counter > button:disabled { opacity: .25; cursor: default; }
 .activity-board .activity-counter > span { min-width: 22px; font-size: 16px; }
 .activity-board .activity-counts > small { max-width: 100px; font-size: 9px; line-height: 1.4; white-space: normal; }
+
+.resonance-activity-layout { align-items: start; }
+.resonance-activity-layout .vision-activity-group {
+  container: vision-rewards / inline-size;
+  padding: 12px;
+  border: 1px solid #58787555;
+  border-radius: 8px;
+  background: #0b202a;
+}
+.vision-reward-groups { display: grid; gap: 12px; }
+.vision-reward-block {
+  container: reward-block / inline-size;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #58787544;
+  border-radius: 6px;
+  background: #081923;
+}
+.vision-reward-block h3 { margin: 0 0 8px; font-size: 12px; line-height: 1.3; color: #c2e8e2; }
+.reward-block-echo h3 { color: #e6cf9c; }
+.activity-board .vision-reward-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.activity-board .vision-reward-grid .activity-card:not(.phase-activity-card) {
+  grid-template: "points name controls" auto "points stats controls" auto / 29px minmax(0, 1fr) auto;
+  gap: 3px 6px;
+  align-content: center;
+  min-height: 62px;
+  padding: 7px;
+}
+.vision-reward-grid .activity-card:not(.phase-activity-card) .activity-points { grid-area: points; align-self: center; }
+.vision-reward-grid .activity-card:not(.phase-activity-card) .activity-copy { grid-area: name; min-width: 0; overflow-wrap: anywhere; }
+.activity-board .vision-reward-grid .activity-card:not(.phase-activity-card) .activity-counts { display: contents; }
+.vision-reward-grid .activity-card:not(.phase-activity-card) .activity-counter { grid-area: controls; align-self: center; gap: 3px; }
+.activity-board .vision-reward-grid .activity-counter > span { min-width: 18px; }
+.activity-board .vision-reward-grid .activity-card:not(.phase-activity-card) .activity-counts > small {
+  grid-area: stats;
+  max-width: none;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+@container reward-block (min-width: 500px) {
+  .activity-board .vision-reward-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container vision-rewards (min-width: 780px) {
+  .vision-reward-groups:has(.reward-block-echo):has(.reward-block-movements) { grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr); align-items: start; }
+  .vision-reward-groups .reward-block-other { grid-column: 1 / -1; }
+}
+@media (min-width: 1101px) {
+  .common-activity-groups.resonance-activity-layout { grid-template-columns: minmax(0, 3fr) minmax(200px, 1fr); }
+  .resonance-activity-layout .general-activity-group .quick-activity-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .common-activity-groups.resonance-activity-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
 .scenario-activity-panel { --map-accent: #d6b57c; padding: 12px; border: 1px solid #58787555; border-top: 2px solid var(--map-accent); border-radius: 8px; background: #0b202a; }
 .scenario-activity-panel.map-dream { --map-accent: #bbacff; }
 .scenario-activity-panel.map-abyss { --map-accent: #69cbe9; }
@@ -120,6 +174,7 @@
   .progress-page .chance-card > p { display: none; }
   .common-activity-groups { grid-template-columns: minmax(0, 1fr); }
   .activity-board .activity-counter > button { height: 44px; }
+  .activity-board .vision-reward-grid .activity-counter > button:first-child { width: 44px; }
   .activity-board .activity-card { padding: 10px; }
   .activity-board .phase-activity-card { grid-column: 1 / -1; }
   .activity-phases > button { min-height: 44px; }

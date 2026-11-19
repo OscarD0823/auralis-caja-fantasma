@@ -205,6 +205,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.31.3", date: "19 de noviembre de 2026", title: "Recompensas de la rueda en Caja", items: ["El Eco y los Movimientos Resonantes aparecen en secciones separadas, con botones más cómodos para registrar puntos en el celular.", "Movimiento de Deleite figura con el nombre del juego y suma 1 punto por recompensa."] },
   { version: "1.31.2", date: "18 de noviembre de 2026", title: "Puntos de los Movimientos Resonantes", items: ["Deleite, Ira, Lamento y Terror suman 1 punto por recompensa.", "Los cuatro botones están disponibles en Caja, en las recompensas de Resonancia discordante."] },
   { version: "1.31.1", date: "18 de noviembre de 2026", title: "El Eco en los contadores", items: ["El Eco suma 1 punto por recompensa en Normal y Difícil.", "Durante Resonancia discordante se ocultan el correo de Plataformas y los ajustes de Ballena.", "El reloj del portal del Eco aparece también en el contador flotante."] },
   { version: "1.31.0", date: "18 de noviembre de 2026", title: "Resonancia discordante y variantes de Ritmo", items: ["La Rueda usa 30 minutos de actividad y 30 de espera, con el reloj alineado al juego.", "El portal del Eco aparece 15 minutos después de empezar la Rueda. El aviso por voz anuncia Resonancia discordante.", "Casco y Superior suman 40 variantes de Ritmo y Energía de aberración de Ritmo." ] },
@@ -2634,7 +2635,7 @@ function ActivityCard({ activity, phaseNames, currentCount, dailyCount, totalCou
           <span aria-label={`${currentCount} ${english ? "in the current round" : "en la ronda actual"}`}>{currentCount}</span>
           {!activity.phaseCount && <button type="button" aria-label={`${english ? "Add" : "Sumar"} ${name}`} disabled={inactive} onClick={() => onAdd()}><Plus size={19} /></button>}
         </div>
-        <small>{translate(language, "Hoy", "Today")} {dailyCount} · {translate(language, "Histórico", "All time")} {totalCount}</small>
+        <small>{translate(language, "Hoy", "Today")}&nbsp;{dailyCount} · {translate(language, "Histórico", "All time")}&nbsp;{totalCount}</small>
       </div>
     </article>
   );
