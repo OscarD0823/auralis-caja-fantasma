@@ -16,7 +16,7 @@ Las descargas llevan a la **última versión publicada**, no a versiones en prep
 
 **¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**1.31.1 · Resonancia discordante.** El reloj conserva el ciclo de 30 minutos activos y 30 de espera. Anota las recompensas de El Eco y las 40 variantes nuevas de Ritmo en Casco y Superior. [Qué cambió](docs/versiones/NOTAS-VERSION-1.31.1.md) · [Historial de versiones](docs/versiones/).
+**1.31.2 · Movimientos Resonantes.** Alegría, Ira, Lamento y Terror suman 1 punto por recompensa. Encuentra sus botones en Caja, bajo Resonancia discordante. [Qué cambió](docs/versiones/NOTAS-VERSION-1.31.2.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 
