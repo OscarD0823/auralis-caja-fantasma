@@ -230,7 +230,7 @@ export type CountdownTransitionSnapshot = {
   progress: number;
 };
 
-export const APP_VERSION = "1.30.1";
+export const APP_VERSION = "1.31.0";
 export const AUTHOR = "OscarD0823";
 export const AUTHOR_PROFILE_URL = `https://github.com/${AUTHOR}`;
 export const DEFAULT_CHARACTER_ID = "character-main";
@@ -349,6 +349,13 @@ export function computeCountdownTransition(settings: Settings, now = Date.now())
   const elapsedWaitingMs = Math.max(0, waitMs - cycle.remainingMs);
   const remainingMs = Math.max(0, delayMs - elapsedWaitingMs);
   return { active: remainingMs > 0, remainingMs, progress: Math.min(1, elapsedWaitingMs / delayMs) };
+}
+
+export function echoPortalCountdown(cycle: CycleSnapshot, activeMinutes: number) {
+  const opensAfterMs = 15 * 60_000;
+  if (cycle.phase === "waiting") return cycle.remainingMs + opensAfterMs;
+  const elapsedMs = activeMinutes * 60_000 - cycle.remainingMs;
+  return Math.max(0, opensAfterMs - elapsedMs);
 }
 
 export function resolveTransitionDelayMilliseconds(

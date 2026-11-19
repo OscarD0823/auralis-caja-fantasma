@@ -16,7 +16,7 @@ Las descargas llevan a la **última versión publicada**, no a versiones en prep
 
 **¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**1.30.1 · Colección de módulos revisada en el juego.** Los 102 módulos y sus 831 variantes están ordenados por pieza y estilo. Registra el nivel que recibiste hasta 17 y Shiny; incluye los dos módulos nuevos de Islas del Abismo. [Qué cambió](docs/versiones/NOTAS-VERSION-1.30.1.md) · [Historial de versiones](docs/versiones/).
+**1.31.0 · Resonancia discordante.** El reloj sigue el ciclo de 30 minutos activos y 30 de espera. Registra las 40 variantes nuevas de Ritmo en Casco y Superior. [Qué cambió](docs/versiones/NOTAS-VERSION-1.31.0.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 
@@ -29,7 +29,7 @@ No necesitas iniciar sesión. Pulsa **Tutorial** en la cabecera para recorrer la
 ## Qué puedes hacer
 
 - Contar recompensas y consultar actividad diaria, ranking e historial de cajas.
-- Ver el evento público y el tiempo de la Ballena. Solo el administrador cambia la rueda y sus horarios.
+- Ver el reloj de la Rueda, la aparición del Eco y sus avisos por voz. Solo el administrador cambia la rueda y sus horarios.
 - Personalizar los contadores en **Caja → Abrir configuración**. Windows ofrece una ventana flotante que deja pasar los clics al juego mientras no la estás ajustando.
 - Llevar personajes por separado o sumar actividades a un equipo.
 - Registrar cada variante de módulo desde el nivel recibido hasta **17** y **Brillante**, sin entradas duplicadas.

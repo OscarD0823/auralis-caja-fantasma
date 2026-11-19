@@ -33,7 +33,7 @@ assert.equal(localSyncTargetAddressSpace("127.0.0.1:48183"), "loopback", "La pá
 assert.equal(localSyncTargetAddressSpace("192.168.1.20:48183"), "local", "Una IP de la red debe solicitar acceso a la red local.");
 
 assert.equal(validateCatalog(catalog), true, "El catálogo incluido debe ser válido.");
-assert.equal(sharedVisionId(catalog, "gravity", publicationNow), catalog.eventTiming.selectedVisionId, "Antes de la siguiente fecha programada rige la selección publicada.");
+assert.equal(sharedVisionId(catalog, "gravity", Date.parse(catalog.updatedAt)), catalog.eventTiming.selectedVisionId, "La rueda vigente debe coincidir con la selección publicada.");
 assert.equal(catalog.visions.find((vision) => vision.id === sharedVisionId(catalog, "gravity", publicationNow))?.enabled, true, "La rueda pública no puede estar desactivada.");
 const invalidDisabledSelection = structuredClone(catalog);
 invalidDisabledSelection.visions.find((vision) => vision.id === "lunar")!.enabled = true;
@@ -411,18 +411,19 @@ const platformSplit = splitPlatformCarryover(platformActions, Date.parse("2026-0
 assert.deepEqual(platformSplit.completedAttempt.map((action) => action.id), ["old"]);
 assert.deepEqual(platformSplit.carryOver.map((action) => action.id), ["new-1", "new-2"]);
 
-assert.equal(SHINY_MOD_CATALOG.length, 831, "809 variantes anteriores y 22 variantes del mapa acuático, sin duplicados Shiny.");
+assert.equal(SHINY_MOD_CATALOG.length, 871, "809 variantes anteriores, 22 acuáticas y 40 de S5, sin duplicados Shiny.");
 assert.deepEqual(SHINY_MOD_CATALOG_META, {
   sourceUrl: "https://wikily.gg/es-la/once-human/mods/",
   sourceCheckedAt: SHINY_MOD_CATALOG_META.sourceCheckedAt,
-  total: 831,
-  normal: 831,
+  total: 871,
+  normal: 871,
   shiny: 0,
   abyssCheckedAt: "2026-11-17",
   abyssSourceUrl: "https://www.oncehuman.game/news/update/20261021/40780_1317280.html",
   abyssCount: 22,
+  resonanceCount: 40,
 });
-assert.equal(SHINY_MOD_CATALOG.filter((item) => item.system === "new" && !item.isCatalogShiny).length, 831);
+assert.equal(SHINY_MOD_CATALOG.filter((item) => item.system === "new" && !item.isCatalogShiny).length, 871);
 assert.equal(SHINY_MOD_CATALOG.filter((item) => item.isCatalogShiny).length, 0);
 assert.equal(new Set(SHINY_MOD_CATALOG.map((item) => item.id)).size, SHINY_MOD_CATALOG.length);
 assert.ok(SHINY_MOD_GROUPS.filter((item) => item.category === "weapon").length >= 9);

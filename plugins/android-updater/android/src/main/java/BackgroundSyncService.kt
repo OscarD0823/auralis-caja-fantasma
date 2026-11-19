@@ -421,7 +421,13 @@ class BackgroundSyncService : Service() {
         val timing = if (published != null && published.optString("updatedAt") >= settings.optString("sharedTimingUpdatedAt")) published else settings
         val selected = timing.optString("selectedVisionId", "gravity")
         val english = settings.optString("uiLanguage", "es") != "es"
-        val defaultName = when (selected) { "gravity" -> if (english) "Gravity" else "Gravedad"; "lunar" -> "Lunar"; "symbiosis" -> if (english) "Symbiosis" else "Simbiosis"; else -> if (english) "Vision" else "Visión" }
+        val defaultName = when (selected) {
+            "gravity" -> if (english) "Gravity" else "Gravedad"
+            "resonance" -> if (english) "Dissonant Resonance" else "Resonancia discordante"
+            "lunar" -> "Lunar"
+            "symbiosis" -> if (english) "Symbiosis" else "Simbiosis"
+            else -> if (english) "Vision" else "Visión"
+        }
         notificationClocks(EventTiming(
             selectedVisionId = selected,
             name = defaultName,
@@ -447,7 +453,7 @@ class BackgroundSyncService : Service() {
             views.setChronometer(timerId, elapsedNow + ((clock.endsAt ?: now) - now).coerceAtLeast(0), null, clock.endsAt != null)
         }
         setClock(R.id.vision_timer_label, R.id.vision_timer, clocks.vision)
-        setClock(R.id.whale_timer_label, R.id.whale_timer, clocks.whale)
+        setClock(R.id.whale_timer_label, R.id.whale_timer, clocks.secondary)
         return views
     }
 

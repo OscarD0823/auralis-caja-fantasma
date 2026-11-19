@@ -33,7 +33,10 @@ export function VisionInformation({ vision, now, language }: { vision: Vision; n
     <header><Music2 size={25} aria-hidden="true" /><div><span className="eyebrow">{english ? "VISION INFORMATION" : "INFORMACIÓN DE LA RUEDA"}</span><h2>{english ? vision.englishName || vision.name : vision.name}</h2></div></header>
     {vision.startsAt && <div className="vision-change-date"><Clock3 size={17} aria-hidden="true" /><div><strong>{vision.transitionReason === "maintenance-start" ? (english ? "Changes when maintenance begins" : "Cambia al comenzar el mantenimiento") : (english ? "Automatic change of the tracker" : "Cambio automático del contador")}: {visionChangeDate(vision, language)} ({english ? "Colombia" : "hora de Colombia"})</strong><span>{upcoming ? `${english ? "In" : "Faltan"} ${formatDuration(Date.parse(vision.startsAt) - now)}. ` : ""}{english ? "The tracker changes at the start of maintenance, without waiting for servers to reopen." : "El contador cambia al iniciar el mantenimiento, sin esperar a que los servidores vuelvan a abrir."}</span></div></div>}
     <ul>{(english ? vision.information.en : vision.information.es).map((line) => <li key={line}>{line}</li>)}</ul>
-    {vision.cycleConfirmed === false && <p className="vision-unconfirmed">{english ? "Event cycle and reward points await confirmation. Tracking buttons will become available when their values are published." : "Ciclo horario y puntos de recompensa por confirmar. Los botones para anotar se habilitarán cuando se publiquen sus valores."}</p>}
+    {vision.cycleConfirmed === false && <p className="vision-unconfirmed">{english ? "Event timing awaits confirmation." : "Ciclo horario por confirmar."}</p>}
+    {vision.activities.some((activity) => !activity.enabled && activity.points === 0) && (
+      <p className="vision-unconfirmed">{english ? "Reward points await confirmation. Tracking becomes available when their values are published." : "Puntos de recompensa por confirmar. Podrás anotar cuando se publiquen sus valores."}</p>
+    )}
     <a href={vision.information.sourceUrl} target="_blank" rel="noreferrer">{english ? "Official announcement" : "Anuncio oficial"}<ExternalLink size={14} /></a>
   </article>;
 }

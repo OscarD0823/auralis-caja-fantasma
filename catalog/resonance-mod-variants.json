@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-11-18",
+  "sourceUrl": "https://www.oncehuman.game/news/update/20261118/40780_1319892.html",
+  "groups": [
+    { "id": "armor-casco", "variantTotal": 109 },
+    { "id": "armor-parte-superior", "variantTotal": 160 }
+  ],
+  "variants": [
+    { "id": "rhythm", "name": "Ritmo", "englishName": "Rhythm" },
+    { "id": "rhythm-deviant-energy", "name": "Energía de aberración de Ritmo", "englishName": "Rhythm Deviant Energy" }
+  ]
+}

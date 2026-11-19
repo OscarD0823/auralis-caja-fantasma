@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { gravityVoiceMessage, preferredVoice, speakMessage, voiceSchedule, VOICE_MESSAGES } from "../src/voice.ts";
+import { formatVoiceMessage, preferredVoice, speakMessage, voiceSchedule, VOICE_MESSAGES } from "../src/voice.ts";
 import { UI_LANGUAGES } from "../src/i18n.ts";
 import { initialState } from "../src/storage.ts";
 
@@ -20,10 +20,14 @@ assert.equal(voiceSchedule({ ...settings, voiceLeadMinutes: 60 }, now).leadMs, 3
 assert.equal(voiceSchedule({ ...settings, phase: "active" }, now).nextStartAt, now + 60 * 60_000);
 for (const { code, locale } of UI_LANGUAGES) {
   assert(VOICE_MESSAGES[code].test);
-  assert(!gravityVoiceMessage(code, 2).includes("{minutes}"));
-  assert.equal(voiceSchedule({ ...settings, uiLanguage: code }, now).language, locale);
+  const localized = voiceSchedule({ ...settings, uiLanguage: code }, now);
+  assert.equal(localized.language, locale);
+  assert(!formatVoiceMessage(code, localized.message, 2).includes("{minutes}"));
+  const resonance = voiceSchedule({ ...settings, uiLanguage: code, selectedVisionId: "resonance" }, now);
+  assert(resonance.enabled);
+  assert(resonance.message.includes(code === "es" ? "Resonancia discordante" : "Dissonant Resonance"));
 }
-assert(gravityVoiceMessage("es", 1).endsWith("1 minuto."));
+assert(schedule.singularMessage.endsWith("1 minuto."));
 const makeVoice = (lang: string, localService: boolean) => ({ lang, localService }) as SpeechSynthesisVoice;
 const localSpanish = makeVoice("es-MX", true);
 const onlineColombian = makeVoice("es-CO", false);

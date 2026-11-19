@@ -27,6 +27,7 @@ import {
   Mail,
   Minus,
   MonitorUp,
+  Music2,
   Plus,
   RadioTower,
   RefreshCw,
@@ -90,6 +91,7 @@ import {
   computeGravityWhale,
   createId,
   detachCharacterFromActions,
+  echoPortalCountdown,
   formatCompactDuration,
   formatDuration,
   gameDayKey,
@@ -114,7 +116,7 @@ import StartupOpeningVideo from "./StartupOpeningVideo";
 import CounterChestArt from "./CounterChestArt";
 import { persistDesktopProgress } from "./desktopProgress";
 import { activityName, activityPhaseNames, localizedActivityRecord } from "./gameNames";
-import { gravityVoiceMessage, speakMessage, voiceSchedule, VOICE_MESSAGES } from "./voice";
+import { formatVoiceMessage, speakMessage, voiceSchedule, VOICE_MESSAGES } from "./voice";
 import { VisionInformation, VisionScheduleNotice } from "./VisionInformation";
 import { BrowserOverlayControls, useBrowserOverlay } from "./BrowserOverlayTools";
 import { useWindowsInstaller } from "./useWindowsInstaller";
@@ -203,6 +205,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.31.0", date: "18 de noviembre de 2026", title: "Resonancia discordante y variantes de Ritmo", items: ["La Rueda usa 30 minutos de actividad y 30 de espera, con el reloj alineado al juego.", "El portal del Eco aparece 15 minutos después de empezar la Rueda. El aviso por voz anuncia Resonancia discordante.", "Casco y Superior suman 40 variantes de Ritmo y Energía de aberración de Ritmo." ] },
   { version: "1.30.1", date: "17 de noviembre de 2026", title: "Catálogo completo revisado en el juego", items: ["Se comprobaron los 102 módulos y sus 831 variantes, incluidos los dos del mapa acuático.", "Orden de estilos de armas y Superior corregido; Guantes muestra Amplificación de arma y conserva la búsqueda por el nombre anterior.", "La clase usa el nombre Violencia. Se conservan los niveles, los intentos, las fechas y el progreso anterior."] },
   { version: "1.30.0", date: "17 de noviembre de 2026", title: "Colección por pieza, nivel y variante", items: ["Anota el nivel recibido y auméntalo hasta 17 y después Shiny en cada variante.", "Filas por módulo, piezas en el orden del juego y filtros para encontrar lo que falta.", "Precision Load y Turret Enhancement añaden 22 variantes del mapa acuático. Se conservan los intentos y los registros anteriores."] },
   { version: "1.29.2 · Web", date: "16 de noviembre de 2026", title: "Contador web y descarga directa de Windows", items: ["Se retiran las opciones del puntero de la web y se conserva el contador flotante.", "El botón Descargar instalador de Windows descarga directamente la última aplicación publicada. Los contadores e historiales se conservan."] },
@@ -994,6 +997,9 @@ export default function App() {
   const whale = computeGravityWhale({ ...state.settings, selectedVisionId: publicVisionId }, now);
   const whaleAvailable = selectedVision?.id === "gravity" && state.settings.activeMinutes > 15;
   const whaleNextMs = cycle.phase === "active" ? Math.max(0, 15 * 60_000 - (state.settings.activeMinutes * 60_000 - cycle.remainingMs)) : cycle.remainingMs + 15 * 60_000;
+  const echoPortalMs = selectedVision?.id === "resonance" && cycleReady && state.settings.activeMinutes > 15
+    ? echoPortalCountdown(cycle, state.settings.activeMinutes)
+    : undefined;
   const currentDevice: DeviceKind = IS_WEB ? "web" : IS_ANDROID ? "mobile" : "pc";
   const visibleTabs = TABS.filter((item) => item.id !== "changes" || creatorAccess === "granted");
   const commitState = useCallback((update: PersistedState | ((current: PersistedState) => PersistedState)) => {
@@ -1650,13 +1656,13 @@ export default function App() {
   useEffect(() => {
     const leadMinutes = clampNumber(state.settings.voiceLeadMinutes, 1, 60);
     const phaseKey = cycle.phaseEndsAt;
-    if (!personalRestoreReady || IS_ANDROID || voiceTesting || !scheduledVoice.enabled || cycle.phase !== "waiting" || selectedVision?.id !== "gravity" || !state.settings.voiceNotificationsEnabled) return;
+    if (!personalRestoreReady || IS_ANDROID || voiceTesting || !scheduledVoice.enabled || cycle.phase !== "waiting") return;
     if (cycle.remainingMs > leadMinutes * 60_000 || state.settings.lastVoiceAlertPhaseStartedAt === phaseKey || voiceAlertRef.current === phaseKey) return;
     if (Date.now() < voiceRetryAtRef.current) return;
 
     voiceAlertRef.current = phaseKey;
     const remainingMinutes = Math.max(1, Math.ceil(cycle.remainingMs / 60_000));
-    void speakMessage(gravityVoiceMessage(language, remainingMinutes), language).then(() => {
+    void speakMessage(formatVoiceMessage(language, scheduledVoice.message, remainingMinutes), language).then(() => {
       setVoiceError("");
       commitState((current) => ({
         ...current,
@@ -1668,7 +1674,7 @@ export default function App() {
       voiceAlertRef.current = "";
     });
 
-  }, [commitState, cycle.phase, cycle.phaseEndsAt, cycle.remainingMs, language, personalRestoreReady, scheduledVoice.enabled, selectedVision?.id, state.settings.lastVoiceAlertPhaseStartedAt, state.settings.voiceLeadMinutes, state.settings.voiceNotificationsEnabled, voiceTesting]);
+  }, [commitState, cycle.phase, cycle.phaseEndsAt, cycle.remainingMs, language, personalRestoreReady, scheduledVoice.enabled, scheduledVoice.message, state.settings.lastVoiceAlertPhaseStartedAt, state.settings.voiceLeadMinutes, voiceTesting]);
 
   const syncCatalog = useCallback(async (silent = false) => {
     if (!silent) setSyncStatus(tx("Buscando catálogo público…", "Checking the public catalog…"));
@@ -2166,10 +2172,18 @@ export default function App() {
               <span className="pulse" />
               <div><small>{!cycleReady ? overlayDisplayName : transition.active ? tx("Preparando próximo contador", "Preparing next countdown") : cycle.phase === "active" ? `${overlayDisplayName} ${tx("activa", "active")}` : `${tx("Próxima", "Next")} ${overlayDisplayName}`}</small><strong>{overlayDisplayTimer}</strong></div>
             </div>
-            <div className={`phase-chip whale-phase-chip counter-${state.settings.overlayWhaleCounterStyle} ${whale.visible && !whale.departing ? "active" : "waiting"}`} style={{ "--card-progress": `${Math.round((1 - whale.progress) * 360)}deg` } as import("react").CSSProperties}>
+            {echoPortalMs !== undefined ? (
+              <div className={`phase-chip echo-phase-chip ${echoPortalMs === 0 ? "active" : "waiting"}`}>
+                <Music2 size={15} aria-hidden="true" />
+                <div>
+                  <small>{echoPortalMs === 0 ? tx("El Eco", "The Echo") : tx("Portal del Eco · aparece en", "Echo portal · opens in")}</small>
+                  <strong>{echoPortalMs === 0 ? tx("Ya apareció", "Has appeared") : formatDuration(echoPortalMs)}</strong>
+                </div>
+              </div>
+            ) : <div className={`phase-chip whale-phase-chip counter-${state.settings.overlayWhaleCounterStyle} ${whale.visible && !whale.departing ? "active" : "waiting"}`} style={{ "--card-progress": `${Math.round((1 - whale.progress) * 360)}deg` } as import("react").CSSProperties}>
               <Zap size={15} />
               <div><small>{!whaleAvailable ? tx("Ballena · sin evento", "Whale · no event") : whale.departing ? tx("Ballena retirándose", "Whale departing") : whale.visible ? tx("Ballena · termina en", "Whale · ends in") : tx("Próxima ballena", "Next whale")}</small>{whaleAvailable && whale.visible && (state.settings.overlayWhaleCounterStyle === "beam" || !state.settings.overlayWhaleShowTime) ? <span className="whale-chip-beam" role="progressbar" aria-label={tx("Tiempo restante de Ballena", "Whale remaining time")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((1 - whale.progress) * 100)}><i style={{ width: `${(1 - whale.progress) * 100}%` }} /></span> : <strong>{whaleAvailable ? state.settings.overlayWhaleCounterStyle === "compact" ? formatCompactDuration(whale.visible ? whale.remainingMs : whaleNextMs) : formatDuration(whale.visible ? whale.remainingMs : whaleNextMs) : "—"}</strong>}</div>
-            </div>
+            </div>}
             <label className="topbar-language" aria-label={tx("Idioma de la aplicación", "Application language")}>
               <Languages size={15} aria-hidden="true" />
               <select value={state.settings.uiLanguageMode === "auto" ? "auto" : language} onChange={(event) => { const automatic = event.target.value === "auto"; commitState(current => ({ ...current, settings: { ...current.settings, uiLanguageMode: automatic ? "auto" : "manual", uiLanguage: automatic ? detectUiLanguage() : event.target.value as UiLanguage } })); }}><option value="auto">Auto · {language.toUpperCase()}</option>{UI_LANGUAGES.map((item) => <option key={item.code} value={item.code}>{item.short}</option>)}</select>
@@ -2485,7 +2499,7 @@ export default function App() {
               <article className="settings-card voice-settings panel">
                 <div className="settings-icon"><Volume2 /></div>
                 <div>
-                  <h3>{tx("Aviso por voz · Gravedad", "Voice alert · Gravity")}</h3>
+                  <h3>{tx("Aviso por voz de la Rueda", "Visional Wheel voice alert")}</h3>
                   <p>{IS_WEB
                     ? tx("Pulsa Probar voz una vez y mantén la página abierta para recibir el aviso.", "Select Test voice once and keep this page open to receive alerts.")
                     : tx("Habla antes de que empiece el evento aunque la aplicación esté minimizada.", "Speaks before the event starts even when the app is minimized.")}</p>

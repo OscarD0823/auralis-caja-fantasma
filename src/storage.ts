@@ -241,9 +241,11 @@ function characterState(parsed: Partial<PersistedState>, fallback: PersistedStat
 }
 
 export function initialState(): PersistedState {
+  const catalog = defaultCatalog as Catalog;
+  const timing = catalog.eventTiming;
   return {
     schemaVersion: 1,
-    catalog: defaultCatalog as Catalog,
+    catalog,
     actions: [],
     deletedActionIds: [],
     activityHistory: [],
@@ -256,11 +258,11 @@ export function initialState(): PersistedState {
     settings: {
       uiLanguage: detectUiLanguage(),
       uiLanguageMode: "auto",
-      selectedVisionId: sharedVisionId(defaultCatalog as Catalog),
-      waitMinutes: 30,
-      activeMinutes: 30,
-      phaseStartedAt: VISION_CYCLE_WAIT_STARTED_AT,
-      phase: "waiting",
+      selectedVisionId: sharedVisionId(catalog),
+      waitMinutes: timing?.waitMinutes ?? 30,
+      activeMinutes: timing?.activeMinutes ?? 30,
+      phaseStartedAt: timing?.phaseStartedAt ?? VISION_CYCLE_WAIT_STARTED_AT,
+      phase: timing?.phase ?? "waiting",
       overlayEnabled: false,
       overlayScale: 1,
       overlayAddonScale: 1,
@@ -273,7 +275,7 @@ export function initialState(): PersistedState {
       overlayNameMode: "spanish",
       overlayCustomName: "",
       pointer: pointerSettings(),
-      transitionDelayMilliseconds: 3_000,
+      transitionDelayMilliseconds: resolveTransitionDelayMilliseconds(timing),
       voiceNotificationsEnabled: true,
       voiceLeadMinutes: 5,
       timingPresetVersion: 4,
@@ -284,7 +286,7 @@ export function initialState(): PersistedState {
       localSyncCode: "",
       phoneSyncAddress: "",
       phoneSyncCode: "",
-      sharedTimingUpdatedAt: (defaultCatalog as Catalog).eventTiming?.updatedAt,
+      sharedTimingUpdatedAt: timing?.updatedAt,
       dataResetVersion: CURRENT_DATA_RESET_VERSION,
     },
   };
@@ -355,7 +357,7 @@ export function loadState(): PersistedState {
     const loadedState: PersistedState = {
       ...fresh,
       ...parsed,
-      catalog,
+      catalog: parsed.catalog,
       actions: removeBoxCompletedActions(actions, boxes),
       deletedActionIds,
       activityHistory: (mustClearPreviousRecords ? [] : Array.isArray(parsed.activityHistory) ? sanitizeActivityHistory(parsed.activityHistory) : legacyActivityHistory(actions, boxes, catalog))

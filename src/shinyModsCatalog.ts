@@ -1,6 +1,7 @@
 import catalogData from "../catalog/shiny-mods.json" with { type: "json" };
 import abyssData from "../catalog/abyss-mods.json" with { type: "json" };
 import collectionOrderData from "../catalog/mod-collection-order.json" with { type: "json" };
+import resonanceData from "../catalog/resonance-mod-variants.json" with { type: "json" };
 
 export type ShinyModSystem = "new";
 
@@ -24,6 +25,7 @@ export type ShinyModCatalogItem = {
   legacyShinyIds?: string[];
   legacyShinyItemIds?: string[];
   scenarioId?: string;
+  visionId?: string;
   sourceUrl?: string;
   searchAliases?: string[];
 };
@@ -90,6 +92,7 @@ export const MOD_VARIANT_ORDER = [
   "Espejo", "Energía de aberración de espejo", "Fantasmagórico", "Energía de aberración espectral",
   "Salvaje", "Energía de Aberración Salvaje", "Aero", "Energía de aberración aérea",
   "Creciente", "Energía de aberración creciente", "Estrella Descendente", "Energía de aberración de estrella descendente", "Melee Predeterminado",
+  ...resonanceData.variants.map((variant) => variant.name),
 ];
 
 export function compareModVariants(left: string, right: string) {
@@ -103,6 +106,7 @@ const ENGLISH_VARIANTS: Record<string, string> = {
   Resonancia: "Resonance", "Energía de aberración resonante": "Resonant Deviant Energy", Lunar: "Lunar", "Energía de aberración lunar": "Lunar Deviant Energy", Batalla: "Battle",
   Espejo: "Mirror", "Energía de aberración de espejo": "Mirror Deviant Energy", "Fantasmagórico": "Phantasm", "Energía de aberración espectral": "Phantasm Deviant Energy", Salvaje: "Wild", "Energía de Aberración Salvaje": "Wild Deviant Energy",
   Aero: "Aero", "Energía de aberración aérea": "Aero Deviant Energy", Creciente: "Crescent", "Energía de aberración creciente": "Crescent Deviant Energy", "Estrella Descendente": "Downstar", "Energía de aberración de estrella descendente": "Downstar Deviant Energy", "Melee Predeterminado": "Melee Default",
+  ...Object.fromEntries(resonanceData.variants.map((variant) => [variant.name, variant.englishName])),
 };
 
 export function modVariantName(variant: string, english = false) {
@@ -141,7 +145,23 @@ export function compareModCatalogItems(left: ShinyModCatalogItem, right: ShinyMo
   return left.itemId.localeCompare(right.itemId, "es", { numeric: true });
 }
 
-const items = [...document.records.filter((item) => !item.isCatalogShiny).map(collectionGroup), ...abyssItems];
+const baseItems = [...document.records.filter((item) => !item.isCatalogShiny).map(collectionGroup), ...abyssItems];
+const resonanceGroups = new Set(resonanceData.groups.map((group) => group.id));
+const resonanceItems: ShinyModCatalogItem[] = baseItems
+  .filter((item) => item.variant === "General" && resonanceGroups.has(item.groupId))
+  .flatMap((item) => resonanceData.variants.map((variant) => ({
+    ...item,
+    id: `s5-${item.id}-${variant.id}`,
+    itemId: "",
+    name: `${item.baseName} <${variant.name}>`,
+    englishName: `${item.baseEnglishName} <${variant.englishName}>`,
+    variant: variant.name,
+    legacyShinyIds: undefined,
+    legacyShinyItemIds: undefined,
+    visionId: "resonance",
+    sourceUrl: resonanceData.sourceUrl,
+  })));
+const items = [...baseItems, ...resonanceItems];
 const collectionOrders = collectionOrderData.groups as Record<string, { baseName: string; scenarioId?: string }[]>;
 const verifiedFamilyOrder = new Map<string, number>(Object.entries(collectionOrders).flatMap(([groupId, families]) => families.map((family, index) => [`${groupId}:${family.baseName}:${family.scenarioId ?? ""}`, index] as const)));
 const baseOrder = new Map<string, number>();
@@ -164,6 +184,7 @@ export const SHINY_MOD_CATALOG_META = {
   abyssCheckedAt: abyssData.checkedAt,
   abyssSourceUrl: abyssData.officialSourceUrl,
   abyssCount: abyssItems.length,
+  resonanceCount: resonanceItems.length,
 };
 
 const groups = new Map<string, ShinyModCatalogGroup>();
@@ -206,6 +227,7 @@ export function matchesModSearch(item: ShinyModCatalogItem, search: string) {
     catalogStatusLabel(item),
     catalogOriginLabel(item),
     item.itemId,
+    item.visionId === "resonance" ? "S5 Resonancia discordante Dissonant Resonance" : "",
     ...(item.legacyShinyItemIds ?? []),
     ...(item.searchAliases ?? []),
   ].join(" "));

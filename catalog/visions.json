@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 62,
-  "updatedAt": "2026-11-16T04:14:41.316Z",
+  "catalogVersion": 63,
+  "updatedAt": "2026-11-19T00:31:29.914Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
-    "selectedVisionId": "gravity",
+    "selectedVisionId": "resonance",
     "waitMinutes": 30,
     "activeMinutes": 30,
     "transitionDelayMilliseconds": 50,
     "transitionDelaySeconds": 0.05,
-    "phaseStartedAt": "2026-10-05T02:22:26.240Z",
+    "phaseStartedAt": "2026-11-19T00:15:05.500Z",
     "phase": "active",
-    "updatedAt": "2026-10-05T02:23:26.240Z",
+    "updatedAt": "2026-11-19T00:31:29.914Z",
     "updatedBy": "OscarD0823"
   },
   "proActivities": [
@@ -465,25 +465,25 @@
     },
     {
       "id": "resonance",
-      "name": "Resonancia disonante",
+      "name": "Resonancia discordante",
       "englishName": "Dissonant Resonance",
       "visualTheme": "neutral",
       "enabled": true,
       "startsAt": "2026-11-18T23:00:00.000Z",
-      "cycleConfirmed": false,
-      "description": "S5 · Movimientos Resonantes y Guerra del Eco. Disponible tras el mantenimiento del 18 de noviembre (PT).",
+      "cycleConfirmed": true,
+      "description": "S5 · Movimientos Resonantes y Guerra del Eco.",
       "information": {
-        "sourceUrl": "https://www.oncehuman.game/news/devBlog/20261113/40781_1319568.html",
+        "sourceUrl": "https://www.oncehuman.game/news/update/20261118/40780_1319892.html",
         "es": [
           "Movimientos Resonantes: activa la Campana del Eco y completa tu partitura personal en Alegría, Ira, Lamento o Terror.",
-          "Guerra del Eco: hasta cuatro jugadores; Básico y Difícil. El portal aparece a los 15 minutos del evento.",
+          "La guerra del Eco: hasta cuatro jugadores en Normal o Difícil. El portal aparece 15 minutos después de que empieza la Rueda. Dentro de la instancia tienes 20 minutos para derrotar a El Eco.",
           "Polvo disonante abre cajas de resonancia; estas entregan Ritmo divino para canjear en la tienda.",
           "Incluye mundos visionales de Islas del Abismo; excluye Manibus Novato.",
           "Canjea las monedas de Gravedad antes del cierre de su tienda el 2 de diciembre (PT)."
         ],
         "en": [
           "Resonant Movements: ring the Echo Bell and complete your own score in Delight, Wrath, Lament, or Terror.",
-          "The Echo War: up to four players; Basic and Hard. Its portal appears 15 minutes into the event.",
+          "The Echo War: up to four players in Basic or Hard. The portal appears 15 minutes into the event. You have 20 minutes to defeat The Echo inside the instance.",
           "Dissonant Dust opens Resonance Boxes; these award Divine Rhythm for the shop.",
           "Includes Isles of Abyss Vision worlds; excludes Manibus Novice.",
           "Redeem Gravity currencies before its shop closes on December 2 (PT)."
@@ -532,7 +532,7 @@
         },
         {
           "id": "echo-war-basic",
-          "name": "Guerra del Eco · Básico",
+          "name": "Guerra del Eco · Normal",
           "names": {
             "en": "The Echo War · Basic"
           },

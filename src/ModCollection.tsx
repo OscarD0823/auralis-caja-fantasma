@@ -45,7 +45,8 @@ function ModCollection({ catalog, records, language, onChange }: Props) {
     const record = progress(item), level = modLevel(record);
     return status === "all" || (status === "owned" && (level ?? 0) > 0) || (status === "missing" && level === 0)
       || (status === "ready" && level === 17 && !record?.isShiny) || (status === "shiny" && record?.isShiny)
-      || (status === "abyss" && item.scenarioId === "isles-of-abyss");
+      || (status === "abyss" && item.scenarioId === "isles-of-abyss")
+      || (status === "resonance" && item.visionId === "resonance");
   });
   const rows = new Map<string, { item: ShinyModCatalogItem; variants: ShinyModCatalogItem[] }>();
   for (const item of visible) {
@@ -89,7 +90,21 @@ function ModCollection({ catalog, records, language, onChange }: Props) {
       <div className="mod-collection-filters">
         <label className="mod-search"><span>{tx("Buscar módulo", "Find a mod")}</span><div><Search size={16} /><input value={search} onChange={event => setSearch(event.target.value)} placeholder={tx("Nombre en español o inglés, variante o ID", "Spanish or English name, variant, or ID")} /></div></label>
         <label>{tx("Variante", "Variant")}<select value={variant} onChange={event => setVariant(event.target.value)}><option value="all">{tx("Todas las variantes", "All variants")}</option>{availableVariants.map(value => <option key={value} value={value}>{catalog.modVariantName(value, en)}</option>)}</select></label>
-        <label>{tx("Mostrar", "Show")}<select value={status} onChange={event => { setStatus(event.target.value); if (event.target.value === "abyss") { setPiece("all"); setVariant("all"); } }}><option value="all">{tx("Todos", "All")}</option><option value="owned">{tx("Los que tengo", "Owned")}</option><option value="missing">{tx("No los tengo", "Missing")}</option><option value="ready">{tx("Nivel 17", "Level 17")}</option><option value="shiny">Shiny</option><option value="abyss">{tx("Nuevos · Islas del Abismo", "New · Isles of Abyss")}</option></select></label>
+        <label>{tx("Mostrar", "Show")}
+          <select value={status} onChange={event => {
+            const value = event.target.value;
+            setStatus(value);
+            if (value === "abyss" || value === "resonance") changePiece("all");
+          }}>
+            <option value="all">{tx("Todos", "All")}</option>
+            <option value="owned">{tx("Los que tengo", "Owned")}</option>
+            <option value="missing">{tx("No los tengo", "Missing")}</option>
+            <option value="ready">{tx("Nivel 17", "Level 17")}</option>
+            <option value="shiny">Shiny</option>
+            <option value="abyss">{tx("Islas del Abismo", "Isles of Abyss")}</option>
+            <option value="resonance">{tx("Nuevas · Resonancia discordante", "New · Dissonant Resonance")}</option>
+          </select>
+        </label>
       </div>
       <div className="mod-collection-result-count"><span>{rows.size} {tx("módulos", "mods")} · {visible.length} {tx("variantes", "variants")}</span><small>{tx("Cada variante guarda su propio nivel e intentos.", "Each variant keeps its own level and attempts.")}</small></div>
       <div className="mod-collection-scroll" tabIndex={0} aria-label={tx("Módulos y variantes", "Mods and variants")}>

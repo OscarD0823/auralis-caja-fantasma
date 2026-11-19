@@ -13,7 +13,7 @@ internal data class EventTiming(
 )
 
 internal data class NotificationClock(val label: String, val endsAt: Long?)
-internal data class EventNotificationClocks(val vision: NotificationClock, val whale: NotificationClock)
+internal data class EventNotificationClocks(val vision: NotificationClock, val secondary: NotificationClock)
 
 internal fun notificationClocks(timing: EventTiming, now: Long): EventNotificationClocks {
     val fullCycle = timing.waitMs + timing.activeMs
@@ -36,6 +36,17 @@ internal fun notificationClocks(timing: EventTiming, now: Long): EventNotificati
         if (timing.english) "ends in" else "termina en"
     } else if (timing.english) "starts in" else "empieza en"
     val vision = NotificationClock("${timing.name} · $phaseLabel", if (transition) (start + timing.delayMs).coerceAtMost(end) else end)
+    val appearanceDelay = 15 * 60_000L
+    if (timing.selectedVisionId == "resonance" && timing.activeMs > appearanceDelay) {
+        val name = if (timing.english) "The Echo" else "El Eco"
+        val opensAt = (if (active) start else end) + appearanceDelay
+        val portal = if (now >= opensAt) {
+            NotificationClock("$name · ${if (timing.english) "has appeared" else "ya apareció"}", null)
+        } else {
+            NotificationClock("$name · ${if (timing.english) "portal opens in" else "portal en"}", opensAt)
+        }
+        return EventNotificationClocks(vision, portal)
+    }
     val whaleName = if (timing.english) "Whale" else "Ballena"
     val whale = when {
         timing.selectedVisionId != "gravity" || timing.activeMs <= 15 * 60_000L ->
