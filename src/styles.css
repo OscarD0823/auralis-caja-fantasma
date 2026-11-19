@@ -831,6 +831,8 @@ html.overlay-document, body.overlay-document, body.overlay-document #root { over
 .overlay-grip { flex: none; color: rgba(188, 219, 222, .45); filter: drop-shadow(0 1px 3px #000); }
 .overlay-visual button { flex: none; width: 27px; height: 27px; padding: 0; border: 1px solid rgba(173, 215, 220, .12); border-radius: 8px; display: grid; place-items: center; color: #9cb4b9; background: rgba(3, 15, 23, .62); cursor: pointer; }
 .overlay-visual.preview button { pointer-events: none; }
+.overlay-echo-stage { width: min(230px, var(--overlay-main-width)); height: 27px; margin-top: 5px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid rgba(92, 225, 210, .3); border-radius: 9px; background: #071a26; color: var(--cyan); font-size: 12px; }
+.overlay-echo-stage strong { margin-left: auto; color: #ecffff; font-variant-numeric: tabular-nums; }
 .overlay-whale-stage { position: relative; z-index: 2; flex: none; margin-top: -2px; pointer-events: none; transition: width .3s ease, height .3s ease; }
 .overlay-whale-canvas { position: absolute; left: 50%; top: 0; width: 512px; height: 146px; transform-origin: top center; transition: transform .3s ease; }
 .overlay-whale-motion { position: absolute; inset: 0; overflow: hidden; contain: layout paint style; isolation: isolate; }

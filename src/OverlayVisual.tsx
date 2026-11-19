@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { Box, GripHorizontal, X, Zap } from "lucide-react";
+import { Box, GripHorizontal, Music2, X, Zap } from "lucide-react";
 import { GRAVITY_EVENT_IMAGE_A, GRAVITY_EVENT_IMAGE_B, GRAVITY_WHALE_BOSS_IMAGE, LUNAR_EVENT_IMAGE, SYMBIOSIS_EVENT_IMAGE } from "./assets";
 import type { GravityWhaleSnapshot, OverlayCounterStyle, OverlayNameMode, OverlayShape, Vision, WhaleCounterStyle } from "./model";
 import { formatCompactDuration, formatDuration, overlayVisionName } from "./model";
@@ -14,6 +14,7 @@ type Props = {
   progress: number;
   transitionRemainingMs?: number;
   whale: GravityWhaleSnapshot;
+  echoPortalMs?: number;
   addonScale: number;
   whaleCounterScale: number;
   whaleCounterStyle: WhaleCounterStyle;
@@ -27,7 +28,7 @@ type Props = {
   interactive?: boolean;
 };
 
-export default function OverlayVisual({ vision, phase, remainingMs, progress, transitionRemainingMs = 0, whale, addonScale, whaleCounterScale, whaleCounterStyle, whaleShowTime, shape, counterStyle, nameMode, customName, onClose, preview = false, interactive = true }: Props) {
+export default function OverlayVisual({ vision, phase, remainingMs, progress, transitionRemainingMs = 0, whale, echoPortalMs, addonScale, whaleCounterScale, whaleCounterStyle, whaleShowTime, shape, counterStyle, nameMode, customName, onClose, preview = false, interactive = true }: Props) {
   const remainingWhalePercent = Math.max(0, Math.min(100, Math.round((1 - whale.progress) * 100)));
   const beamCounter = whaleCounterStyle === "beam";
   const normalizedAddonScale = whaleScaleWithinWindow(addonScale, shape);
@@ -41,6 +42,7 @@ export default function OverlayVisual({ vision, phase, remainingMs, progress, tr
   const displayedMs = transitionActive ? transitionRemainingMs : remainingMs;
   const cycleReady = vision?.cycleConfirmed !== false;
   const timer = !cycleReady ? "Por confirmar" : counterStyle === "compact" ? formatCompactDuration(displayedMs) : formatDuration(displayedMs);
+  const english = nameMode === "english";
   const visualStyle = {
     "--overlay-main-width": `${designSize.width - 8}px`,
     "--overlay-main-height": `${designSize.height - 8}px`,
@@ -62,6 +64,14 @@ export default function OverlayVisual({ vision, phase, remainingMs, progress, tr
         {interactive && <button type="button" aria-label={preview ? "Vista previa del botón cerrar" : "Cerrar y desactivar contador"} onClick={onClose}><X size={15} /></button>}
       </div>
     </section>
+
+    {echoPortalMs !== undefined && (
+      <section className="overlay-echo-stage" aria-label={english ? "Echo portal" : "Portal del Eco"}>
+        <Music2 size={14} aria-hidden="true" />
+        <span>{english ? "The Echo" : "El Eco"}</span>
+        <strong>{echoPortalMs === 0 ? (english ? "Has appeared" : "Ya apareció") : formatDuration(echoPortalMs)}</strong>
+      </section>
+    )}
 
     {whale.visible && <section style={{ width: (OVERLAY_WHALE_WIDTH - 8) * normalizedAddonScale, height: whaleShowTime && !beamCounter ? whaleLayout.stageHeight : Math.ceil((150 - 4) * normalizedAddonScale) } as CSSProperties} className={`overlay-whale-stage whale-counter-${whaleCounterStyle} counter-placement-${whaleLayout.placement} ${whaleShowTime ? "with-time" : "beam-only"} ${whale.departing ? "departing" : "engaged"}`} aria-label={whale.departing ? "El Riftwalker se retira" : whaleShowTime ? `Riftwalker activo durante ${formatDuration(whale.remainingMs)}` : "Riftwalker activo con rayo de progreso"}>
       <div className="overlay-whale-canvas" style={{ top: whaleLayout.canvasOffset, transform: `translateX(-50%) scale(${normalizedAddonScale})` }}>

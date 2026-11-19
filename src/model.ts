@@ -230,7 +230,7 @@ export type CountdownTransitionSnapshot = {
   progress: number;
 };
 
-export const APP_VERSION = "1.31.0";
+export const APP_VERSION = "1.31.1";
 export const AUTHOR = "OscarD0823";
 export const AUTHOR_PROFILE_URL = `https://github.com/${AUTHOR}`;
 export const DEFAULT_CHARACTER_ID = "character-main";
@@ -351,7 +351,8 @@ export function computeCountdownTransition(settings: Settings, now = Date.now())
   return { active: remainingMs > 0, remainingMs, progress: Math.min(1, elapsedWaitingMs / delayMs) };
 }
 
-export function echoPortalCountdown(cycle: CycleSnapshot, activeMinutes: number) {
+export function echoPortalCountdown(vision: Vision | undefined, cycle: Pick<CycleSnapshot, "phase" | "remainingMs">, activeMinutes: number) {
+  if (vision?.id !== "resonance" || vision.cycleConfirmed === false || activeMinutes <= 15) return undefined;
   const opensAfterMs = 15 * 60_000;
   if (cycle.phase === "waiting") return cycle.remainingMs + opensAfterMs;
   const elapsedMs = activeMinutes * 60_000 - cycle.remainingMs;

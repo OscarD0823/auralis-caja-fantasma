@@ -3,7 +3,7 @@ import { LogicalSize } from "@tauri-apps/api/dpi";
 import { emit } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { PersistedState } from "./model";
-import { applyScheduledVision, clampNumber, computeCountdownTransition, computeCycle, computeGravityWhale } from "./model";
+import { applyScheduledVision, clampNumber, computeCountdownTransition, computeCycle, computeGravityWhale, echoPortalCountdown } from "./model";
 import OverlayVisual, { overlayDesignSize } from "./OverlayVisual";
 import { loadState } from "./storage";
 import { useOverlayInteraction, useOverlayPosition } from "./floatingOverlay";
@@ -19,8 +19,9 @@ export default function Overlay() {
   const whale = computeGravityWhale(effectiveState.settings, now);
   const displayedWhale = state.settings.overlayWhaleEnabled ? whale : { ...whale, visible: false };
   const selectedVision = effectiveState.catalog.visions.find((vision) => vision.id === effectiveState.settings.selectedVisionId);
+  const echoPortalMs = echoPortalCountdown(selectedVision, cycle, effectiveState.settings.activeMinutes);
   const overlayScale = clampNumber(state.settings.overlayScale, .2, 1.5);
-  const designSize = overlayDesignSize(displayedWhale.visible, state.settings.overlayShape, state.settings.overlayAddonScale, state.settings.overlayWhaleCounterScale, state.settings.overlayWhaleCounterStyle, state.settings.overlayWhaleShowTime);
+  const designSize = overlayDesignSize(displayedWhale.visible, state.settings.overlayShape, state.settings.overlayAddonScale, state.settings.overlayWhaleCounterScale, state.settings.overlayWhaleCounterStyle, state.settings.overlayWhaleShowTime, echoPortalMs !== undefined);
 
   const hideOverlay = () => {
     const next = { ...state, settings: { ...state.settings, overlayEnabled: false } };
@@ -75,7 +76,7 @@ export default function Overlay() {
   return (
     <div className={`floating-overlay ${interactive ? "interactive" : "passive"}`} onMouseDown={(event) => { if (!interactive || (event.target as HTMLElement).closest("button")) return; void getCurrentWindow().startDragging(); }}>
       <div className="overlay-scale-stage" style={{ width: designSize.width, height: designSize.height, transform: `scale(${overlayScale})` }}>
-        <OverlayVisual vision={selectedVision} phase={cycle.phase} remainingMs={cycle.remainingMs} progress={cycle.progress} transitionRemainingMs={transition.active ? transition.remainingMs : 0} whale={displayedWhale} addonScale={state.settings.overlayAddonScale} whaleCounterScale={state.settings.overlayWhaleCounterScale} whaleCounterStyle={state.settings.overlayWhaleCounterStyle} whaleShowTime={state.settings.overlayWhaleShowTime} shape={state.settings.overlayShape} counterStyle={state.settings.overlayCounterStyle} nameMode={state.settings.overlayNameMode} customName={state.settings.overlayCustomName} onClose={hideOverlay} interactive={interactive} />
+        <OverlayVisual vision={selectedVision} phase={cycle.phase} remainingMs={cycle.remainingMs} progress={cycle.progress} transitionRemainingMs={transition.active ? transition.remainingMs : 0} whale={displayedWhale} echoPortalMs={echoPortalMs} addonScale={state.settings.overlayAddonScale} whaleCounterScale={state.settings.overlayWhaleCounterScale} whaleCounterStyle={state.settings.overlayWhaleCounterStyle} whaleShowTime={state.settings.overlayWhaleShowTime} shape={state.settings.overlayShape} counterStyle={state.settings.overlayCounterStyle} nameMode={state.settings.overlayNameMode} customName={state.settings.overlayCustomName} onClose={hideOverlay} interactive={interactive} />
       </div>
     </div>
   );

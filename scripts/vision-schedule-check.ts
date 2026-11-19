@@ -1,15 +1,16 @@
 import assert from "node:assert/strict";
 import catalogData from "../catalog/visions.json" with { type: "json" };
-import { applyRemoteCatalog, applyScheduledVision, computeCycle, echoPortalCountdown, sharedVisionId, upcomingVision, validateCatalog, visionSeasonChange, type Catalog } from "../src/model.ts";
+import { activityRewardPoints, applyRemoteCatalog, applyScheduledVision, computeCycle, echoPortalCountdown, sharedVisionId, upcomingVision, validateCatalog, visionSeasonChange, type Catalog } from "../src/model.ts";
 import { initialState, loadState, personalSyncPayload, STORAGE_KEY } from "../src/storage.ts";
 import { voiceSchedule } from "../src/voice.ts";
 
 const catalog = catalogData as Catalog;
+const resonance = catalog.visions.find(vision => vision.id === "resonance")!;
 const changeAt = Date.parse("2026-11-18T23:00:00.000Z");
 const observedAt = Date.parse("2026-11-19T00:35:57.734Z");
 const minute = 60_000;
 const previousCatalog = structuredClone(catalog);
-previousCatalog.catalogVersion -= 1;
+previousCatalog.catalogVersion = 62;
 previousCatalog.eventTiming = {
   ...catalog.eventTiming!,
   selectedVisionId: "gravity",
@@ -59,10 +60,11 @@ assert.equal(offline.activeMinutes, 30);
 assert.equal(offline.waitMinutes, 30);
 const activeEnd = Date.parse(measuredCycle.phaseEndsAt);
 const activeStart = activeEnd - 30 * minute;
-assert.equal(echoPortalCountdown(computeCycle(offline, activeStart), 30), 15 * minute);
-assert.equal(echoPortalCountdown(computeCycle(offline, activeStart + 15 * minute), 30), 0);
+assert.equal(echoPortalCountdown(resonance, computeCycle(offline, activeStart), 30), 15 * minute);
+assert.equal(echoPortalCountdown(resonance, computeCycle(offline, activeStart + 15 * minute), 30), 0);
 assert.equal(computeCycle(offline, activeEnd).phase, "waiting");
-assert.equal(echoPortalCountdown(computeCycle(offline, activeEnd), 30), 45 * minute);
+assert.equal(echoPortalCountdown(resonance, computeCycle(offline, activeEnd), 30), 45 * minute);
+assert.equal(echoPortalCountdown(catalog.visions.find(vision => vision.id === "gravity"), computeCycle(offline, activeEnd), 30), undefined);
 assert.equal(computeCycle(offline, activeEnd + 30 * minute).phase, "active");
 const savedStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
 try {
@@ -92,10 +94,10 @@ const newVoice = voiceSchedule({ ...updated.settings, voiceNotificationsEnabled:
 assert.equal(newVoice.enabled, true);
 assert.equal(newVoice.nextStartAt, activeEnd + 30 * minute);
 assert.equal(newVoice.singularMessage, "Atención. Resonancia discordante comienza en 1 minuto.");
-const resonance = catalog.visions.find(vision => vision.id === "resonance")!;
 assert.equal(resonance.cycleConfirmed, true);
 assert.equal(resonance.activities.length, 6);
-assert(resonance.activities.every(activity => activity.points === 0 && !activity.enabled), "Los puntos aún no confirmados no pueden sumarse.");
+assert.deepEqual(resonance.activities.slice(0, 2).map(activity => [activity.id, activityRewardPoints(activity)]), [["echo-war-basic", 1], ["echo-war-hard", 1]]);
+assert(resonance.activities.slice(2).every(activity => activity.points === 0 && !activity.enabled), "Los Movimientos siguen pendientes de puntos.");
 for (const startsAt of ["malformed", "2026-11-18T23:00:00"]) {
   const bad = structuredClone(catalog);
   bad.visions.at(-1)!.startsAt = startsAt;

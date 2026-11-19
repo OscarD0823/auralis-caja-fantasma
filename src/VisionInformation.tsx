@@ -35,7 +35,7 @@ export function VisionInformation({ vision, now, language }: { vision: Vision; n
     <ul>{(english ? vision.information.en : vision.information.es).map((line) => <li key={line}>{line}</li>)}</ul>
     {vision.cycleConfirmed === false && <p className="vision-unconfirmed">{english ? "Event timing awaits confirmation." : "Ciclo horario por confirmar."}</p>}
     {vision.activities.some((activity) => !activity.enabled && activity.points === 0) && (
-      <p className="vision-unconfirmed">{english ? "Reward points await confirmation. Tracking becomes available when their values are published." : "Puntos de recompensa por confirmar. Podrás anotar cuando se publiquen sus valores."}</p>
+      <p className="vision-unconfirmed">{english ? "Some rewards still have unconfirmed point values." : "Algunas recompensas tienen puntos por confirmar."}</p>
     )}
     <a href={vision.information.sourceUrl} target="_blank" rel="noreferrer">{english ? "Official announcement" : "Anuncio oficial"}<ExternalLink size={14} /></a>
   </article>;

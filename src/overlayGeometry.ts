@@ -10,6 +10,7 @@ export const OVERLAY_SHAPE_SIZES: Record<OverlayShape, { width: number; height: 
 
 export const OVERLAY_WHALE_WIDTH = 520;
 export const OVERLAY_WHALE_HEIGHT = 150;
+const ECHO_CLOCK_HEIGHT = 32;
 
 export const OVERLAY_WHALE_COUNTER_SIZES: Record<WhaleCounterStyle, { width: number; height: number }> = {
   digital: { width: 142, height: 42 },
@@ -93,11 +94,13 @@ export function whaleCounterLayoutWithinWindow(addonScale: number, counterScale:
   };
 }
 
-export function overlayDesignSize(showWhale: boolean, shape: OverlayShape = "event", addonScale = 1, whaleCounterScale = 1, whaleCounterStyle: WhaleCounterStyle = "digital", showWhaleTime = true) {
+export function overlayDesignSize(showWhale: boolean, shape: OverlayShape = "event", addonScale = 1, whaleCounterScale = 1, whaleCounterStyle: WhaleCounterStyle = "digital", showWhaleTime = true, showEcho = false) {
   const base = OVERLAY_SHAPE_SIZES[shape] ?? OVERLAY_SHAPE_SIZES.event;
+  const height = base.height + (showEcho ? ECHO_CLOCK_HEIGHT : 0);
+  if (!showWhale) return { width: base.width, height };
   const normalizedAddonScale = whaleScaleWithinWindow(addonScale, shape);
   const normalizedCounterScale = whaleCounterScaleWithinWindow(whaleCounterScale, shape, whaleCounterStyle);
   const layout = whaleCounterLayoutWithinWindow(normalizedAddonScale, normalizedCounterScale, shape, whaleCounterStyle);
   const whaleStageHeight = showWhaleTime && whaleCounterStyle !== "beam" ? layout.stageHeight : Math.ceil((OVERLAY_WHALE_HEIGHT - 4) * normalizedAddonScale);
-  return showWhale ? { width: base.width, height: base.height + whaleStageHeight } : base;
+  return { width: base.width, height: height + whaleStageHeight };
 }

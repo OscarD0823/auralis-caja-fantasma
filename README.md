@@ -16,12 +16,12 @@ Las descargas llevan a la **última versión publicada**, no a versiones en prep
 
 **¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**1.31.0 · Resonancia discordante.** El reloj sigue el ciclo de 30 minutos activos y 30 de espera. Registra las 40 variantes nuevas de Ritmo en Casco y Superior. [Qué cambió](docs/versiones/NOTAS-VERSION-1.31.0.md) · [Historial de versiones](docs/versiones/).
+**1.31.1 · Resonancia discordante.** El reloj conserva el ciclo de 30 minutos activos y 30 de espera. Anota las recompensas de El Eco y las 40 variantes nuevas de Ritmo en Casco y Superior. [Qué cambió](docs/versiones/NOTAS-VERSION-1.31.1.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 
 1. En **Caja**, pulsa **+** al reclamar una recompensa. **−** corrige un registro de la ronda actual. Los puntos se calculan automáticamente.
-2. Usa **Guardar ronda** para archivar el parcial sin reiniciar el total del intento. Al obtener la caja, pulsa **¡Salió la caja!**; si llegó por correo de Plataformas, usa su botón específico.
+2. Usa **Guardar ronda** para archivar el parcial y conservar el total del intento. Al obtener la caja, pulsa **¡Salió la caja!**.
 3. En **Personajes**, crea tus perfiles o selecciona un equipo. En **Módulos**, busca la pieza y la variante, anota su nivel y marca Shiny cuando lo consigas.
 
 No necesitas iniciar sesión. Pulsa **Tutorial** en la cabecera para recorrer las funciones. El inicio de sesión en GitHub es solo para el editor del propietario.

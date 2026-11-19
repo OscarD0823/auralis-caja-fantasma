@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, Download, ExternalLink, MonitorUp, X } from "lucide-react";
-import { applyScheduledVision, computeCountdownTransition, computeCycle, computeGravityWhale, formatDuration, overlayVisionName, visionSeasonChange, type PersistedState } from "./model";
+import { applyScheduledVision, computeCountdownTransition, computeCycle, computeGravityWhale, echoPortalCountdown, formatDuration, overlayVisionName, visionSeasonChange, type PersistedState } from "./model";
 import type { UiLanguage } from "./i18n";
 import type { PwaInstallState } from "./usePwaInstall";
 import WebInstallNotice from "./WebInstallNotice";
@@ -91,6 +91,7 @@ function BrowserToolWindow({ target, state, language, onClose }: { target: Windo
   const transition = computeCountdownTransition(effective.settings, now);
   const cycleReady = selected?.cycleConfirmed !== false;
   const whale = computeGravityWhale(effective.settings, now);
+  const echoPortalMs = echoPortalCountdown(selected, cycle, effective.settings.activeMinutes);
   const season = visionSeasonChange(effective.catalog, now);
   const english = language !== "es";
   const name = overlayVisionName(selected, state.settings.overlayNameMode, state.settings.overlayCustomName);
@@ -101,6 +102,9 @@ function BrowserToolWindow({ target, state, language, onClose }: { target: Windo
       <strong role="timer" aria-live="off">{!cycleReady ? (english ? "Unconfirmed" : "Por confirmar") : formatDuration(transition.active ? transition.remainingMs : cycle.remainingMs)}</strong>
       {cycleReady && <div className="pip-progress"><i style={{ width: `${cycle.progress * 100}%` }} /></div>}
       {selected?.id === "gravity" && state.settings.overlayWhaleEnabled && <small>{english ? "Whale" : "Ballena"}: {whale.visible ? formatDuration(whale.remainingMs) : (english ? "not active" : "sin evento")}</small>}
+      {echoPortalMs !== undefined && (
+        <small>{english ? "The Echo" : "El Eco"} · {echoPortalMs === 0 ? (english ? "has appeared" : "ya apareció") : formatDuration(echoPortalMs)}</small>
+      )}
     </section>
     {season?.endingSoon && <div className="pip-season-warning">{english ? "This wheel ends in" : "Esta rueda acaba en"} {formatDuration(season.remainingMs)}</div>}
   </main>;
