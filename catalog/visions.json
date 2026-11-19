@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 64,
-  "updatedAt": "2026-11-19T00:56:59.739Z",
+  "catalogVersion": 65,
+  "updatedAt": "2026-11-19T01:38:09.000Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -475,14 +475,14 @@
       "information": {
         "sourceUrl": "https://www.oncehuman.game/news/update/20261118/40780_1319892.html",
         "es": [
-          "Movimientos Resonantes: activa la Campana del Eco y completa tu partitura personal en Alegría, Ira, Lamento o Terror.",
+          "Movimientos Resonantes: activa la Campana del Eco y completa tu partitura personal en Alegría, Ira, Lamento o Terror. Registra 1 punto por recompensa.",
           "La guerra del Eco: hasta cuatro jugadores en Normal o Difícil. El portal aparece 15 minutos después de que empieza la Rueda. Dentro de la instancia tienes 20 minutos para derrotar a El Eco. Registra 1 punto por recompensa en cualquiera de las dos dificultades.",
           "Polvo disonante abre cajas de resonancia; estas entregan Ritmo divino para canjear en la tienda.",
           "Incluye mundos visionales de Islas del Abismo; excluye Manibus Novato.",
           "Canjea las monedas de Gravedad antes del cierre de su tienda el 2 de diciembre (PT)."
         ],
         "en": [
-          "Resonant Movements: ring the Echo Bell and complete your own score in Delight, Wrath, Lament, or Terror.",
+          "Resonant Movements: ring the Echo Bell and complete your own score in Delight, Wrath, Lament, or Terror. Record 1 point per reward.",
           "The Echo War: up to four players in Basic or Hard. The portal appears 15 minutes into the event. You have 20 minutes to defeat The Echo inside the instance. Record 1 point per reward on either difficulty.",
           "Dissonant Dust opens Resonance Boxes; these award Divine Rhythm for the shop.",
           "Includes Isles of Abyss Vision worlds; excludes Manibus Novice.",
@@ -514,9 +514,8 @@
           "names": {
             "en": "Movement of Delight"
           },
-          "points": 0,
-          "enabled": false,
-          "note": "Puntos de recompensa por confirmar."
+          "points": 1,
+          "enabled": true
         },
         {
           "id": "movement-wrath",
@@ -524,9 +523,8 @@
           "names": {
             "en": "Movement of Wrath"
           },
-          "points": 0,
-          "enabled": false,
-          "note": "Puntos de recompensa por confirmar."
+          "points": 1,
+          "enabled": true
         },
         {
           "id": "movement-lament",
@@ -534,9 +532,8 @@
           "names": {
             "en": "Movement of Lament"
           },
-          "points": 0,
-          "enabled": false,
-          "note": "Puntos de recompensa por confirmar."
+          "points": 1,
+          "enabled": true
         },
         {
           "id": "movement-terror",
@@ -544,9 +541,8 @@
           "names": {
             "en": "Movement of Terror"
           },
-          "points": 0,
-          "enabled": false,
-          "note": "Puntos de recompensa por confirmar."
+          "points": 1,
+          "enabled": true
         }
       ],
       "transitionReason": "maintenance-start"

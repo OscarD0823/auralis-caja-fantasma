@@ -95,9 +95,14 @@ assert.equal(newVoice.enabled, true);
 assert.equal(newVoice.nextStartAt, activeEnd + 30 * minute);
 assert.equal(newVoice.singularMessage, "Atención. Resonancia discordante comienza en 1 minuto.");
 assert.equal(resonance.cycleConfirmed, true);
-assert.equal(resonance.activities.length, 6);
-assert.deepEqual(resonance.activities.slice(0, 2).map(activity => [activity.id, activityRewardPoints(activity)]), [["echo-war-basic", 1], ["echo-war-hard", 1]]);
-assert(resonance.activities.slice(2).every(activity => activity.points === 0 && !activity.enabled), "Los Movimientos siguen pendientes de puntos.");
+assert.deepEqual(resonance.activities.map(activity => [activity.id, activityRewardPoints(activity)]), [
+  ["echo-war-basic", 1],
+  ["echo-war-hard", 1],
+  ["movement-delight", 1],
+  ["movement-wrath", 1],
+  ["movement-lament", 1],
+  ["movement-terror", 1],
+]);
 for (const startsAt of ["malformed", "2026-11-18T23:00:00"]) {
   const bad = structuredClone(catalog);
   bad.visions.at(-1)!.startsAt = startsAt;
