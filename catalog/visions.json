@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 65,
-  "updatedAt": "2026-11-19T01:38:09.000Z",
+  "catalogVersion": 66,
+  "updatedAt": "2026-11-19T04:50:23.000Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -475,7 +475,7 @@
       "information": {
         "sourceUrl": "https://www.oncehuman.game/news/update/20261118/40780_1319892.html",
         "es": [
-          "Movimientos Resonantes: activa la Campana del Eco y completa tu partitura personal en Alegría, Ira, Lamento o Terror. Registra 1 punto por recompensa.",
+          "Movimientos Resonantes: activa la Campana del Eco y completa tu partitura personal en Deleite, Ira, Lamento o Terror. Registra 1 punto por recompensa.",
           "La guerra del Eco: hasta cuatro jugadores en Normal o Difícil. El portal aparece 15 minutos después de que empieza la Rueda. Dentro de la instancia tienes 20 minutos para derrotar a El Eco. Registra 1 punto por recompensa en cualquiera de las dos dificultades.",
           "Polvo disonante abre cajas de resonancia; estas entregan Ritmo divino para canjear en la tienda.",
           "Incluye mundos visionales de Islas del Abismo; excluye Manibus Novato.",
@@ -510,7 +510,7 @@
         },
         {
           "id": "movement-delight",
-          "name": "Movimiento de Alegría",
+          "name": "Movimiento de Deleite",
           "names": {
             "en": "Movement of Delight"
           },
