@@ -1,5 +1,6 @@
 import type { Activity, ActivityMapId, Catalog, PointAction } from "./model.ts";
 import type { UiLanguage } from "./i18n.ts";
+import type { PrimeWarDifficulty } from "./activityMaps.ts";
 import names from "../catalog/game-names.json" with { type: "json" };
 
 export function activityMapName(id: ActivityMapId, language: UiLanguage) {
@@ -9,6 +10,16 @@ export function activityMapName(id: ActivityMapId, language: UiLanguage) {
 
 export function activityName(activity: Activity, language: UiLanguage) {
   return language === "es" ? activity.name : activity.names?.[language] ?? activity.names?.en ?? activity.name;
+}
+
+export function primeWarDifficultyName(difficulty: PrimeWarDifficulty, language: UiLanguage) {
+  const labels: Partial<Record<UiLanguage, string>> = names.primeWar.difficulties[difficulty];
+  return labels[language] ?? names.primeWar.difficulties[difficulty].en;
+}
+
+export function primeWarCrateName(crate: number, language: UiLanguage) {
+  const labels: Partial<Record<UiLanguage, string>> = names.primeWar.crates;
+  return `${labels[language] ?? names.primeWar.crates.en} ${crate}`;
 }
 
 export function activityPhaseNames(activity: Activity, activities: readonly Activity[], language: UiLanguage) {

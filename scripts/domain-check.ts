@@ -40,7 +40,7 @@ invalidDisabledSelection.visions.find((vision) => vision.id === "lunar")!.enable
 invalidDisabledSelection.visions.find((vision) => vision.id === invalidDisabledSelection.eventTiming.selectedVisionId)!.enabled = false;
 assert.equal(validateCatalog(invalidDisabledSelection), false, "El administrador no puede publicar como actual una rueda desactivada.");
 assert.equal(sharedVisionId(invalidDisabledSelection, "gravity", publicationNow), "lunar", "Si una copia antigua apunta a una rueda desactivada debe usar la primera habilitada.");
-for (const id of ["pro-monolith-boss", "pro-silo", "dream-manibus-challenge", "pro-war", "manibus-manibus", "dream-zone-invasion", "dreamer-light", "dreamer-deep", "dreamer-eternal"]) {
+for (const id of ["pro-monolith-boss", "pro-silo", "dream-manibus-challenge", "prime-war-pro-crate-1", "manibus-manibus", "dream-zone-invasion", "dreamer-light", "dreamer-deep", "dreamer-eternal", "prism-crisis-event"]) {
   assert.ok(catalog.proActivities.some((item) => item.id === id), `Falta la recompensa editable ${id}.`);
 }
 const calamityBosses = [

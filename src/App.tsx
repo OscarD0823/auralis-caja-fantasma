@@ -205,6 +205,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.32.0", date: "20 de noviembre de 2026", title: "Cajas de Manibus y Prismaverso", items: ["En Guerras primigenias, elige Normal, Difícil, Pro o Pesadilla / Apocalipsis y suma 1 punto por cada caja que reclames.", "Choque con el Prismaverso tiene su propia pestaña. Cada recompensa de Eventos de crisis suma 1 punto."] },
   { version: "1.31.3", date: "19 de noviembre de 2026", title: "Recompensas de la rueda en Caja", items: ["El Eco y los Movimientos Resonantes aparecen en secciones separadas, con botones más cómodos para registrar puntos en el celular.", "Movimiento de Deleite figura con el nombre del juego y suma 1 punto por recompensa."] },
   { version: "1.31.2", date: "18 de noviembre de 2026", title: "Puntos de los Movimientos Resonantes", items: ["Deleite, Ira, Lamento y Terror suman 1 punto por recompensa.", "Los cuatro botones están disponibles en Caja, en las recompensas de Resonancia discordante."] },
   { version: "1.31.1", date: "18 de noviembre de 2026", title: "El Eco en los contadores", items: ["El Eco suma 1 punto por recompensa en Normal y Difícil.", "Durante Resonancia discordante se ocultan el correo de Plataformas y los ajustes de Ballena.", "El reloj del portal del Eco aparece también en el contador flotante."] },
@@ -2252,10 +2253,11 @@ export default function App() {
               </article>
             </div>
 
-            <ActivityMapBoard activities={state.catalog.proActivities} vision={selectedVision} language={language} onViewVision={() => setTab("vision")} renderActivity={(activity, vision) => <ActivityCard
+            <ActivityMapBoard activities={state.catalog.proActivities} vision={selectedVision} language={language} onViewVision={() => setTab("vision")} renderActivity={(activity, vision, displayName) => <ActivityCard
                 key={`${vision?.id ?? "map"}:${activity.id}`}
                 language={language}
                 activity={activity}
+                displayName={displayName}
                 phaseNames={activityPhaseNames(activity, state.catalog.proActivities, language)}
                 disabled={!teamReady || (vision !== undefined && !vision.enabled)}
                 currentCount={currentPointRoundActions.filter((action) => action.visionId === vision?.id && action.activityId === activity.id).length}
@@ -2616,14 +2618,14 @@ function VisionAtmosphere({ visionId, active }: { visionId?: string; active: boo
   </div>;
 }
 
-function ActivityCard({ activity, phaseNames, currentCount, dailyCount, totalCount, language, disabled = false, onAdd, onRemove }: { activity: Activity; phaseNames?: string[]; currentCount: number; dailyCount: number; totalCount: number; language: UiLanguage; disabled?: boolean; onAdd: (phase?: RewardPhase) => void; onRemove: () => void }) {
+function ActivityCard({ activity, displayName, phaseNames, currentCount, dailyCount, totalCount, language, disabled = false, onAdd, onRemove }: { activity: Activity; displayName?: string; phaseNames?: string[]; currentCount: number; dailyCount: number; totalCount: number; language: UiLanguage; disabled?: boolean; onAdd: (phase?: RewardPhase) => void; onRemove: () => void }) {
   const english = language !== "es";
   const name = activityName(activity, language);
   const inactive = disabled || !activity.enabled || activity.points <= 0;
   return (
     <article className={`activity-card ${activity.phaseCount ? "phase-activity-card" : ""} ${inactive ? "disabled" : ""}`} title={activity.note}>
       <div className="activity-points"><strong>{activity.phaseCount ? "1–3" : activity.points > 0 ? activity.points : "?"}</strong><small>PTS</small></div>
-      <div className="activity-copy"><strong title={activity.names?.en}>{name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
+      <div className="activity-copy"><strong title={activity.names?.en}>{displayName ?? name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
       {activity.phaseCount && <div className="activity-phases" role="group" aria-label={`${name} · ${english ? "Highest phase reached" : "Fase más alta alcanzada"}`}>
         {REWARD_PHASES.map((phase) => <button key={phase} type="button" disabled={inactive} onClick={() => onAdd(phase)}>
           <span>{translate(language, "Fase", "Phase")} {phase}</span>{phaseNames?.[phase - 1] && <span className="phase-boss-name">{phaseNames[phase - 1]}</span>}<strong>+{phase}</strong>

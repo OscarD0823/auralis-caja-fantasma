@@ -66,20 +66,20 @@
 }
 .vision-reward-block h3 { margin: 0 0 8px; font-size: 12px; line-height: 1.3; color: #c2e8e2; }
 .reward-block-echo h3 { color: #e6cf9c; }
-.activity-board .vision-reward-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-.activity-board .vision-reward-grid .activity-card:not(.phase-activity-card) {
+.activity-board .compact-activity-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.activity-board .compact-activity-grid .activity-card:not(.phase-activity-card) {
   grid-template: "points name controls" auto "points stats controls" auto / 29px minmax(0, 1fr) auto;
   gap: 3px 6px;
   align-content: center;
   min-height: 62px;
   padding: 7px;
 }
-.vision-reward-grid .activity-card:not(.phase-activity-card) .activity-points { grid-area: points; align-self: center; }
-.vision-reward-grid .activity-card:not(.phase-activity-card) .activity-copy { grid-area: name; min-width: 0; overflow-wrap: anywhere; }
-.activity-board .vision-reward-grid .activity-card:not(.phase-activity-card) .activity-counts { display: contents; }
-.vision-reward-grid .activity-card:not(.phase-activity-card) .activity-counter { grid-area: controls; align-self: center; gap: 3px; }
-.activity-board .vision-reward-grid .activity-counter > span { min-width: 18px; }
-.activity-board .vision-reward-grid .activity-card:not(.phase-activity-card) .activity-counts > small {
+.compact-activity-grid .activity-card:not(.phase-activity-card) .activity-points { grid-area: points; align-self: center; }
+.compact-activity-grid .activity-card:not(.phase-activity-card) .activity-copy { grid-area: name; min-width: 0; overflow-wrap: anywhere; }
+.activity-board .compact-activity-grid .activity-card:not(.phase-activity-card) .activity-counts { display: contents; }
+.compact-activity-grid .activity-card:not(.phase-activity-card) .activity-counter { grid-area: controls; align-self: center; gap: 3px; }
+.activity-board .compact-activity-grid .activity-counter > span { min-width: 18px; }
+.activity-board .compact-activity-grid .activity-card:not(.phase-activity-card) .activity-counts > small {
   grid-area: stats;
   max-width: none;
   text-align: start;
@@ -104,13 +104,28 @@
 .scenario-activity-panel.map-dream { --map-accent: #bbacff; }
 .scenario-activity-panel.map-abyss { --map-accent: #69cbe9; }
 .scenario-activity-panel.map-winter { --map-accent: #b1e2fd; }
+.scenario-activity-panel.map-prism { --map-accent: #e4a9eb; }
 .scenario-activity-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
 .scenario-activity-heading .eyebrow { font-size: 8px; color: var(--map-accent); }
 .scenario-activity-heading p { margin: 4px 0 0; color: #9bb5bc; font-size: 10px; }
-.activity-map-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
-.activity-map-tabs > button { min-height: 40px; padding: 7px 10px; display: flex; align-items: center; gap: 7px; border: 1px solid #58777b66; border-radius: 5px; color: #a8bfc5; background: #0b1a25; cursor: pointer; font-size: 12px; }
-.activity-map-tabs > button.selected { border-color: var(--map-accent); color: #effffb; background: #223c44; box-shadow: inset 0 -2px var(--map-accent); }
+.activity-map-tabs, .prime-war-difficulties { display: flex; gap: 5px; flex-wrap: wrap; }
+.activity-map-tabs > button, .prime-war-difficulties > button { min-height: 40px; padding: 7px 10px; display: flex; align-items: center; gap: 7px; border: 1px solid #58777b66; border-radius: 5px; color: #a8bfc5; background: #0b1a25; cursor: pointer; font-size: 12px; }
+.activity-map-tabs > button.selected, .prime-war-difficulties > button[aria-pressed="true"] { border-color: var(--map-accent); color: #effffb; background: #223c44; box-shadow: inset 0 -2px var(--map-accent); }
 .activity-map-tabs > button > small { min-width: 17px; padding: 2px 4px; border-radius: 3px; background: #ffffff0d; font-size: 9px; }
+.scenario-map-rewards { display: grid; gap: 12px; }
+.prime-war-rewards {
+  container: prime-war / inline-size;
+  padding: 10px;
+  border: 1px solid #d6b57c55;
+  border-radius: 6px;
+  background: #081923;
+}
+.prime-war-rewards > header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 9px; }
+.prime-war-rewards h3 { margin: 0; font-size: 13px; color: #e6cf9c; }
+.prime-war-difficulties > button { justify-content: center; overflow-wrap: anywhere; }
+@container prime-war (min-width: 675px) {
+  .activity-board .prime-war-crates { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 .activity-board .map-activity-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .phase-activity-card .activity-points strong { font-size: 12px; }
 .activity-phases { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
@@ -174,13 +189,14 @@
   .progress-page .chance-card > p { display: none; }
   .common-activity-groups { grid-template-columns: minmax(0, 1fr); }
   .activity-board .activity-counter > button { height: 44px; }
-  .activity-board .vision-reward-grid .activity-counter > button:first-child { width: 44px; }
+  .activity-board .compact-activity-grid .activity-counter > button:first-child { width: 44px; }
   .activity-board .activity-card { padding: 10px; }
   .activity-board .phase-activity-card { grid-column: 1 / -1; }
   .activity-phases > button { min-height: 44px; }
   .progress-page > .home-overlay-controls { grid-template-columns: minmax(0, 1fr); }
-  .activity-map-tabs { width: 100%; display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; }
-  .activity-map-tabs > button { justify-content: center; padding: 9px 5px; font-size: 11px; min-height: 44px; }
+  .activity-map-tabs { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .prime-war-difficulties { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.75fr); }
+  .activity-map-tabs > button, .prime-war-difficulties > button { justify-content: center; padding: 9px 5px; font-size: 11px; min-height: 44px; }
   .activity-map-tabs > button > small { display: none; }
   .scenario-activity-panel { padding: 10px; }
   .activity-editor.has-map { grid-template-columns: minmax(0, 1fr); }

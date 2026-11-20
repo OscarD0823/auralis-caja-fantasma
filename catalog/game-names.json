@@ -57,10 +57,97 @@
       "ko": "혹독한 겨울",
       "zh": "雪国人生",
       "es": "El camino del invierno"
+    },
+    "prism": {
+      "es": "Choque con el Prismaverso",
+      "en": "Prismverse's Clash",
+      "pt": "Confronto do Prismaverso",
+      "fr": "L'affrontement du Prismevers",
+      "de": "Prismaversum-Zusammenprall"
+    }
+  },
+  "primeWar": {
+    "crates": {
+      "es": "Caja",
+      "en": "Crate",
+      "pt": "Caixa",
+      "fr": "Caisse",
+      "de": "Kiste",
+      "it": "Cassa",
+      "pl": "Skrzynia",
+      "tr": "Sandık",
+      "ru": "Ящик",
+      "ja": "報酬箱",
+      "ko": "보상 상자",
+      "zh": "奖励箱"
+    },
+    "difficulties": {
+      "normal": {
+        "es": "Normal",
+        "en": "Normal",
+        "pt": "Normal",
+        "fr": "Normal",
+        "de": "Normal",
+        "it": "Normale",
+        "pl": "Normalny",
+        "tr": "Normal",
+        "ru": "Обычный",
+        "ja": "ノーマル",
+        "ko": "일반",
+        "zh": "普通"
+      },
+      "hard": {
+        "es": "Difícil",
+        "en": "Hard",
+        "pt": "Difícil",
+        "fr": "Difficile",
+        "de": "Schwer",
+        "it": "Difficile",
+        "pl": "Trudny",
+        "tr": "Zor",
+        "ru": "Сложный",
+        "ja": "ハード",
+        "ko": "어려움",
+        "zh": "困难"
+      },
+      "pro": {
+        "es": "Pro",
+        "en": "Pro",
+        "pt": "Pro",
+        "fr": "Pro",
+        "de": "Pro",
+        "it": "Pro",
+        "pl": "Pro",
+        "tr": "Pro",
+        "ru": "Профи",
+        "ja": "プロ",
+        "ko": "전문가",
+        "zh": "专家"
+      },
+      "nightmare-apocalypse": {
+        "es": "Pesadilla / Apocalipsis",
+        "en": "Nightmare / Apocalypse",
+        "pt": "Pesadelo / Apocalipse",
+        "fr": "Cauchemar / Apocalypse",
+        "de": "Albtraum / Apokalypse",
+        "it": "Incubo / Apocalisse",
+        "pl": "Koszmar / Apokalipsa",
+        "tr": "Kâbus / Kıyamet",
+        "ru": "Кошмар / Апокалипсис",
+        "ja": "ナイトメア / アポカリプス",
+        "ko": "악몽 / 아포칼립스",
+        "zh": "噩梦 / 天启"
+      }
     }
   },
   "sources": [
     "https://www.oncehuman.game/news/update/20261021/40780_1317280.html",
+    "https://www.oncehuman.game/news/update/20250318/40780_1219962.html",
+    "https://www.oncehuman.game/es/news/update/20240924/41114_1182722.html",
+    "https://www.oncehuman.game/news/update/20240924/40780_1182732.html",
+    "https://www.oncehuman.game/pt/news/update/20241009/41108_1185613.html",
+    "https://www.oncehuman.game/fr/news/update/20240924/40788_1182735.html",
+    "https://www.oncehuman.game/de/news/update/20240924/40796_1182724.html",
     "https://oncehuman.th.gl/es/maps/El%20camino%20del%20invierno",
     "https://wikily.gg/es-419/once-human/items/30380004",
     "https://wikily.gg/fr/once-human/items/30380004/",

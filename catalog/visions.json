@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": 66,
-  "updatedAt": "2026-11-19T04:50:23.000Z",
+  "catalogVersion": 67,
+  "updatedAt": "2026-11-20T22:25:37.031Z",
   "updatedBy": "OscarD0823",
   "boxTargetPoints": 1000,
   "eventTiming": {
@@ -53,21 +53,219 @@
       }
     },
     {
-      "id": "pro-war",
-      "name": "Guerra Pro",
-      "points": 2,
+      "id": "prime-war-normal-crate-1",
+      "name": "Guerra primigenia · Normal · Caja 1",
+      "points": 1,
       "enabled": true,
-      "note": "Recompensa reclamada de la guerra.",
+      "note": "Suma 1 punto al reclamar esta caja.",
       "mapId": "manibus",
       "names": {
-        "en": "The Prime War · Pro",
-        "pt": "Guerra Primordial · Pro",
-        "fr": "Guerre primordiale · Pro",
-        "de": "Urkrieg · Pro",
-        "ru": "Первая война · Pro",
-        "ja": "根源の戦い · Pro",
-        "ko": "근원전 · Pro",
-        "zh": "根源之战 · 专家"
+        "en": "The Prime War · Normal · Crate 1",
+        "pt": "Guerra Primordial · Normal · Caixa 1",
+        "fr": "Guerre primordiale · Normal · Caisse 1",
+        "de": "Urkrieg · Normal · Kiste 1",
+        "ru": "Первая война · Обычный · Ящик 1",
+        "ja": "根源の戦い · ノーマル · 報酬箱 1",
+        "ko": "근원전 · 일반 · 보상 상자 1",
+        "zh": "根源之战 · 普通 · 奖励箱 1"
+      }
+    },
+    {
+      "id": "prime-war-normal-crate-2",
+      "name": "Guerra primigenia · Normal · Caja 2",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Normal · Crate 2",
+        "pt": "Guerra Primordial · Normal · Caixa 2",
+        "fr": "Guerre primordiale · Normal · Caisse 2",
+        "de": "Urkrieg · Normal · Kiste 2",
+        "ru": "Первая война · Обычный · Ящик 2",
+        "ja": "根源の戦い · ノーマル · 報酬箱 2",
+        "ko": "근원전 · 일반 · 보상 상자 2",
+        "zh": "根源之战 · 普通 · 奖励箱 2"
+      }
+    },
+    {
+      "id": "prime-war-normal-crate-3",
+      "name": "Guerra primigenia · Normal · Caja 3",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Normal · Crate 3",
+        "pt": "Guerra Primordial · Normal · Caixa 3",
+        "fr": "Guerre primordiale · Normal · Caisse 3",
+        "de": "Urkrieg · Normal · Kiste 3",
+        "ru": "Первая война · Обычный · Ящик 3",
+        "ja": "根源の戦い · ノーマル · 報酬箱 3",
+        "ko": "근원전 · 일반 · 보상 상자 3",
+        "zh": "根源之战 · 普通 · 奖励箱 3"
+      }
+    },
+    {
+      "id": "prime-war-hard-crate-1",
+      "name": "Guerra primigenia · Difícil · Caja 1",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Hard · Crate 1",
+        "pt": "Guerra Primordial · Difícil · Caixa 1",
+        "fr": "Guerre primordiale · Difficile · Caisse 1",
+        "de": "Urkrieg · Schwer · Kiste 1",
+        "ru": "Первая война · Сложный · Ящик 1",
+        "ja": "根源の戦い · ハード · 報酬箱 1",
+        "ko": "근원전 · 어려움 · 보상 상자 1",
+        "zh": "根源之战 · 困难 · 奖励箱 1"
+      }
+    },
+    {
+      "id": "prime-war-hard-crate-2",
+      "name": "Guerra primigenia · Difícil · Caja 2",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Hard · Crate 2",
+        "pt": "Guerra Primordial · Difícil · Caixa 2",
+        "fr": "Guerre primordiale · Difficile · Caisse 2",
+        "de": "Urkrieg · Schwer · Kiste 2",
+        "ru": "Первая война · Сложный · Ящик 2",
+        "ja": "根源の戦い · ハード · 報酬箱 2",
+        "ko": "근원전 · 어려움 · 보상 상자 2",
+        "zh": "根源之战 · 困难 · 奖励箱 2"
+      }
+    },
+    {
+      "id": "prime-war-hard-crate-3",
+      "name": "Guerra primigenia · Difícil · Caja 3",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Hard · Crate 3",
+        "pt": "Guerra Primordial · Difícil · Caixa 3",
+        "fr": "Guerre primordiale · Difficile · Caisse 3",
+        "de": "Urkrieg · Schwer · Kiste 3",
+        "ru": "Первая война · Сложный · Ящик 3",
+        "ja": "根源の戦い · ハード · 報酬箱 3",
+        "ko": "근원전 · 어려움 · 보상 상자 3",
+        "zh": "根源之战 · 困难 · 奖励箱 3"
+      }
+    },
+    {
+      "id": "prime-war-pro-crate-1",
+      "name": "Guerra primigenia · Pro · Caja 1",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Pro · Crate 1",
+        "pt": "Guerra Primordial · Pro · Caixa 1",
+        "fr": "Guerre primordiale · Pro · Caisse 1",
+        "de": "Urkrieg · Pro · Kiste 1",
+        "ru": "Первая война · Профи · Ящик 1",
+        "ja": "根源の戦い · プロ · 報酬箱 1",
+        "ko": "근원전 · 전문가 · 보상 상자 1",
+        "zh": "根源之战 · 专家 · 奖励箱 1"
+      }
+    },
+    {
+      "id": "prime-war-pro-crate-2",
+      "name": "Guerra primigenia · Pro · Caja 2",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Pro · Crate 2",
+        "pt": "Guerra Primordial · Pro · Caixa 2",
+        "fr": "Guerre primordiale · Pro · Caisse 2",
+        "de": "Urkrieg · Pro · Kiste 2",
+        "ru": "Первая война · Профи · Ящик 2",
+        "ja": "根源の戦い · プロ · 報酬箱 2",
+        "ko": "근원전 · 전문가 · 보상 상자 2",
+        "zh": "根源之战 · 专家 · 奖励箱 2"
+      }
+    },
+    {
+      "id": "prime-war-pro-crate-3",
+      "name": "Guerra primigenia · Pro · Caja 3",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Pro · Crate 3",
+        "pt": "Guerra Primordial · Pro · Caixa 3",
+        "fr": "Guerre primordiale · Pro · Caisse 3",
+        "de": "Urkrieg · Pro · Kiste 3",
+        "ru": "Первая война · Профи · Ящик 3",
+        "ja": "根源の戦い · プロ · 報酬箱 3",
+        "ko": "근원전 · 전문가 · 보상 상자 3",
+        "zh": "根源之战 · 专家 · 奖励箱 3"
+      }
+    },
+    {
+      "id": "prime-war-nightmare-apocalypse-crate-1",
+      "name": "Guerra primigenia · Pesadilla / Apocalipsis · Caja 1",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Nightmare / Apocalypse · Crate 1",
+        "pt": "Guerra Primordial · Pesadelo / Apocalipse · Caixa 1",
+        "fr": "Guerre primordiale · Cauchemar / Apocalypse · Caisse 1",
+        "de": "Urkrieg · Albtraum / Apokalypse · Kiste 1",
+        "ru": "Первая война · Кошмар / Апокалипсис · Ящик 1",
+        "ja": "根源の戦い · ナイトメア / アポカリプス · 報酬箱 1",
+        "ko": "근원전 · 악몽 / 아포칼립스 · 보상 상자 1",
+        "zh": "根源之战 · 噩梦 / 天启 · 奖励箱 1"
+      }
+    },
+    {
+      "id": "prime-war-nightmare-apocalypse-crate-2",
+      "name": "Guerra primigenia · Pesadilla / Apocalipsis · Caja 2",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Nightmare / Apocalypse · Crate 2",
+        "pt": "Guerra Primordial · Pesadelo / Apocalipse · Caixa 2",
+        "fr": "Guerre primordiale · Cauchemar / Apocalypse · Caisse 2",
+        "de": "Urkrieg · Albtraum / Apokalypse · Kiste 2",
+        "ru": "Первая война · Кошмар / Апокалипсис · Ящик 2",
+        "ja": "根源の戦い · ナイトメア / アポカリプス · 報酬箱 2",
+        "ko": "근원전 · 악몽 / 아포칼립스 · 보상 상자 2",
+        "zh": "根源之战 · 噩梦 / 天启 · 奖励箱 2"
+      }
+    },
+    {
+      "id": "prime-war-nightmare-apocalypse-crate-3",
+      "name": "Guerra primigenia · Pesadilla / Apocalipsis · Caja 3",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar esta caja.",
+      "mapId": "manibus",
+      "names": {
+        "en": "The Prime War · Nightmare / Apocalypse · Crate 3",
+        "pt": "Guerra Primordial · Pesadelo / Apocalipse · Caixa 3",
+        "fr": "Guerre primordiale · Cauchemar / Apocalypse · Caisse 3",
+        "de": "Urkrieg · Albtraum / Apokalypse · Kiste 3",
+        "ru": "Первая война · Кошмар / Апокалипсис · Ящик 3",
+        "ja": "根源の戦い · ナイトメア / アポカリプス · 報酬箱 3",
+        "ko": "근원전 · 악몽 / 아포칼립스 · 보상 상자 3",
+        "zh": "根源之战 · 噩梦 / 天启 · 奖励箱 3"
       }
     },
     {
@@ -345,6 +543,20 @@
         "ja": "エクスターミネーター",
         "ko": "엔드브링어",
         "zh": "灭绝者"
+      }
+    },
+    {
+      "id": "prism-crisis-event",
+      "name": "Eventos de crisis",
+      "points": 1,
+      "enabled": true,
+      "note": "Suma 1 punto al reclamar la recompensa del evento de crisis.",
+      "mapId": "prism",
+      "names": {
+        "en": "Public Crisis Events",
+        "pt": "Eventos de Crise Pública",
+        "fr": "Situations de crise",
+        "de": "Öffentliche Notstand-Events"
       }
     }
   ],

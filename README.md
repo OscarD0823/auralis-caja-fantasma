@@ -16,7 +16,7 @@ Las descargas llevan a la **última versión publicada**, no a versiones en prep
 
 **¿Tienes una versión anterior a 1.25.0?** En Windows, descarga el instalador y ejecútalo sobre tu copia actual para conservar el progreso. Este paso se hace una vez. En Android, exporta el respaldo desde la anterior e impórtalo en la nueva. [Guía de actualización](https://oscard0823.github.io/auralis-caja-fantasma/actualizar.html)
 
-**1.31.3 · Recompensas de la rueda en Caja.** El Eco y los Movimientos Resonantes tienen secciones separadas con controles adaptados a PC y celular. Cada recompensa suma 1 punto. [Qué cambió](docs/versiones/NOTAS-VERSION-1.31.3.md) · [Historial de versiones](docs/versiones/).
+**1.32.0 · Cajas de Manibus y Prismaverso.** Registra las tres cajas de cada dificultad de Guerra primigenia por separado. Choque con el Prismaverso tiene un contador para Eventos de crisis. Cada caja y cada recompensa de crisis suman 1 punto. [Qué cambió](docs/versiones/NOTAS-VERSION-1.32.0.md) · [Historial de versiones](docs/versiones/).
 
 ## Empieza en un minuto
 

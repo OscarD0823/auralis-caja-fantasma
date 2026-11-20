@@ -1,19 +1,21 @@
 import { useRef, useState, type ReactNode } from "react";
-import { ChevronRight, Moon, Snowflake, Swords, Waves } from "lucide-react";
+import { ChevronRight, Gem, Moon, Snowflake, Swords, Waves } from "lucide-react";
 import type { Activity, ActivityMapId, Vision } from "./model";
-import { activitiesByMap } from "./activityMaps";
+import { activitiesByMap, isPrimeWarCrate, PRIME_WAR_CRATES, PRIME_WAR_DIFFICULTIES, primeWarCrateId, type PrimeWarDifficulty } from "./activityMaps";
 import type { UiLanguage } from "./i18n";
-import { activityMapName } from "./gameNames";
+import { activityMapName, primeWarCrateName, primeWarDifficultyName } from "./gameNames";
 
 const MAP_PREFERENCE = "caja-fantasma.activity-map.v1";
-const MAP_ICONS = { manibus: Swords, dream: Moon, abyss: Waves, winter: Snowflake };
+const PRIME_WAR_PREFERENCE = "caja-fantasma.prime-war-difficulty";
+const MAP_ICONS = { manibus: Swords, dream: Moon, abyss: Waves, winter: Snowflake, prism: Gem };
 type ScenarioMapId = Exclude<ActivityMapId, "general">;
+type RenderActivity = (activity: Activity, vision?: Vision, displayName?: string) => ReactNode;
 
 export default function ActivityMapBoard({ activities, vision, language, renderActivity, onViewVision }: {
   activities: Activity[];
   vision?: Vision;
   language: UiLanguage;
-  renderActivity: (activity: Activity, vision?: Vision) => ReactNode;
+  renderActivity: RenderActivity;
   onViewVision: () => void;
 }) {
   const english = language !== "es";
@@ -36,6 +38,10 @@ export default function ActivityMapBoard({ activities, vision, language, renderA
   });
   const tabs = useRef<HTMLDivElement>(null);
   const active = scenarios.find((map) => map.id === selected)!;
+  const primeWarActivities = active.id === "manibus" ? active.activities.filter((activity) => isPrimeWarCrate(activity.id)) : [];
+  const mapActivities = primeWarActivities.length > 0
+    ? active.activities.filter((activity) => activity.id !== "pro-war" && !isPrimeWarCrate(activity.id))
+    : active.activities;
   const select = (id: ScenarioMapId) => {
     setSelected(id);
     try { localStorage.setItem(MAP_PREFERENCE, id); } catch { /* Preference only. */ }
@@ -58,7 +64,7 @@ export default function ActivityMapBoard({ activities, vision, language, renderA
           {wheelGroups.map((group) => (
             <section key={group.id} className={`vision-reward-block reward-block-${group.id}`} aria-labelledby={`wheel-rewards-${group.id}`}>
               <h3 id={`wheel-rewards-${group.id}`}>{group.title}</h3>
-              <div className="activity-grid vision-reward-grid">{group.activities.map((activity) => renderActivity(activity, vision))}</div>
+              <div className="activity-grid compact-activity-grid vision-reward-grid">{group.activities.map((activity) => renderActivity(activity, vision))}</div>
             </section>
           ))}
         </div>
@@ -89,7 +95,45 @@ export default function ActivityMapBoard({ activities, vision, language, renderA
           })}
         </div>
       </div>
-      <div id="activity-map-panel" role="tabpanel" aria-labelledby={`activity-map-tab-${selected}`} tabIndex={0} className="activity-grid map-activity-grid">{active.activities.length ? active.activities.map((activity) => renderActivity(activity)) : <p className="activity-map-empty">{english ? "No activities configured for this map yet." : "Aún no hay actividades configuradas para este mapa."}</p>}</div>
+      <div id="activity-map-panel" role="tabpanel" aria-labelledby={`activity-map-tab-${selected}`} tabIndex={0} className="scenario-map-rewards">
+        {primeWarActivities.length > 0 && <PrimeWarRewards activities={primeWarActivities} language={language} renderActivity={renderActivity} />}
+        {mapActivities.length > 0 && <div className="activity-grid map-activity-grid">{mapActivities.map((activity) => renderActivity(activity))}</div>}
+        {active.activities.length === 0 && <p className="activity-map-empty">{english ? "No activities configured for this map yet." : "Aún no hay actividades configuradas para este mapa."}</p>}
+      </div>
     </section>
+  </section>;
+}
+
+function PrimeWarRewards({ activities, language, renderActivity }: { activities: Activity[]; language: UiLanguage; renderActivity: RenderActivity }) {
+  const english = language !== "es";
+  const [preferredDifficulty, setPreferredDifficulty] = useState<PrimeWarDifficulty>(() => {
+    try {
+      const saved = localStorage.getItem(PRIME_WAR_PREFERENCE);
+      return PRIME_WAR_DIFFICULTIES.find((difficulty) => difficulty === saved) ?? "pro";
+    } catch {
+      return "pro";
+    }
+  });
+  const groups = PRIME_WAR_DIFFICULTIES.map((difficulty) => ({
+    difficulty,
+    crates: PRIME_WAR_CRATES.flatMap((number) => {
+      const activity = activities.find((crate) => crate.id === primeWarCrateId(difficulty, number));
+      return activity ? [{ number, activity }] : [];
+    }),
+  })).filter((group) => group.crates.length > 0);
+  const selected = groups.find((group) => group.difficulty === preferredDifficulty) ?? groups[0];
+  if (!selected) return null;
+
+  return <section className="prime-war-rewards" aria-labelledby="prime-war-rewards-title">
+    <header>
+      <h3 id="prime-war-rewards-title">{english ? "The Prime War" : "Guerras primigenias"}</h3>
+      <div className="prime-war-difficulties" role="group" aria-label={english ? "War difficulty" : "Dificultad de la guerra"}>
+        {groups.map(({ difficulty }) => <button key={difficulty} type="button" aria-pressed={selected.difficulty === difficulty} onClick={() => {
+          setPreferredDifficulty(difficulty);
+          try { localStorage.setItem(PRIME_WAR_PREFERENCE, difficulty); } catch { /* Preference only. */ }
+        }}>{primeWarDifficultyName(difficulty, language)}</button>)}
+      </div>
+    </header>
+    <div className="activity-grid compact-activity-grid prime-war-crates">{selected.crates.map(({ number, activity }) => renderActivity(activity, undefined, primeWarCrateName(number, language)))}</div>
   </section>;
 }
