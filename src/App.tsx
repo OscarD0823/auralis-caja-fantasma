@@ -205,6 +205,7 @@ const TABS: Array<{ id: TabId; es: string; en: string; icon: typeof Box }> = [
 ];
 
 const CHANGELOG = [
+  { version: "1.32.1", date: "20 de noviembre de 2026", title: "Las tres cajas de Manibus juntas", items: ["Las tres cajas están en una sola tarjeta, con botones como los del Laboratorio LEA.", "Elige la dificultad y suma 1 punto por cada caja reclamada. Eventos de crisis de Prismaverso también suma 1 punto por recompensa."] },
   { version: "1.32.0", date: "20 de noviembre de 2026", title: "Cajas de Manibus y Prismaverso", items: ["En Guerras primigenias, elige Normal, Difícil, Pro o Pesadilla / Apocalipsis y suma 1 punto por cada caja que reclames.", "Choque con el Prismaverso tiene su propia pestaña. Cada recompensa de Eventos de crisis suma 1 punto."] },
   { version: "1.31.3", date: "19 de noviembre de 2026", title: "Recompensas de la rueda en Caja", items: ["El Eco y los Movimientos Resonantes aparecen en secciones separadas, con botones más cómodos para registrar puntos en el celular.", "Movimiento de Deleite figura con el nombre del juego y suma 1 punto por recompensa."] },
   { version: "1.31.2", date: "18 de noviembre de 2026", title: "Puntos de los Movimientos Resonantes", items: ["Deleite, Ira, Lamento y Terror suman 1 punto por recompensa.", "Los cuatro botones están disponibles en Caja, en las recompensas de Resonancia discordante."] },
@@ -2253,11 +2254,11 @@ export default function App() {
               </article>
             </div>
 
-            <ActivityMapBoard activities={state.catalog.proActivities} vision={selectedVision} language={language} onViewVision={() => setTab("vision")} renderActivity={(activity, vision, displayName) => <ActivityCard
+            <ActivityMapBoard activities={state.catalog.proActivities} vision={selectedVision} language={language} onViewVision={() => setTab("vision")} renderActivity={(activity, vision, crateLabel) => <ActivityCard
                 key={`${vision?.id ?? "map"}:${activity.id}`}
                 language={language}
                 activity={activity}
-                displayName={displayName}
+                crateLabel={crateLabel}
                 phaseNames={activityPhaseNames(activity, state.catalog.proActivities, language)}
                 disabled={!teamReady || (vision !== undefined && !vision.enabled)}
                 currentCount={currentPointRoundActions.filter((action) => action.visionId === vision?.id && action.activityId === activity.id).length}
@@ -2618,27 +2619,37 @@ function VisionAtmosphere({ visionId, active }: { visionId?: string; active: boo
   </div>;
 }
 
-function ActivityCard({ activity, displayName, phaseNames, currentCount, dailyCount, totalCount, language, disabled = false, onAdd, onRemove }: { activity: Activity; displayName?: string; phaseNames?: string[]; currentCount: number; dailyCount: number; totalCount: number; language: UiLanguage; disabled?: boolean; onAdd: (phase?: RewardPhase) => void; onRemove: () => void }) {
+function ActivityCard({ activity, crateLabel, phaseNames, currentCount, dailyCount, totalCount, language, disabled = false, onAdd, onRemove }: { activity: Activity; crateLabel?: string; phaseNames?: string[]; currentCount: number; dailyCount: number; totalCount: number; language: UiLanguage; disabled?: boolean; onAdd: (phase?: RewardPhase) => void; onRemove: () => void }) {
   const english = language !== "es";
   const name = activityName(activity, language);
   const inactive = disabled || !activity.enabled || activity.points <= 0;
+  const addLabel = `${english ? "Add" : "Sumar"} ${name}`;
+  const counts = <div className="activity-counts">
+    <div className="activity-counter">
+      <button type="button" aria-label={`${english ? "Remove one" : "Quitar una de"} ${name}`} disabled={currentCount === 0} onClick={onRemove}><Minus size={15} /></button>
+      <span aria-label={`${currentCount} ${english ? "in the current round" : "en la ronda actual"}`}>{currentCount}</span>
+      {!activity.phaseCount && !crateLabel && <button type="button" aria-label={addLabel} disabled={inactive} onClick={() => onAdd()}><Plus size={19} /></button>}
+    </div>
+    <small>{translate(language, "Hoy", "Today")}&nbsp;{dailyCount} · {translate(language, "Histórico", "All time")}&nbsp;{totalCount}</small>
+  </div>;
+  if (crateLabel) {
+    return <div className="prime-war-crate" title={activity.note}>
+      <button className="activity-reward-button" type="button" aria-label={addLabel} disabled={inactive} onClick={() => onAdd()}>
+        <span>{crateLabel}</span><strong>+{activity.points}</strong>
+      </button>
+      {counts}
+    </div>;
+  }
   return (
     <article className={`activity-card ${activity.phaseCount ? "phase-activity-card" : ""} ${inactive ? "disabled" : ""}`} title={activity.note}>
       <div className="activity-points"><strong>{activity.phaseCount ? "1–3" : activity.points > 0 ? activity.points : "?"}</strong><small>PTS</small></div>
-      <div className="activity-copy"><strong title={activity.names?.en}>{displayName ?? name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
+      <div className="activity-copy"><strong title={activity.names?.en}>{name}</strong><span>{activity.note ?? (english ? "Claimed reward" : "Recompensa reclamada")}</span></div>
       {activity.phaseCount && <div className="activity-phases" role="group" aria-label={`${name} · ${english ? "Highest phase reached" : "Fase más alta alcanzada"}`}>
-        {REWARD_PHASES.map((phase) => <button key={phase} type="button" disabled={inactive} onClick={() => onAdd(phase)}>
+        {REWARD_PHASES.map((phase) => <button key={phase} className="activity-reward-button" type="button" disabled={inactive} onClick={() => onAdd(phase)}>
           <span>{translate(language, "Fase", "Phase")} {phase}</span>{phaseNames?.[phase - 1] && <span className="phase-boss-name">{phaseNames[phase - 1]}</span>}<strong>+{phase}</strong>
         </button>)}
       </div>}
-      <div className="activity-counts">
-        <div className="activity-counter">
-          <button type="button" aria-label={`${english ? "Remove one" : "Quitar una de"} ${name}`} disabled={currentCount === 0} onClick={onRemove}><Minus size={15} /></button>
-          <span aria-label={`${currentCount} ${english ? "in the current round" : "en la ronda actual"}`}>{currentCount}</span>
-          {!activity.phaseCount && <button type="button" aria-label={`${english ? "Add" : "Sumar"} ${name}`} disabled={inactive} onClick={() => onAdd()}><Plus size={19} /></button>}
-        </div>
-        <small>{translate(language, "Hoy", "Today")}&nbsp;{dailyCount} · {translate(language, "Histórico", "All time")}&nbsp;{totalCount}</small>
-      </div>
+      {counts}
     </article>
   );
 }

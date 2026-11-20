@@ -9,7 +9,7 @@ const MAP_PREFERENCE = "caja-fantasma.activity-map.v1";
 const PRIME_WAR_PREFERENCE = "caja-fantasma.prime-war-difficulty";
 const MAP_ICONS = { manibus: Swords, dream: Moon, abyss: Waves, winter: Snowflake, prism: Gem };
 type ScenarioMapId = Exclude<ActivityMapId, "general">;
-type RenderActivity = (activity: Activity, vision?: Vision, displayName?: string) => ReactNode;
+type RenderActivity = (activity: Activity, vision?: Vision, crateLabel?: string) => ReactNode;
 
 export default function ActivityMapBoard({ activities, vision, language, renderActivity, onViewVision }: {
   activities: Activity[];
@@ -134,6 +134,8 @@ function PrimeWarRewards({ activities, language, renderActivity }: { activities:
         }}>{primeWarDifficultyName(difficulty, language)}</button>)}
       </div>
     </header>
-    <div className="activity-grid compact-activity-grid prime-war-crates">{selected.crates.map(({ number, activity }) => renderActivity(activity, undefined, primeWarCrateName(number, language)))}</div>
+    <div className="prime-war-crates" role="group" aria-label={primeWarDifficultyName(selected.difficulty, language)}>
+      {selected.crates.map(({ number, activity }) => renderActivity(activity, undefined, primeWarCrateName(number, language)))}
+    </div>
   </section>;
 }

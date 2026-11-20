@@ -114,7 +114,6 @@
 .activity-map-tabs > button > small { min-width: 17px; padding: 2px 4px; border-radius: 3px; background: #ffffff0d; font-size: 9px; }
 .scenario-map-rewards { display: grid; gap: 12px; }
 .prime-war-rewards {
-  container: prime-war / inline-size;
   padding: 10px;
   border: 1px solid #d6b57c55;
   border-radius: 6px;
@@ -123,18 +122,19 @@
 .prime-war-rewards > header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 9px; }
 .prime-war-rewards h3 { margin: 0; font-size: 13px; color: #e6cf9c; }
 .prime-war-difficulties > button { justify-content: center; overflow-wrap: anywhere; }
-@container prime-war (min-width: 675px) {
-  .activity-board .prime-war-crates { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
+.prime-war-crate { display: grid; align-content: start; gap: 5px; min-width: 0; }
+.activity-board .prime-war-crate .activity-counts { justify-content: center; flex-wrap: wrap; }
+.activity-board .prime-war-crate .activity-counts > small { max-width: none; text-align: center; overflow-wrap: anywhere; }
 .activity-board .map-activity-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .phase-activity-card .activity-points strong { font-size: 12px; }
-.activity-phases { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
-.activity-phases > button { display: grid; place-content: center; gap: 2px; min-height: 42px; padding: 4px 2px; border: 1px solid #40756f; border-radius: 6px; color: #c7f4e7; background: #193c3e; font-size: 10px; cursor: pointer; }
-.activity-phases > button strong { font-size: 14px; }
+.activity-phases { grid-column: 1 / -1; }
+.activity-phases, .prime-war-crates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.activity-reward-button { display: grid; place-content: center; gap: 2px; min-height: 42px; padding: 4px 2px; border: 1px solid #40756f; border-radius: 6px; color: #c7f4e7; background: #193c3e; font-size: 10px; cursor: pointer; }
+.activity-reward-button strong { font-size: 14px; }
 .activity-phases .phase-boss-name { font-size: 10px; line-height: 1.3; overflow-wrap: anywhere; }
 .activity-map-tabs > button > span { white-space: normal; overflow-wrap: anywhere; }
-.activity-phases > button:hover:not(:disabled), .activity-phases > button:focus-visible { background: #28615f; border-color: #8ae1d2; }
-.activity-phases > button:disabled { opacity: .35; cursor: default; }
+.activity-reward-button:hover:not(:disabled), .activity-reward-button:focus-visible { background: #28615f; border-color: #8ae1d2; }
+.activity-reward-button:disabled { opacity: .35; cursor: default; }
 .activity-board .phase-activity-card .activity-counter > button { width: 38px; color: inherit; background: #102f3a; }
 .activity-map-empty { grid-column: 1 / -1; margin: 0; padding: 16px; color: #9bb5bc; font-size: 12px; }
 .progress-page > .home-overlay-controls { margin: 0 0 14px; }
@@ -189,10 +189,11 @@
   .progress-page .chance-card > p { display: none; }
   .common-activity-groups { grid-template-columns: minmax(0, 1fr); }
   .activity-board .activity-counter > button { height: 44px; }
-  .activity-board .compact-activity-grid .activity-counter > button:first-child { width: 44px; }
+  .activity-board .compact-activity-grid .activity-counter > button:first-child,
+  .activity-board .prime-war-crate .activity-counter > button:first-child { width: 44px; }
   .activity-board .activity-card { padding: 10px; }
   .activity-board .phase-activity-card { grid-column: 1 / -1; }
-  .activity-phases > button { min-height: 44px; }
+  .activity-reward-button { min-height: 44px; }
   .progress-page > .home-overlay-controls { grid-template-columns: minmax(0, 1fr); }
   .activity-map-tabs { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .prime-war-difficulties { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.75fr); }
